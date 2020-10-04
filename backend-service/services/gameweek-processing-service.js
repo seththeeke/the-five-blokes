@@ -1,6 +1,5 @@
 var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
-var axios = require('axios');
 AWS.config.update({region: process.env.AWS_REGION});
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
@@ -8,6 +7,7 @@ var s3 = new AWS.S3({apiVersion: '2006-03-01'});
 var badgesDao = require('./../dao/badges-dao');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');
+var fplDraftService = require('./fpl-draft-service');
 
 /**
  * All functions related to processing a particular gameweek, collecting data, normalizing, badging
@@ -18,7 +18,7 @@ module.exports = {
         let activeLeague = await leagueDetailsDao.getActiveLeague();
         let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
 
-        let response = await axios.get('https://draft.premierleague.com/api/game');
+        let response = await fplDraftService.getGameweekMetadata();
         let gameweekData = response.data;
         if (gameweekData.current_event_finished && (!lastCompletedGameweek || parseInt(gameweekData.current_event) > parseInt(lastCompletedGameweek.gameweek.N))) {
             console.log("New gameweek completed " + gameweekData);
@@ -46,7 +46,7 @@ module.exports = {
     processGameweekCompleted: async function(processGameweekCompletedRequest){
         console.log("Beginning to process gameweek: " + JSON.stringify(processGameweekCompletedRequest));
         console.log("Fetching bootstrap static for gameweek: " + processGameweekCompletedRequest.gameweekNum.toString());
-        let allSeasonDetailsResponse = await axios.get('https://draft.premierleague.com/api/bootstrap-static');
+        let allSeasonDetailsResponse = await fplDraftService.getBootstapStatic();
         let allSeasonDetailsData = allSeasonDetailsResponse.data;
         let players = allSeasonDetailsData.elements;
         console.log("Filtering out players who have not played")
@@ -64,7 +64,7 @@ module.exports = {
             let player = filteredPlayers[k];
             playerMap[player.id.toString()] = player;
         }
-        let gameweekFixturesResponse = await axios.get('https://draft.premierleague.com/api/event/' + processGameweekCompletedRequest.gameweekNum.toString() + '/fixtures');
+        let gameweekFixturesResponse = await fplDraftService.getGameweekFixtures(processGameweekCompletedRequest.gameweekNum.toString());
         let gameweekFixtures = gameweekFixturesResponse.data;
         console.log("Beginning to convert fixture data into player specific data");
         // Map of player id to object containing goals, assists, bonus, bps, red cards, yellow cards, etc
@@ -92,7 +92,7 @@ module.exports = {
         }
 
         // Fetch Standings
-        let response = await axios.get('https://draft.premierleague.com/api/league/' + processGameweekCompletedRequest.leagueId + '/details');
+        let response = await fplDraftService.getLeagueDetails(processGameweekCompletedRequest.leagueId);
         let leagueDetails = response.data;
         let standings = leagueDetails.standings;
         let gameweekUpdateParams = {
@@ -124,7 +124,7 @@ module.exports = {
         for (let i in leagueEntries){
             let entry = leagueEntries[i];
             let teamId = entry.entry_id.toString();
-            let gameweekTeamDataResponse = await axios.get('https://draft.premierleague.com/api/entry/' + teamId + '/event/' + processGameweekCompletedRequest.gameweekNum.toString());
+            let gameweekTeamDataResponse = await fplDraftService.getGameweekTeamData(processGameweekCompletedRequest.gameweekNum, teamId);
             let gameweekTeamData = gameweekTeamDataResponse.data;
             let picks = gameweekTeamData.picks;
             leaguePicks[teamId] = picks;
@@ -251,7 +251,7 @@ module.exports = {
         }
 
         // Weekly MVP
-        let topElementsResponse = await axios.get('https://draft.premierleague.com/api/top-elements');
+        let topElementsResponse = await fplDraftService.getTopPlayers();
         let topPlayer = topElementsResponse.data[processGameweekCompletedRequest.gameweekNum.toString()];
         let topTeam = undefined;
         for (let teamId in leaguePicks) {

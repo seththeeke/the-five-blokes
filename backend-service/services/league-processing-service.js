@@ -1,9 +1,9 @@
 var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
-var axios = require('axios');
 AWS.config.update({region: process.env.AWS_REGION});
 var badgesDao = require('./../dao/badges-dao');
 var leagueDetailsDao = require('./../dao/league-details-dao');
+var fplDraftService = require('./fpl-draft-service');
 
 /**
  * All functions related to processing a particular league event, initiating new leagues, collecting data, normalizing, badging
@@ -13,7 +13,7 @@ module.exports = {
         let dynamoDbEvent = initiateLeagueRequest.dynamoDbEvent;
         if (dynamoDbEvent.eventName === "INSERT"){
             let leagueDetailsDDB = dynamoDbEvent.dynamodb.NewImage;
-            let response = await axios.get('https://draft.premierleague.com/api/league/' + leagueDetailsDDB.leagueId.S + '/details');
+            let response = await fplDraftService.getLeagueDetails(leagueDetailsDDB.leagueId.S);
             let leagueDetails = response.data;
             let updateLeagueResponse = await leagueDetailsDao.updateLeague(leagueDetailsDDB.leagueId.S, leagueDetailsDDB.isActive.BOOL, leagueDetailsDDB.year.S, leagueDetails.league, leagueDetails.league_entries);
             console.log("Successfully saved league details for start of season");
