@@ -1,7 +1,9 @@
 .participant-table-name-container {
-    text-align: left;
     font-weight: bold;
     padding-right: 100px;
+    display: inline-flex;
+    align-items: center;
+    float: left;
 }
 
 .participant-table-name-container:hover {

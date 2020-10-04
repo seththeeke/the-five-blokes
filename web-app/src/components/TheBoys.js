@@ -5,6 +5,7 @@ import ProfilePage from './ProfilePage';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
+import StarRateIcon from '@material-ui/icons/StarRate';
 
 class TheBoys extends React.Component {
    constructor(props){
@@ -30,9 +31,17 @@ class TheBoys extends React.Component {
                 let numChampion = participant.badges.filter(badge => badge.badgeType.S === "League Champion").length;
                 let numLastPlace = participant.badges.filter(badge => badge.badgeType.S === "Season Loser").length;
                 let numBadges = participant.badges.length;
+                let i = 0;
+                let stars = [];
+                while (i < numChampion) {
+                    stars.push(<StarRateIcon></StarRateIcon>)
+                    i++;
+                }
                 tableData.push(
                     <tr className="body-row" key={participantId} onClick={() => this.openProfile(participant)}>
-                        <td className="participant-table-name-container">{participant.participant.player_first_name} {participant.participant.player_last_name}</td>
+                        <td className="participant-table-name-container">
+                            {participant.participant.player_first_name} {participant.participant.player_last_name} {stars}
+                        </td>
                         <td>{numParticipations}</td>
                         <td>{numBadges}</td>
                         <td>{numLastPlace}</td>
