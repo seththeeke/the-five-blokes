@@ -1,12 +1,12 @@
 var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
 AWS.config.update({region: process.env.AWS_REGION});
-var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var badgesDao = require('./../dao/badges-dao');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');
 var staticContentDao = require('./../dao/static-content-dao');
+var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
 var fplDraftService = require('./fpl-draft-service');
 
 /**
@@ -101,22 +101,7 @@ module.exports = {
             let gameweekTeamData = gameweekTeamDataResponse.data;
             let picks = gameweekTeamData.picks;
             leaguePicks[teamId] = picks;
-            let gameweekPlayerHistoryParams = {
-                Item: {
-                    "leagueIdTeamId": {
-                        S: processGameweekCompletedRequest.leagueId + "-" + teamId
-                    },
-                    "gameweek": {
-                        N: processGameweekCompletedRequest.gameweekNum.toString()
-                    },
-                    "picks": {
-                        S: JSON.stringify(picks)
-                    }
-                },
-                TableName: processGameweekCompletedRequest.gameweekPlayerHistoryTableName
-            }
-            let gameweekPlayerHistoryResponse = await ddb.putItem(gameweekPlayerHistoryParams).promise();
-            console.log("Persisted player history for teamId: " + teamId);
+            let gameweekPlayerHistoryResponse = await gameweekPlayerDataDao.putGameweekPlayerData(processGameweekCompletedRequest.leagueId, teamId, processGameweekCompletedRequest.gameweekNum, picks);
         }
         console.log("Completed persistence of all teams player picks for gameweek: " + processGameweekCompletedRequest.gameweekNum.toString() + " with picks: " + JSON.stringify(leaguePicks));
 
