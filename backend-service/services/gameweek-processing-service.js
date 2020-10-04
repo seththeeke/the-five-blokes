@@ -7,6 +7,7 @@ var s3 = new AWS.S3({apiVersion: '2006-03-01'});
 var badgesDao = require('./../dao/badges-dao');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');
+var staticContentDao = require('./../dao/static-content-dao');
 var fplDraftService = require('./fpl-draft-service');
 
 /**
@@ -49,16 +50,10 @@ module.exports = {
         let allSeasonDetailsResponse = await fplDraftService.getBootstapStatic();
         let allSeasonDetailsData = allSeasonDetailsResponse.data;
         let players = allSeasonDetailsData.elements;
-        console.log("Filtering out players who have not played")
+        console.log("Filtering out players who have not played");
         let filteredPlayers = players.filter(player => player.minutes > 0);
-        let putObjectS3BucketParams = {
-            Body: JSON.stringify(filteredPlayers), 
-            Bucket: processGameweekCompletedRequest.staticContentBucketName, 
-            Key: processGameweekCompletedRequest.leagueId.toString() + "/" + processGameweekCompletedRequest.gameweekNum.toString()
-        }
-        let s3Response = await s3.putObject(putObjectS3BucketParams).promise();
-        console.log("Completed posting static content to s3 with params: " + JSON.stringify(putObjectS3BucketParams));
-        console.log("Converting filtered players to player map")
+        let s3Response = await staticContentDao.putStaticContent(filteredPlayers, processGameweekCompletedRequest.leagueId.toString() + "/" + processGameweekCompletedRequest.gameweekNum.toString());
+        console.log("Converting filtered players to player map");
         let playerMap = {};
         for (let k in filteredPlayers){
             let player = filteredPlayers[k];
