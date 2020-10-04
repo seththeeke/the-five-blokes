@@ -64,3 +64,5 @@ Fantasy Api
  - Fetches top point getters and returns by gameweek
 15. https://draft.premierleague.com/api/draft/league/11133/transactions
  - Returns all transactions, successful and denied for the league id
+16. https://draft.premierleague.com/api/element-summary/164
+ - Returns all gameweek data for a particular player with the id

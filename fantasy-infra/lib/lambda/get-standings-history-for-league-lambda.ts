@@ -11,7 +11,7 @@ export class GetStandingsHistoryForLeagueLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: GetStandingsHistoryForLeagueLambdaProps) {
     super(scope, id, {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
-      handler: "fpl-service-controller.getStandingsHistoryForActiveLeague",
+      handler: "controller/last-of-the-mohigans-controller.getStandingsHistoryForActiveLeague",
       runtime: lambda.Runtime.NODEJS_12_X,
       tracing: lambda.Tracing.ACTIVE,
       environment: {

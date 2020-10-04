@@ -11,7 +11,7 @@ export class GetAllParticipantsLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: GetAllParticipantsLambdaProps) {
     super(scope, id, {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
-      handler: "fpl-service-controller.getAllParticipants",
+      handler: "controller/last-of-the-mohigans-controller.getAllParticipants",
       runtime: lambda.Runtime.NODEJS_12_X,
       tracing: lambda.Tracing.ACTIVE,
       environment: {

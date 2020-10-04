@@ -18,7 +18,7 @@ export class GameweekCompletedLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: GameweekCompletedLambdaProps) {
     super(scope, id, {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
-      handler: "fpl-service-controller.gameweekCompletedHandler",
+      handler: "controller/gameweek-processing-controller.gameweekCompletedHandler",
       runtime: lambda.Runtime.NODEJS_12_X,
       tracing: lambda.Tracing.ACTIVE,
       environment: {

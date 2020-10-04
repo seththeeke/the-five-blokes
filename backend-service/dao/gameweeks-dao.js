@@ -39,5 +39,31 @@ module.exports = {
             }
         }
         return allGameweeksForLeague;
+    },
+
+    putGameweek: async function(leagueId, gameweek, standings, gameweekFixtures, gameweekPlayerData){
+        let gameweekUpdateParams = {
+            Item: {
+                "leagueId": {
+                    S: leagueId
+                },
+                "gameweek": {
+                    N: gameweek.toString()
+                },
+                "standings": {
+                    S: JSON.stringify(standings)
+                },
+                "fixtures": {
+                    S: JSON.stringify(gameweekFixtures)
+                },
+                "gameweekPlayerStats": {
+                    S: JSON.stringify(gameweekPlayerData)
+                }
+            },
+            TableName: process.env.GAMEWEEK_TABLE_NAME
+        }
+        let gameweekUpdateResponse = await ddb.putItem(gameweekUpdateParams).promise();
+        console.log("Successfully saved gameweek with params " + gameweekUpdateParams);
+        return gameweekUpdateResponse;
     }
 }

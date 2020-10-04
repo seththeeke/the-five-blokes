@@ -10,7 +10,7 @@ import fifteenAssistGameweek from "../img/15-assists.png";
 import tenPointBench from "../img/10-point-bench.png";
 import fifteenPointPlayer from "../img/15-point-player.png";
 import twentyPointPlayer from "../img/20-point-player.png";
-import twentyFivePointPlayer from "../img/15-point-player.png";
+import twentyFivePointPlayer from "../img/25-point-player.png";
 import negativeGameweekPlayer from "../img/negative-gameweek-player.png";
 import participant from "../img/participant.png";
 import fiftyPointGameweek from "../img/50.png";

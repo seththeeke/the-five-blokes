@@ -11,7 +11,7 @@ export class GetLatestGameweekLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: GetLatestGameweekLambdaProps) {
     super(scope, id, {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
-      handler: "fpl-service-controller.getLatestGameweek",
+      handler: "controller/last-of-the-mohigans-controller.getLatestGameweek",
       runtime: lambda.Runtime.NODEJS_12_X,
       tracing: lambda.Tracing.ACTIVE,
       environment: {

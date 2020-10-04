@@ -1,38 +1,8 @@
 var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
-var fplService = require('./fpl-service');
+var gameweekProcessService = require('./../services/gameweek-processing-service');
 AWS.config.update({region: process.env.AWS_REGION});
-
-exports.addNewLeague = async (event, context) => {
-    try {
-        console.log(JSON.stringify(event));
-        let addNewLeagueRequest = {
-            "leagueId": event.body.leagueId,
-            "leagueDetailsTableName": process.env.LEAGUE_DETAILS_TABLE_NAME
-        }
-        let response = await fplService.addNewLeague(addNewLeagueRequest);
-        return respond(response);
-    } catch (err) {
-        console.log(err);
-        return error(err);
-    }
-}
-
-exports.initiateLeague = async (event, context) => {
-    try {
-        console.log(JSON.stringify(event));
-        let initiateLeagueRequest = {
-            "dynamoDbEvent": event.Records[0],
-            "leagueDetailsTableName": process.env.LEAGUE_DETAILS_TABLE_NAME
-        }
-        let response = await fplService.initiateLeague(initiateLeagueRequest);
-        return respond(response);
-    } catch (err) {
-        console.log(err);
-        return error(err);
-    }
-}
 
 exports.hasGameweekCompleted = async (event, context) => {
     try {
@@ -43,7 +13,7 @@ exports.hasGameweekCompleted = async (event, context) => {
             "gameweekCompletedTopicArn": process.env.GAMEWEEK_COMPLETED_TOPIC_ARN,
             "seasonCompletedTopicArn": process.env.SEASON_COMPLETED_TOPIC_ARN
         }
-        let response = await fplService.hasGameweekCompleted(hasGameweekCompletedRequest);
+        let response = await gameweekProcessService.hasGameweekCompleted(hasGameweekCompletedRequest);
         return respond(response);
     } catch (err) {
         console.log(err);
@@ -64,45 +34,12 @@ exports.gameweekCompletedHandler = async (event, context) => {
             "gameweekNum": event.Records[0].Sns.Message,
             "staticContentBucketName": process.env.STATIC_CONTENT_BUCKET_NAME
         }
-        let response = await fplService.processGameweekCompleted(gameweekCompletedRequest);
+        let response = await gameweekProcessService.processGameweekCompleted(gameweekCompletedRequest);
         return respond(response);
     } catch (err) {
         console.log(err);
         let errorResponse = await errWithNotify(err);
         return errorResponse;
-    }
-}
-
-exports.getAllParticipants = async (event, context) => {
-    try {
-        console.log(JSON.stringify(event));
-        let response = await fplService.getAllParticipants();
-        return respond(response);
-    } catch (err) {
-        console.log(err);
-        return error(err);
-    }
-}
-
-exports.getLatestGameweek = async (event, context) => {
-    try {
-        console.log(JSON.stringify(event));
-        let response = await fplService.getLatestGameweek();
-        return respond(response);
-    } catch (err) {
-        console.log(err);
-        return error(err);
-    }
-}
-
-exports.getStandingsHistoryForActiveLeague = async (event, context) => {
-    try {
-        console.log(JSON.stringify(event));
-        let response = await fplService.getStandingsHistoryForActiveLeague();
-        return respond(response);
-    } catch (err) {
-        console.log(err);
-        return error(err);
     }
 }
 
