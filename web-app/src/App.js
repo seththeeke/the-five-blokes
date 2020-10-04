@@ -26,7 +26,7 @@ class App extends React.Component {
             fplService={this.fplService}
           ></AppRouter>
           <div>
-            <a target="_blank" rel="noopener noreferrer" href="https://github.com/seththeeke/fantasy-premier-league">
+            <a target="_blank" rel="noopener noreferrer" href="https://github.com/seththeeke/last-of-the-mohigans">
               <img className="icon" alt="github" src={github}></img>
             </a>
           </div>
