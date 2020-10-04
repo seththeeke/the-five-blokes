@@ -46,6 +46,10 @@ class BadgeLegend extends React.Component {
         let badgeContent = [];
         let counter = 0;
         let badgeRows = [];
+        let rowLength = 8;
+        if (window.innerWidth < 850) {
+            rowLength = 4;
+        }
         for (let i in badges){
             counter++;
             let badge = badges[i];
@@ -54,7 +58,7 @@ class BadgeLegend extends React.Component {
                     <Badge badge={badge}></Badge>
                 </div>
             );
-            if (badgeRows.length === 8){
+            if (badgeRows.length === rowLength){
                 badgeContent.push(
                     <div className="badge-row" key={counter}>
                         {badgeRows}
