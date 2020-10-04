@@ -1,6 +1,5 @@
 var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
-var uuid = require('uuid');
 AWS.config.update({region: process.env.AWS_REGION});
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 

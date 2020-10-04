@@ -11,7 +11,7 @@ export class InitiateLeagueLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: InitiateLeagueLambdaProps) {
     super(scope, id, {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
-      handler: "fpl-service-controller.initiateLeague",
+      handler: "controller/league-processing-controller.initiateLeague",
       runtime: lambda.Runtime.NODEJS_12_X,
       tracing: lambda.Tracing.ACTIVE,
       environment: {

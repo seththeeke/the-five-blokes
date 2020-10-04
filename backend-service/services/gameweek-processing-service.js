@@ -1,74 +1,25 @@
 var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
-var axios = require('axios');
 AWS.config.update({region: process.env.AWS_REGION});
-var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
-var lambda = new AWS.Lambda({apiVersion: '2015-03-31'});
-var s3 = new AWS.S3({apiVersion: '2006-03-01'});
-var badgesDao = require('./badges-dao');
-var leagueDetailsDao = require('./league-details-dao');
-var gameweeksDao = require('./gameweeks-dao');
+var badgesDao = require('./../dao/badges-dao');
+var leagueDetailsDao = require('./../dao/league-details-dao');
+var gameweeksDao = require('./../dao/gameweeks-dao');
+var staticContentDao = require('./../dao/static-content-dao');
+var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
+var fplDraftService = require('./fpl-draft-service');
 
+/**
+ * All functions related to processing a particular gameweek, collecting data, normalizing, badging
+ */
 module.exports = {
-    addNewLeague: async function(addNewLeagueRequest){
-        let newLeagueResponse = await leagueDetailsDao.addNewLeague(addNewLeagueRequest.leagueId);
-        console.log("Successfully added league with leagueId " + addNewLeagueRequest.leagueId);
-        return newLeagueResponse;
-    },
-
-    initiateLeague: async function(initiateLeagueRequest){
-        let dynamoDbEvent = initiateLeagueRequest.dynamoDbEvent;
-        if (dynamoDbEvent.eventName === "INSERT"){
-            let leagueDetailsDDB = dynamoDbEvent.dynamodb.NewImage;
-            let response = await axios.get('https://draft.premierleague.com/api/league/' + leagueDetailsDDB.leagueId.S + '/details');
-            let leagueDetails = response.data;
-            let updateLeagueResponse = await leagueDetailsDao.updateLeague(leagueDetailsDDB.leagueId.S, leagueDetailsDDB.isActive.BOOL, leagueDetailsDDB.year.S, leagueDetails.league, leagueDetails.league_entries);
-            console.log("Successfully saved league details for start of season");
-            let preseasonBadges = await this._addPreseasonBadges({
-                "leagueDetails": leagueDetails
-            });
-            return {
-                ddbResponse,
-                preseasonBadges
-            };
-        } else {
-            console.log("Cannot initiate league that has already been created");
-        }
-    },
-
-    _addPreseasonBadges: async function(addBadgesForLeagueUpdateRequest){
-        console.log("Beginning to badge league initiation badges: " + JSON.stringify(addBadgesForLeagueUpdateRequest));
-        let participantBadges = await this._badgeParticipants(addBadgesForLeagueUpdateRequest.leagueDetails);
-        return {
-            participantBadges
-        };
-    },
-
-    _badgeParticipants: async function(leagueDetails) {
-        console.log("Beginning to badge league participants: " + JSON.stringify(leagueDetails));
-        let participants = leagueDetails.league_entries
-        for (let i in participants){
-            let participant = participants[i];
-            let participantResponse = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + participant.id.toString() + "-Participant",
-                participant.id.toString(),
-                "Participant", 
-                {
-                    "year": leagueDetails.league.draft_dt.substring(0, 4),
-                    "detail": leagueDetails.league.draft_dt.substring(0, 4) + " - " + participant.entry_name,
-                },
-                leagueDetails);
-        }
-    },
-
     hasGameweekCompleted: async function(hasGameweekCompletedRequest){
         console.log("Beginning to check if a gameweek has completed");
         let activeLeague = await leagueDetailsDao.getActiveLeague();
         let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
 
-        let response = await axios.get('https://draft.premierleague.com/api/game');
-        let gameweekData = response.data;
+        let gameweekMetadataResponse = await fplDraftService.getGameweekMetadata();
+        let gameweekData = gameweekMetadataResponse.data;
         if (gameweekData.current_event_finished && (!lastCompletedGameweek || parseInt(gameweekData.current_event) > parseInt(lastCompletedGameweek.gameweek.N))) {
             console.log("New gameweek completed " + gameweekData);
             if (gameweekData.current_event === 38) {
@@ -95,25 +46,19 @@ module.exports = {
     processGameweekCompleted: async function(processGameweekCompletedRequest){
         console.log("Beginning to process gameweek: " + JSON.stringify(processGameweekCompletedRequest));
         console.log("Fetching bootstrap static for gameweek: " + processGameweekCompletedRequest.gameweekNum.toString());
-        let allSeasonDetailsResponse = await axios.get('https://draft.premierleague.com/api/bootstrap-static');
+        let allSeasonDetailsResponse = await fplDraftService.getBootstapStatic();
         let allSeasonDetailsData = allSeasonDetailsResponse.data;
         let players = allSeasonDetailsData.elements;
-        console.log("Filtering out players who have not played")
+        console.log("Filtering out players who have not played");
         let filteredPlayers = players.filter(player => player.minutes > 0);
-        let putObjectS3BucketParams = {
-            Body: JSON.stringify(filteredPlayers), 
-            Bucket: processGameweekCompletedRequest.staticContentBucketName, 
-            Key: processGameweekCompletedRequest.leagueId.toString() + "/" + processGameweekCompletedRequest.gameweekNum.toString()
-        }
-        let s3Response = await s3.putObject(putObjectS3BucketParams).promise();
-        console.log("Completed posting static content to s3 with params: " + JSON.stringify(putObjectS3BucketParams));
-        console.log("Converting filtered players to player map")
+        let s3Response = await staticContentDao.putStaticContent(filteredPlayers, processGameweekCompletedRequest.leagueId.toString() + "/" + processGameweekCompletedRequest.gameweekNum.toString());
+        console.log("Converting filtered players to player map");
         let playerMap = {};
         for (let k in filteredPlayers){
             let player = filteredPlayers[k];
             playerMap[player.id.toString()] = player;
         }
-        let gameweekFixturesResponse = await axios.get('https://draft.premierleague.com/api/event/' + processGameweekCompletedRequest.gameweekNum.toString() + '/fixtures');
+        let gameweekFixturesResponse = await fplDraftService.getGameweekFixtures(processGameweekCompletedRequest.gameweekNum.toString());
         let gameweekFixtures = gameweekFixturesResponse.data;
         console.log("Beginning to convert fixture data into player specific data");
         // Map of player id to object containing goals, assists, bonus, bps, red cards, yellow cards, etc
@@ -141,31 +86,10 @@ module.exports = {
         }
 
         // Fetch Standings
-        let response = await axios.get('https://draft.premierleague.com/api/league/' + processGameweekCompletedRequest.leagueId + '/details');
+        let response = await fplDraftService.getLeagueDetails(processGameweekCompletedRequest.leagueId);
         let leagueDetails = response.data;
         let standings = leagueDetails.standings;
-        let gameweekUpdateParams = {
-            Item: {
-                "leagueId": {
-                    S: processGameweekCompletedRequest.leagueId
-                },
-                "gameweek": {
-                    N: processGameweekCompletedRequest.gameweekNum.toString()
-                },
-                "standings": {
-                    S: JSON.stringify(standings)
-                },
-                "fixtures": {
-                    S: JSON.stringify(gameweekFixtures)
-                },
-                "gameweekPlayerStats": {
-                    S: JSON.stringify(gameweekPlayerData)
-                }
-            },
-            TableName: processGameweekCompletedRequest.gameweekTableName
-        }
-        let gameweekUpdateResponse = await ddb.putItem(gameweekUpdateParams).promise();
-        console.log("Successfully saved gameweek with params " + gameweekUpdateParams);
+        let gameweekUpdateResponse = await gameweeksDao.putGameweek(processGameweekCompletedRequest.leagueId, processGameweekCompletedRequest.gameweekNum, standings, gameweekFixtures, gameweekPlayerData);
         
         // Fetch Teams for Each Participant for the gameweek and persist in history table
         let leagueEntries = leagueDetails.league_entries;
@@ -173,26 +97,11 @@ module.exports = {
         for (let i in leagueEntries){
             let entry = leagueEntries[i];
             let teamId = entry.entry_id.toString();
-            let gameweekTeamDataResponse = await axios.get('https://draft.premierleague.com/api/entry/' + teamId + '/event/' + processGameweekCompletedRequest.gameweekNum.toString());
+            let gameweekTeamDataResponse = await fplDraftService.getGameweekTeamData(processGameweekCompletedRequest.gameweekNum, teamId);
             let gameweekTeamData = gameweekTeamDataResponse.data;
             let picks = gameweekTeamData.picks;
             leaguePicks[teamId] = picks;
-            let gameweekPlayerHistoryParams = {
-                Item: {
-                    "leagueIdTeamId": {
-                        S: processGameweekCompletedRequest.leagueId + "-" + teamId
-                    },
-                    "gameweek": {
-                        N: processGameweekCompletedRequest.gameweekNum.toString()
-                    },
-                    "picks": {
-                        S: JSON.stringify(picks)
-                    }
-                },
-                TableName: processGameweekCompletedRequest.gameweekPlayerHistoryTableName
-            }
-            let gameweekPlayerHistoryResponse = await ddb.putItem(gameweekPlayerHistoryParams).promise();
-            console.log("Persisted player history for teamId: " + teamId);
+            let gameweekPlayerHistoryResponse = await gameweekPlayerDataDao.putGameweekPlayerData(processGameweekCompletedRequest.leagueId, teamId, processGameweekCompletedRequest.gameweekNum, picks);
         }
         console.log("Completed persistence of all teams player picks for gameweek: " + processGameweekCompletedRequest.gameweekNum.toString() + " with picks: " + JSON.stringify(leaguePicks));
 
@@ -300,7 +209,7 @@ module.exports = {
         }
 
         // Weekly MVP
-        let topElementsResponse = await axios.get('https://draft.premierleague.com/api/top-elements');
+        let topElementsResponse = await fplDraftService.getTopPlayers();
         let topPlayer = topElementsResponse.data[processGameweekCompletedRequest.gameweekNum.toString()];
         let topTeam = undefined;
         for (let teamId in leaguePicks) {
@@ -423,52 +332,5 @@ module.exports = {
                 },
                 leagueDetails);
         }
-    },
-
-    getAllParticipants: async function() {
-        // Get and Sort all the Badges by participantId
-        let allBadges = await badgesDao.getAllBadges();
-        let badgeMap = {};
-        for (let i in allBadges.Items) {
-            let badge = allBadges.Items[i];
-            if (badgeMap[badge.participantId.S]){
-                let badges = badgeMap[badge.participantId.S];
-                badges.push(badge);
-                badgeMap[badge.participantId.S] = badges;
-            } else {
-                badgeMap[badge.participantId.S] = [badge];
-            }   
-        }
-
-        let allLeagueDetails = await leagueDetailsDao.getAllLeagueDetails();
-        let participantsResponse = {};
-        for (let i in allLeagueDetails.Items) {
-            let leagueDetails = allLeagueDetails.Items[i];
-            let participants = JSON.parse(leagueDetails.participants.S);
-            for (let j in participants) {
-                let participant = participants[j];
-                let participantId = participant.id.toString();
-                if (!participantsResponse[participantId]){
-                    participantsResponse[participantId] = {
-                        "participant": participant,
-                        "badges": badgeMap[participantId]
-                    };
-                }
-            }
-        }
-
-        return participantsResponse;
-    },
-
-    getLatestGameweek: async function() {
-        let activeLeague = await leagueDetailsDao.getActiveLeague();
-        let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
-        return lastCompletedGameweek;
-    },
-
-    getStandingsHistoryForActiveLeague: async function(){
-        let activeLeague = await leagueDetailsDao.getActiveLeague();
-        let allGameweeksForLeagueId = await gameweeksDao.getAllGameweeksForLeague(activeLeague);
-        return allGameweeksForLeagueId;
     }
 }
