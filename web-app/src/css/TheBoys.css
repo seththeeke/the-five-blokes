@@ -1,6 +1,7 @@
 .participant-table-name-container {
     text-align: left;
     font-weight: bold;
+    padding-right: 100px;
 }
 
 .participant-table-name-container:hover {
