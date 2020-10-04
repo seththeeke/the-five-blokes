@@ -1,0 +1,21 @@
+{
+  "name": "announcements-service",
+  "version": "1.0.0",
+  "description": "monolithic-announcements-service",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests/unit/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.606.0",
+    "aws-xray-sdk": "^2.5.0",
+    "axios": "^0.18.0",
+    "uuid": "^8.3.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4"
+  }
+}

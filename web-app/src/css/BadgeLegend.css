@@ -1,0 +1,23 @@
+.legend-title-container {
+    padding: 5px;
+    margin: 5px;
+    border-bottom: 1px solid darkgray;
+}
+
+.legend-title {
+    font-size: 16px;
+    color: gray;
+}
+
+.legend-title-subtext {
+    font-size: 10px;
+    color: gray;
+}
+
+.badge-legend-title {
+    padding: 5px;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: #4D0078;
+    color: white;
+}

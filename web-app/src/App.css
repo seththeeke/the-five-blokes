@@ -1,0 +1,64 @@
+.App {
+  text-align: center;
+  background-color: #F5F5F5;
+  min-height: 740px;
+  min-width: 800px;
+}
+
+button {
+  font-size: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+button:focus {
+  outline: none;
+}
+
+input:focus {
+  outline: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.icon-button {
+  border: none;
+  cursor: pointer;
+}
+
+.icon{
+  padding: 15px;
+  height: 40px;
+  width: 40px;
+}
+
+table {
+  display: inline-table;
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+th {
+  padding: 10px;
+}
+
+td {
+  padding: 10px;
+}
+
+.header-row {
+  background-color: #4D0078;
+  color: white;
+}
+
+.body-row {
+  background-color: white;
+  color: #505050;
+  border: 1px solid black;
+}

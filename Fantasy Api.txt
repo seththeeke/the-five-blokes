@@ -1,0 +1,66 @@
+Fantasy Api
+1. https://users.premierleague.com/accounts/login/
+ - Authentication, need to use session cookie for requests
+ - {
+ "password": "password",
+ "login": "username",
+ "redirect_uri": "https://fantasy.premierleague.com/a/login",
+ "app": "plfpl-web"
+ }
+2. https://draft.premierleague.com/api/bootstrap-static
+ - Overall fantasy information for PL
+3. https://draft.premierleague.com/api/league/11133/details
+ - League Details and Standings
+4. https://draft.premierleague.com/api/game
+ - returns small amount of gameweek information
+{
+    "current_event": 2,
+    "current_event_finished": false,
+    "next_event": 3,
+    "processing_status": "n",
+    "trades_time_for_approval": true,
+    "waivers_processed": false
+}
+5. https://draft.premierleague.com/api/event/2/live
+ - Appears to return all information for all players in the gameweek
+6. https://draft.premierleague.com/api/entry/<team-id>38762/public
+ - public info about the team with the team id
+{
+    "entry": {
+        "event_points": 0,
+        "favourite_team": 1,
+        "id": 38762,
+        "league_set": [
+            11133
+        ],
+        "name": "Arsenal Need A CB",
+        "overall_points": 25,
+        "player_first_name": "Seth",
+        "player_last_name": "Theeke",
+        "region_name": "USA",
+        "region_code_short": "US",
+        "region_code_long": "USA",
+        "started_event": 1,
+        "transactions_event": 0,
+        "transactions_total": 0
+    }
+}
+7. https://draft.premierleague.com/api/event/2/fixtures
+ - fixture summary for the event week
+ - large amount of data, need to be able to interpret element ids
+8. https://draft.premierleague.com/img/shirts/standard/shirt_3-132.png
+ - jersey endpoint, can be fetched with postman via get request, would need to go to the fantasy site to get all the jerseys
+9. https://draft.premierleague.com/img/badges/badge_3_80.png
+ - badge endpoint, same as jerseys
+10. https://draft.premierleague.com/api/entry/<team-id>38762/my-team
+ - Returns current team for team-id, players are identified by their id, requires proper authentication
+11. https://draft.premierleague.com/api/element-summary/164
+ - Queries specific detail for an element id, does not include player name
+12. https://draft.premierleague.com/api/draft/11133/choices
+ - Displays Draft Order and picks
+13. https://draft.premierleague.com/api/entry/116557/event/2
+ - Fetches team pick data for a team id and gameweek
+14. https://draft.premierleague.com/api/top-elements
+ - Fetches top point getters and returns by gameweek
+15. https://draft.premierleague.com/api/draft/league/11133/transactions
+ - Returns all transactions, successful and denied for the league id

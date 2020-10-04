@@ -1,0 +1,20 @@
+.participant-table-name-container {
+    text-align: left;
+    font-weight: bold;
+}
+
+.participant-table-name-container:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.player-header-container {
+    text-align: left;
+}
+
+.player-profile-modal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}

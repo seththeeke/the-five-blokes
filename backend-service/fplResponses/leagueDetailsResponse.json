@@ -1,0 +1,206 @@
+{
+    "league": {
+        "admin_entry": 38762,
+        "closed": true,
+        "draft_dt": "2020-09-05T14:00:00Z",
+        "draft_pick_time_limit": 30,
+        "draft_status": "post",
+        "draft_tz_show": "America/New_York",
+        "id": 11133,
+        "ko_rounds": 0,
+        "make_code_public": false,
+        "max_entries": 16,
+        "min_entries": 2,
+        "name": "Last of the Mohigans",
+        "scoring": "c",
+        "start_event": 1,
+        "stop_event": 38,
+        "trades": "y",
+        "transaction_mode": "waivers",
+        "variety": "x"
+    },
+    "league_entries": [
+        {
+            "entry_id": 38762,
+            "entry_name": "Arsenal Need A CB",
+            "id": 38803,
+            "joined_time": "2020-08-18T16:00:11.585032Z",
+            "player_first_name": "Seth",
+            "player_last_name": "Theeke",
+            "short_name": "ST",
+            "waiver_pick": 8
+        },
+        {
+            "entry_id": 116557,
+            "entry_name": "MUSOM FC",
+            "id": 116756,
+            "joined_time": "2020-08-27T22:51:30.846664Z",
+            "player_first_name": "Evan",
+            "player_last_name": "Stalnaker",
+            "short_name": "ES",
+            "waiver_pick": 5
+        },
+        {
+            "entry_id": 153798,
+            "entry_name": "BIGBOITIKI FC",
+            "id": 154148,
+            "joined_time": "2020-08-31T19:42:39.316960Z",
+            "player_first_name": "Liam",
+            "player_last_name": "Theeke",
+            "short_name": "LT",
+            "waiver_pick": 9
+        },
+        {
+            "entry_id": 155495,
+            "entry_name": "Suck my Klopp",
+            "id": 155849,
+            "joined_time": "2020-08-31T23:27:23.471485Z",
+            "player_first_name": "Antonio",
+            "player_last_name": "Mascaro",
+            "short_name": "AM",
+            "waiver_pick": 3
+        },
+        {
+            "entry_id": 155684,
+            "entry_name": "Jose Urmumahoe",
+            "id": 156040,
+            "joined_time": "2020-09-01T00:00:19.681931Z",
+            "player_first_name": "Matthew",
+            "player_last_name": "Warden",
+            "short_name": "MW",
+            "waiver_pick": 2
+        },
+        {
+            "entry_id": 164874,
+            "entry_name": "MoPersianPower",
+            "id": 165252,
+            "joined_time": "2020-09-01T19:15:26.505791Z",
+            "player_first_name": "Nima",
+            "player_last_name": "Ronaghi",
+            "short_name": "NR",
+            "waiver_pick": 4
+        },
+        {
+            "entry_id": 165602,
+            "entry_name": "CrownMe FC",
+            "id": 165985,
+            "joined_time": "2020-09-01T20:07:12.506886Z",
+            "player_first_name": "Amine",
+            "player_last_name": "Feliachi",
+            "short_name": "AF",
+            "waiver_pick": 1
+        },
+        {
+            "entry_id": 165949,
+            "entry_name": "LampsLeadsTheWay FC",
+            "id": 166334,
+            "joined_time": "2020-09-01T20:38:39.018329Z",
+            "player_first_name": "Nathan",
+            "player_last_name": "Lawer-Yolar",
+            "short_name": "NL",
+            "waiver_pick": 10
+        },
+        {
+            "entry_id": 207170,
+            "entry_name": "urmom.69",
+            "id": 207715,
+            "joined_time": "2020-09-04T22:02:47.426278Z",
+            "player_first_name": "Yacine",
+            "player_last_name": "Feliachi",
+            "short_name": "YF",
+            "waiver_pick": 7
+        },
+        {
+            "entry_id": 209105,
+            "entry_name": "TheBaldFraud",
+            "id": 209662,
+            "joined_time": "2020-09-05T03:01:19.608832Z",
+            "player_first_name": "Jordan",
+            "player_last_name": "Aikens",
+            "short_name": "JA",
+            "waiver_pick": 6
+        }
+    ],
+    "standings": [
+        {
+            "event_total": 39,
+            "last_rank": 1,
+            "league_entry": 166334,
+            "rank": 1,
+            "rank_sort": 1,
+            "total": 91
+        },
+        {
+            "event_total": 15,
+            "last_rank": 3,
+            "league_entry": 154148,
+            "rank": 2,
+            "rank_sort": 2,
+            "total": 60
+        },
+        {
+            "event_total": 34,
+            "last_rank": 7,
+            "league_entry": 38803,
+            "rank": 3,
+            "rank_sort": 3,
+            "total": 59
+        },
+        {
+            "event_total": 2,
+            "last_rank": 2,
+            "league_entry": 207715,
+            "rank": 4,
+            "rank_sort": 4,
+            "total": 53
+        },
+        {
+            "event_total": 10,
+            "last_rank": 5,
+            "league_entry": 209662,
+            "rank": 5,
+            "rank_sort": 5,
+            "total": 42
+        },
+        {
+            "event_total": 27,
+            "last_rank": 10,
+            "league_entry": 116756,
+            "rank": 6,
+            "rank_sort": 6,
+            "total": 40
+        },
+        {
+            "event_total": 15,
+            "last_rank": 8,
+            "league_entry": 165252,
+            "rank": 7,
+            "rank_sort": 7,
+            "total": 38
+        },
+        {
+            "event_total": 1,
+            "last_rank": 4,
+            "league_entry": 155849,
+            "rank": 8,
+            "rank_sort": 8,
+            "total": 37
+        },
+        {
+            "event_total": 1,
+            "last_rank": 6,
+            "league_entry": 156040,
+            "rank": 9,
+            "rank_sort": 9,
+            "total": 29
+        },
+        {
+            "event_total": 3,
+            "last_rank": 9,
+            "league_entry": 165985,
+            "rank": 10,
+            "rank_sort": 10,
+            "total": 19
+        }
+    ]
+}

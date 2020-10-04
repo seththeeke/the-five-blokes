@@ -1,0 +1,49 @@
+var AWSXRay = require('aws-xray-sdk');
+var AWS = AWSXRay.captureAWS(require('aws-sdk'));
+var uuid = require('uuid');
+AWS.config.update({region: process.env.AWS_REGION});
+var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+
+module.exports = {
+    addNewBadge: async function(id, participantId, badgeType, badgeMetadata, leagueDetails){
+        let newBadgeParams = {
+            Item: {
+                "id": {
+                    S: id
+                },
+                "participantId": {
+                    S: participantId
+                },
+                "badgeType": {
+                    S: badgeType
+                },
+                "badgeMetadata": {
+                    S: JSON.stringify(badgeMetadata)
+                },
+                "participantName": {
+                    S: this._getParticipantFullName(leagueDetails.league_entries, participantId)
+                }
+            },
+            TableName: process.env.BADGE_TABLE_NAME
+        }
+        let newBadgeResponse = await ddb.putItem(newBadgeParams).promise();
+        console.log("Added new badge: " + JSON.stringify(newBadgeParams));
+    },
+
+    getAllBadges: async function(){
+        let badgeScanParams = {
+            TableName: process.env.BADGE_TABLE_NAME
+        }
+        let allBadgesResponse = await ddb.scan(badgeScanParams).promise();
+        return allBadgesResponse;
+    },
+
+    _getParticipantFullName: function(participants, participantId) {
+        for (let i in participants) {
+            let participant = participants[i];
+            if (participant.id.toString() === participantId) {
+                return participant.player_first_name + " " + participant.player_last_name;
+            }
+        }
+    },
+}

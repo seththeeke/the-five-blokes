@@ -1,0 +1,72 @@
+.page-spinner-container {
+    padding: 100px;
+}
+
+.toolbar-wrapper {
+    text-align: left;
+}
+
+.app-bar-wrapper {
+    text-align: left;
+    background-image: url(../img/morgantown-view.jpg);
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center;
+    padding: 10px;
+}
+
+.app-bar-content-wrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+.logo-wrapper {
+    background-color: white;
+    display: inline-block;
+    border-radius: 200px;
+}
+
+.logo {
+    height: 100px;
+    width: auto;
+}
+
+.header-wrapper {
+    display: inline-block;
+    font-size: 75px;
+    font-weight: bold;
+    padding-left: 10px;
+    color: white;
+    font-family: "Comic Sans MS";
+}
+
+.badge-legend-container {
+    display: inline-block;
+    background-color: white;
+    border: 1px solid black;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.info-icon-container {
+    color: white;
+    position: absolute;
+    right: 1%;
+    top: 1%;
+}
+
+.info-icon-container:hover {
+    cursor: pointer
+}
+
+.grid-container {
+    justify-content: start;
+    text-align: left;
+}
+
+.grid-item {
+    margin: 5px;
+    display: inline-flex;
+}

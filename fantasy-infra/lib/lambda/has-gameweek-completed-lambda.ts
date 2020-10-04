@@ -1,0 +1,39 @@
+import * as cdk from '@aws-cdk/core';
+import * as lambda from '@aws-cdk/aws-lambda';
+import * as ddb from '@aws-cdk/aws-dynamodb';
+import * as sns from '@aws-cdk/aws-sns';
+import path = require('path');
+
+export interface HasGameweekCompletedLambdaProps {
+    leagueDetailsTable: ddb.Table
+    gameweeksTable: ddb.Table
+    gameweekCompletedTopic: sns.Topic
+    seasonCompletedTopic: sns.Topic
+    errorTopic: sns.Topic
+}
+export class HasGameweekCompletedLambda extends lambda.Function {
+  constructor(scope: cdk.Construct, id: string, props: HasGameweekCompletedLambdaProps) {
+    super(scope, id, {
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
+      handler: "fpl-service-controller.hasGameweekCompleted",
+      runtime: lambda.Runtime.NODEJS_12_X,
+      tracing: lambda.Tracing.ACTIVE,
+      environment: {
+        "LEAGUE_DETAILS_TABLE_NAME": props.leagueDetailsTable.tableName,
+        "GAMEWEEK_TABLE_NAME": props.gameweeksTable.tableName,
+        "GAMEWEEK_COMPLETED_TOPIC_ARN": props.gameweekCompletedTopic.topicArn,
+        "SEASON_COMPLETED_TOPIC_ARN": props.seasonCompletedTopic.topicArn,
+        "ERROR_TOPIC_ARN": props.errorTopic.topicArn
+      },
+      timeout: cdk.Duration.seconds(300),
+      functionName: "HasGameweekCompletedLambda",
+      description: "Checks if the gameweek has completed, and if so, pushes data to related topics to process gameweek comletion"
+    });
+
+    props.leagueDetailsTable.grantReadData(this);
+    props.gameweeksTable.grantReadData(this);
+    props.gameweekCompletedTopic.grantPublish(this);
+    props.seasonCompletedTopic.grantPublish(this);
+    props.errorTopic.grantPublish(this);
+  }
+}

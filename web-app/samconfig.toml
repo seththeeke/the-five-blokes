@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "FPLWebsite"
+s3_prefix = "FPLWebsite"
+region = "us-east-1"
+profile = "lotm"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "S3StaticWebsiteBucketNameParameter=\"lastofthemohigans.com\" DomainNameParameter=\"lastofthemohigans.com\" HostedZoneNameParameter=\"lastofthemohigans.com.\""
+
