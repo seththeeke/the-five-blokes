@@ -18,8 +18,8 @@ module.exports = {
         let activeLeague = await leagueDetailsDao.getActiveLeague();
         let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
 
-        let response = await fplDraftService.getGameweekMetadata();
-        let gameweekData = response.data;
+        let gameweekMetadataResponse = await fplDraftService.getGameweekMetadata();
+        let gameweekData = gameweekMetadataResponse.data;
         if (gameweekData.current_event_finished && (!lastCompletedGameweek || parseInt(gameweekData.current_event) > parseInt(lastCompletedGameweek.gameweek.N))) {
             console.log("New gameweek completed " + gameweekData);
             if (gameweekData.current_event === 38) {

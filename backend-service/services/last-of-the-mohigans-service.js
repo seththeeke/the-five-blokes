@@ -1,6 +1,3 @@
-var AWSXRay = require('aws-xray-sdk');
-var AWS = AWSXRay.captureAWS(require('aws-sdk'));
-AWS.config.update({region: process.env.AWS_REGION});
 var badgesDao = require('./../dao/badges-dao');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');

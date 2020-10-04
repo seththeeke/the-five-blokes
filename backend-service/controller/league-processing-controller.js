@@ -1,7 +1,4 @@
-var AWSXRay = require('aws-xray-sdk');
-var AWS = AWSXRay.captureAWS(require('aws-sdk'));
 var leagueProcessingService = require('./../services/league-processing-service');
-AWS.config.update({region: process.env.AWS_REGION});
 
 exports.initiateLeague = async (event, context) => {
     try {

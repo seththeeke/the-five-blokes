@@ -1,7 +1,4 @@
-var AWSXRay = require('aws-xray-sdk');
-var AWS = AWSXRay.captureAWS(require('aws-sdk'));
 var lastOfTheMohigansService = require('./../services/last-of-the-mohigans-service');
-AWS.config.update({region: process.env.AWS_REGION});
 
 exports.addNewLeague = async (event, context) => {
     try {
