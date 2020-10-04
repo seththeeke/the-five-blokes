@@ -8,6 +8,7 @@ var gameweeksDao = require('./../dao/gameweeks-dao');
 var staticContentDao = require('./../dao/static-content-dao');
 var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
 var fplDraftService = require('./fpl-draft-service');
+var BADGE_TYPE = require('./../util/badge-type');
 
 /**
  * All functions related to processing a particular gameweek, collecting data, normalizing, badging
@@ -106,11 +107,11 @@ module.exports = {
                 gameweekLastPlace = standing.league_entry
             }
             // 50+ Point Gameweek
-            let fiftyPlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, gameweek, "50+ Point Gameweek", 50, "gte");
+            let fiftyPlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, gameweek, BADGE_TYPE._50_POINT_GAMEWEEK, 50, "gte");
             // 75+ Point Gameweek
-            let seventyFivePlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, gameweek, "75+ Point Gameweek", 75, "gte");
+            let seventyFivePlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, gameweek, BADGE_TYPE._75_POINT_GAMEWEEK, 75, "gte");
             // 100+ Point Gameweek
-            let oneHundredPlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, gameweek, "100+ Point Gameweek", 100, "gte");
+            let oneHundredPlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, gameweek, BADGE_TYPE._100_POINT_GAMEWEEK, 100, "gte");
         }
         console.log("Gameweek winners: " + weeklyWinners + " with points: " + mostPoints);
         console.log("Gameweek losers: " + weeklyLosers + " with points: " + leastPoints);
@@ -119,9 +120,9 @@ module.exports = {
         for (let i in weeklyWinners) {
             let entryId = weeklyWinners[i];
             let weeklyWinnerResponse = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + entryId.toString() + "-Gameweek Winner" + "-" + gameweek,
+                leagueDetails.league.id.toString() + "-" + entryId.toString() + "-" + BADGE_TYPE.GAMEWEEK_WINNER + "-" + gameweek,
                 entryId.toString(),
-                "Gameweek Winner", 
+                BADGE_TYPE.GAMEWEEK_WINNER, 
                 {
                     "year": leagueDetails.league.draft_dt.substring(0, 4),
                     "gameweek": gameweek,
@@ -135,9 +136,9 @@ module.exports = {
         for (let i in weeklyLosers) {
             let entryId = weeklyLosers[i];
             let weeklyLoserResponse = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + entryId.toString() + "-Gameweek Loser" + "-" + gameweek,
+                leagueDetails.league.id.toString() + "-" + entryId.toString() + "-" + BADGE_TYPE.GAMEWEEK_LOSER + "-" + gameweek,
                 entryId.toString(),
-                "Gameweek Loser", 
+                BADGE_TYPE.GAMEWEEK_LOSER, 
                 {
                     "year": leagueDetails.league.draft_dt.substring(0, 4),
                     "gameweek": gameweek,
@@ -149,9 +150,9 @@ module.exports = {
 
         // League Leader
         let leagueLeaderResponse = await badgesDao.addNewBadge(
-            leagueDetails.league.id.toString() + "-" + gameweekFirstPlace.toString() + "-League Leader" + "-" + gameweek,
+            leagueDetails.league.id.toString() + "-" + gameweekFirstPlace.toString() + "-" + BADGE_TYPE.LEAGUE_LEADER + "-" + gameweek,
             gameweekFirstPlace.toString(),
-            "League Leader", 
+            BADGE_TYPE.LEAGUE_LEADER,
             {
                 "year": leagueDetails.league.draft_dt.substring(0, 4),
                 "gameweek": gameweek
@@ -161,9 +162,9 @@ module.exports = {
         // Gameweek Last Place
         if (gameweekLastPlace) {
             let leagueLoserResponse = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + gameweekLastPlace.toString() + "-League Loser" + "-" + gameweek,
+                leagueDetails.league.id.toString() + "-" + gameweekLastPlace.toString() + "-" + BADGE_TYPE.LEAGUE_LOSER + "-" + gameweek,
                 gameweekLastPlace.toString(),
-                "League Loser", 
+                BADGE_TYPE.LEAGUE_LOSER, 
                 {
                     "year": leagueDetails.league.draft_dt.substring(0, 4),
                     "gameweek": gameweek
@@ -190,9 +191,9 @@ module.exports = {
         let leagueEntry = leagueDetails.league_entries.filter(leagueEntry => leagueEntry.entry_id.toString() === topTeam.toString());
         if (leagueEntry[0]) {
             let gameweekMVP = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + leagueEntry[0].id.toString() + "-Gameweek MVP" + "-" + gameweek,
+                leagueDetails.league.id.toString() + "-" + leagueEntry[0].id.toString() + "-" + BADGE_TYPE.GAMEWEEK_MVP + "-" + gameweek,
                 leagueEntry[0].id.toString(),
-                "Gameweek MVP", 
+                BADGE_TYPE.GAMEWEEK_MVP, 
                 {
                     "year": leagueDetails.league.draft_dt.substring(0, 4),
                     "gameweek": gameweek,
@@ -213,15 +214,15 @@ module.exports = {
                 let player = playerMap[picks[i].element.toString()];
                 if (player){
                     // Negative Gameweek Player
-                    let negativeGameweekPlayer = await this._badgePlayerPointBasedGameweekBadge(player, picks[i], teamId, leagueDetails, "Negative Gameweek Player", 0, "lt", gameweek, "starter");
+                    let negativeGameweekPlayer = await this._badgePlayerPointBasedGameweekBadge(player, picks[i], teamId, leagueDetails, BADGE_TYPE.NEGATIVE_GAMEWEEK_PLAYER, 0, "lt", gameweek, "starter");
                     // 15+ Point Gameweek Player
-                    let fifteenPointPlayer = await this._badgePlayerPointBasedGameweekBadge(player, picks[i], teamId, leagueDetails, "15+ Point Gameweek Player", 15, "gte", gameweek, "starter");
+                    let fifteenPointPlayer = await this._badgePlayerPointBasedGameweekBadge(player, picks[i], teamId, leagueDetails, BADGE_TYPE._15_POINT_GAMEWEEK_PLAYER, 15, "gte", gameweek, "starter");
                     // 20+ Point Gameweek Player
-                    let twentyPointPlayer = await this._badgePlayerPointBasedGameweekBadge(player, picks[i], teamId, leagueDetails, "20+ Point Gameweek Player", 20, "gte", gameweek, "starter");
+                    let twentyPointPlayer = await this._badgePlayerPointBasedGameweekBadge(player, picks[i], teamId, leagueDetails, BADGE_TYPE._20_POINT_GAMEWEEK_PLAYER, 20, "gte", gameweek, "starter");
                     // 25+ Point Gameweek Player
-                    let twentyFivePointPlayer = await this._badgePlayerPointBasedGameweekBadge(player, picks[i], teamId, leagueDetails, "25+ Point Gameweek Player", 25, "gte", gameweek, "starter");
+                    let twentyFivePointPlayer = await this._badgePlayerPointBasedGameweekBadge(player, picks[i], teamId, leagueDetails, BADGE_TYPE._25_POINT_GAMEWEEK_PLAYER, 25, "gte", gameweek, "starter");
                     // 10+ Point Bench Player
-                    let tenPointBenchPlayer = await this._badgePlayerPointBasedGameweekBadge(player, picks[i], teamId, leagueDetails, "10+ Point Bench Player", 10, "gte", gameweek, "bench");
+                    let tenPointBenchPlayer = await this._badgePlayerPointBasedGameweekBadge(player, picks[i], teamId, leagueDetails, BADGE_TYPE._10_POINT_BENCH_PLAYER, 10, "gte", gameweek, "bench");
                     // Count Goals
                     let gameweekDataForPlayer = gameweekPlayerData[player.id.toString()]
                     if (gameweekDataForPlayer && picks[i].position < 12){
@@ -234,14 +235,14 @@ module.exports = {
                     }
                 }
             }
-            let fifteenGoalBadge = await this._badgeBasedOnValue(totalGoals, "gte", 15, leagueDetails, teamId, gameweek, "15+ Goal Gameweek");
-            let tenGoalBadge = await this._badgeBasedOnValue(totalGoals, "gte", 10, leagueDetails, teamId, gameweek, "10+ Goal Gameweek");
-            let fiveGoalBadge = await this._badgeBasedOnValue(totalGoals, "gte", 5, leagueDetails, teamId, gameweek, "5+ Goal Gameweek");
-            let zeroGoalBadge = await this._badgeBasedOnValue(totalGoals, "eq", 0, leagueDetails, teamId, gameweek, "0 Goal Gameweek");
-            let fifteenAssistBadge = await this._badgeBasedOnValue(totalAssists, "gte", 15, leagueDetails, teamId, gameweek, "15+ Assist Gameweek");
-            let tenAssistBadge = await this._badgeBasedOnValue(totalAssists, "gte", 10, leagueDetails, teamId, gameweek, "10+ Assist Gameweek");
-            let fiveAssistBadge = await this._badgeBasedOnValue(totalAssists, "gte", 5, leagueDetails, teamId, gameweek, "5+ Assist Gameweek");
-            let zeroAssistBadge = await this._badgeBasedOnValue(totalAssists, "eq", 0, leagueDetails, teamId, gameweek, "0 Assist Gameweek");
+            let fifteenGoalBadge = await this._badgeBasedOnValue(totalGoals, "gte", 15, leagueDetails, teamId, gameweek, BADGE_TYPE._15_GOAL_GAMEWEEK);
+            let tenGoalBadge = await this._badgeBasedOnValue(totalGoals, "gte", 10, leagueDetails, teamId, gameweek, BADGE_TYPE._10_GOAL_GAMEWEEK);
+            let fiveGoalBadge = await this._badgeBasedOnValue(totalGoals, "gte", 5, leagueDetails, teamId, gameweek, BADGE_TYPE._5_GOAL_GAMEWEEK);
+            let zeroGoalBadge = await this._badgeBasedOnValue(totalGoals, "eq", 0, leagueDetails, teamId, gameweek, BADGE_TYPE._0_GOAL_GAMEWEEK);
+            let fifteenAssistBadge = await this._badgeBasedOnValue(totalAssists, "gte", 15, leagueDetails, teamId, gameweek, BADGE_TYPE._15_ASSIST_GAMEWEEK);
+            let tenAssistBadge = await this._badgeBasedOnValue(totalAssists, "gte", 10, leagueDetails, teamId, gameweek, BADGE_TYPE._10_ASSIST_GAMEWEEK);
+            let fiveAssistBadge = await this._badgeBasedOnValue(totalAssists, "gte", 5, leagueDetails, teamId, gameweek, BADGE_TYPE._5_ASSIST_GAMEWEEK);
+            let zeroAssistBadge = await this._badgeBasedOnValue(totalAssists, "eq", 0, leagueDetails, teamId, gameweek, BADGE_TYPE._0_ASSIST_GAMEWEEK);
         }
     },
 
