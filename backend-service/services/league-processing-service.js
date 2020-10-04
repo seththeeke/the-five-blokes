@@ -2,9 +2,12 @@ var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
 var axios = require('axios');
 AWS.config.update({region: process.env.AWS_REGION});
-var badgesDao = require('./dao/badges-dao');
-var leagueDetailsDao = require('./dao/league-details-dao');
+var badgesDao = require('./../dao/badges-dao');
+var leagueDetailsDao = require('./../dao/league-details-dao');
 
+/**
+ * All functions related to processing a particular league event, initiating new leagues, collecting data, normalizing, badging
+ */
 module.exports = {
     initiateLeague: async function(initiateLeagueRequest){
         let dynamoDbEvent = initiateLeagueRequest.dynamoDbEvent;

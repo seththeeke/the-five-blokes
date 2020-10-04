@@ -5,10 +5,13 @@ AWS.config.update({region: process.env.AWS_REGION});
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var s3 = new AWS.S3({apiVersion: '2006-03-01'});
-var badgesDao = require('./dao/badges-dao');
-var leagueDetailsDao = require('./dao/league-details-dao');
-var gameweeksDao = require('./dao/gameweeks-dao');
+var badgesDao = require('./../dao/badges-dao');
+var leagueDetailsDao = require('./../dao/league-details-dao');
+var gameweeksDao = require('./../dao/gameweeks-dao');
 
+/**
+ * All functions related to processing a particular gameweek, collecting data, normalizing, badging
+ */
 module.exports = {
     hasGameweekCompleted: async function(hasGameweekCompletedRequest){
         console.log("Beginning to check if a gameweek has completed");
