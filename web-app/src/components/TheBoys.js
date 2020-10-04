@@ -23,10 +23,33 @@ class TheBoys extends React.Component {
 
    componentDidMount(){
         this.props.fplService.getAllParticipants().then(function(event){
-            let particants = event.data;
+            let participants = event.data;
+            let participantsSortedByChamps = [];
+            for (let id in participants){
+                participantsSortedByChamps.push(participants[id]);
+            }
+            participantsSortedByChamps.sort(function(a, b){
+                let aChamps = a.badges.filter(badge => badge.badgeType.S === "League Champion").length;
+                let bChamps = b.badges.filter(badge => badge.badgeType.S === "League Champion").length;
+                let aParticipations = a.badges.filter(badge => badge.badgeType.S === "Participant").length;
+                let bParticipations = b.badges.filter(badge => badge.badgeType.S === "Participant").length;
+                if (aChamps > bChamps){
+                    return -1;
+                } else if (aChamps < bChamps){
+                    return 1;
+                }
+
+                if (aParticipations > bParticipations) {
+                    return -1;
+                } else if (aParticipations < bParticipations) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
             let tableData = [];
-            for (let participantId in particants) {
-                let participant = particants[participantId];
+            for (let k in participantsSortedByChamps) {
+                let participant = participantsSortedByChamps[k];
                 let numParticipations = participant.badges.filter(badge => badge.badgeType.S === "Participant").length;
                 let numChampion = participant.badges.filter(badge => badge.badgeType.S === "League Champion").length;
                 let numLastPlace = participant.badges.filter(badge => badge.badgeType.S === "Season Loser").length;
@@ -37,8 +60,9 @@ class TheBoys extends React.Component {
                     stars.push(<StarRateIcon></StarRateIcon>)
                     i++;
                 }
+                let divKey = 'TheBoys-Row-' + k;
                 tableData.push(
-                    <tr className="body-row" key={participantId} onClick={() => this.openProfile(participant)}>
+                    <tr className="body-row" key={divKey} onClick={() => this.openProfile(participant)}>
                         <td className="participant-table-name-container">
                             {participant.participant.player_first_name} {participant.participant.player_last_name} {stars}
                         </td>
