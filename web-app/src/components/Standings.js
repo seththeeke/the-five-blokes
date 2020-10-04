@@ -26,7 +26,8 @@ class Standings extends React.Component {
                   text: 'Rank'
                 },
                 reversed: true
-            }
+            },
+            colors: ['#FF5733', '#FFB533', '#FFE933', '#D7FF33', '#33FFA5', '#33FFF0', '#33A5FF', '#3349FF', '#B533FF', '#FF33F9', '#FF3386']
         },
         series: []
       }
