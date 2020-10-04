@@ -45,6 +45,7 @@ module.exports = {
 
     processGameweekCompleted: async function(processGameweekCompletedRequest){
         console.log("Beginning to process gameweek: " + JSON.stringify(processGameweekCompletedRequest));
+        // GATHER DATA
         // fetch static content, persist and return a transformed list of player data for processing further
         let playerMap = await this._fetchAndPersistStaticData(processGameweekCompletedRequest.leagueId, processGameweekCompletedRequest.gameweekNum);
         // fetch fixtures and build a map of player data based on the fixture results in the gameweek
@@ -58,7 +59,16 @@ module.exports = {
         // fetch teams for each participant for the gameweek and persist in history table
         let leaguePicks = await this._fetchAndPersistPlayerPicksForGameweek(leagueDetails, processGameweekCompletedRequest.gameweekNum);
 
-        // Award Gameweek Badges
+        // ASSIGN BADGES
+        // assign badges based on the standings at the end of the gameweek
+        let standingsBadges = await this._assignGameweekStandingsBadges(leagueDetails, processGameweekCompletedRequest.gameweekNum, standings);
+        // assign badge to the player who owns the MVP of the gameweek, if any
+        let weeklyMVP = await this._assignGameweekMVPBadge(leagueDetails, processGameweekCompletedRequest.gameweekNum, leaguePicks, playerMap);
+        // award badges based on the player statistics for points, goals, assists, and aggregations
+        let gameweekPlayerBadges = await this._assignGameweekPlayerStatBadges(leagueDetails, processGameweekCompletedRequest.gameweekNum, leaguePicks, playerMap, gameweekPlayerData);
+    },
+
+    _assignGameweekStandingsBadges: async function(leagueDetails, gameweek, standings) {
         let weeklyWinners = [];
         let weeklyLosers = [];
         let mostPoints = 0;
@@ -96,11 +106,11 @@ module.exports = {
                 gameweekLastPlace = standing.league_entry
             }
             // 50+ Point Gameweek
-            let fiftyPlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, processGameweekCompletedRequest.gameweekNum, "50+ Point Gameweek", 50, "gte");
+            let fiftyPlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, gameweek, "50+ Point Gameweek", 50, "gte");
             // 75+ Point Gameweek
-            let seventyFivePlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, processGameweekCompletedRequest.gameweekNum, "75+ Point Gameweek", 75, "gte");
+            let seventyFivePlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, gameweek, "75+ Point Gameweek", 75, "gte");
             // 100+ Point Gameweek
-            let oneHundredPlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, processGameweekCompletedRequest.gameweekNum, "100+ Point Gameweek", 100, "gte");
+            let oneHundredPlusGameweek = await this._badgePointBasedGameweekBadge(standing, leagueDetails, gameweek, "100+ Point Gameweek", 100, "gte");
         }
         console.log("Gameweek winners: " + weeklyWinners + " with points: " + mostPoints);
         console.log("Gameweek losers: " + weeklyLosers + " with points: " + leastPoints);
@@ -109,13 +119,13 @@ module.exports = {
         for (let i in weeklyWinners) {
             let entryId = weeklyWinners[i];
             let weeklyWinnerResponse = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + entryId.toString() + "-Gameweek Winner" + "-" + processGameweekCompletedRequest.gameweekNum,
+                leagueDetails.league.id.toString() + "-" + entryId.toString() + "-Gameweek Winner" + "-" + gameweek,
                 entryId.toString(),
                 "Gameweek Winner", 
                 {
                     "year": leagueDetails.league.draft_dt.substring(0, 4),
-                    "gameweek": processGameweekCompletedRequest.gameweekNum,
-                    "detail": leagueDetails.league.draft_dt.substring(0, 4) + " - Gameweek " + processGameweekCompletedRequest.gameweekNum + ": " + mostPoints,
+                    "gameweek": gameweek,
+                    "detail": leagueDetails.league.draft_dt.substring(0, 4) + " - Gameweek " + gameweek + ": " + mostPoints,
                     "points": mostPoints
                 },
                 leagueDetails);
@@ -125,13 +135,13 @@ module.exports = {
         for (let i in weeklyLosers) {
             let entryId = weeklyLosers[i];
             let weeklyLoserResponse = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + entryId.toString() + "-Gameweek Loser" + "-" + processGameweekCompletedRequest.gameweekNum,
+                leagueDetails.league.id.toString() + "-" + entryId.toString() + "-Gameweek Loser" + "-" + gameweek,
                 entryId.toString(),
                 "Gameweek Loser", 
                 {
                     "year": leagueDetails.league.draft_dt.substring(0, 4),
-                    "gameweek": processGameweekCompletedRequest.gameweekNum,
-                    "detail": leagueDetails.league.draft_dt.substring(0, 4) + " - Gameweek " + processGameweekCompletedRequest.gameweekNum + ": " + leastPoints,
+                    "gameweek": gameweek,
+                    "detail": leagueDetails.league.draft_dt.substring(0, 4) + " - Gameweek " + gameweek + ": " + leastPoints,
                     "points": leastPoints
                 },
                 leagueDetails);
@@ -139,31 +149,32 @@ module.exports = {
 
         // League Leader
         let leagueLeaderResponse = await badgesDao.addNewBadge(
-            leagueDetails.league.id.toString() + "-" + gameweekFirstPlace.toString() + "-League Leader" + "-" + processGameweekCompletedRequest.gameweekNum,
+            leagueDetails.league.id.toString() + "-" + gameweekFirstPlace.toString() + "-League Leader" + "-" + gameweek,
             gameweekFirstPlace.toString(),
             "League Leader", 
             {
                 "year": leagueDetails.league.draft_dt.substring(0, 4),
-                "gameweek": processGameweekCompletedRequest.gameweekNum
+                "gameweek": gameweek
             },
             leagueDetails);
 
         // Gameweek Last Place
         if (gameweekLastPlace) {
             let leagueLoserResponse = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + gameweekLastPlace.toString() + "-League Loser" + "-" + processGameweekCompletedRequest.gameweekNum,
+                leagueDetails.league.id.toString() + "-" + gameweekLastPlace.toString() + "-League Loser" + "-" + gameweek,
                 gameweekLastPlace.toString(),
                 "League Loser", 
                 {
                     "year": leagueDetails.league.draft_dt.substring(0, 4),
-                    "gameweek": processGameweekCompletedRequest.gameweekNum
+                    "gameweek": gameweek
                 },
                 leagueDetails);
         }
+    },
 
-        // Weekly MVP
+    _assignGameweekMVPBadge: async function(leagueDetails, gameweek, leaguePicks, playerMap){
         let topElementsResponse = await fplDraftService.getTopPlayers();
-        let topPlayer = topElementsResponse.data[processGameweekCompletedRequest.gameweekNum.toString()];
+        let topPlayer = topElementsResponse.data[gameweek.toString()];
         let topTeam = undefined;
         for (let teamId in leaguePicks) {
             let picks = leaguePicks[teamId];
@@ -179,24 +190,21 @@ module.exports = {
         let leagueEntry = leagueDetails.league_entries.filter(leagueEntry => leagueEntry.entry_id.toString() === topTeam.toString());
         if (leagueEntry[0]) {
             let gameweekMVP = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + leagueEntry[0].id.toString() + "-Gameweek MVP" + "-" + processGameweekCompletedRequest.gameweekNum,
+                leagueDetails.league.id.toString() + "-" + leagueEntry[0].id.toString() + "-Gameweek MVP" + "-" + gameweek,
                 leagueEntry[0].id.toString(),
                 "Gameweek MVP", 
                 {
                     "year": leagueDetails.league.draft_dt.substring(0, 4),
-                    "gameweek": processGameweekCompletedRequest.gameweekNum,
+                    "gameweek": gameweek,
                     "player": playerMap[topPlayer.element.toString()]
                 },
                 leagueDetails);
         } else {
-            console.log("No participant owned the top player for gameweek: " + processGameweekCompletedRequest.gameweekNum);
+            console.log("No participant owned the top player for gameweek: " + gameweek);
         }
-
-        // award badges based on the player statistics for points, goals, assists, and aggregations
-        let gameweekPlayerBadges = await this._badgeGameweekPlayers(leagueDetails, processGameweekCompletedRequest.gameweekNum, leaguePicks, playerMap, gameweekPlayerData);
     },
 
-    _badgeGameweekPlayers: async function(leagueDetails, gameweek, leaguePicks, playerMap, gameweekPlayerData) {
+    _assignGameweekPlayerStatBadges: async function(leagueDetails, gameweek, leaguePicks, playerMap, gameweekPlayerData) {
         for (let teamId in leaguePicks) {
             let picks = leaguePicks[teamId];
             let totalGoals = 0;
