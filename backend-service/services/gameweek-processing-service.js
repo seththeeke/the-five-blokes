@@ -3,7 +3,6 @@ var AWS = AWSXRay.captureAWS(require('aws-sdk'));
 AWS.config.update({region: process.env.AWS_REGION});
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
-var s3 = new AWS.S3({apiVersion: '2006-03-01'});
 var badgesDao = require('./../dao/badges-dao');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');
@@ -90,28 +89,7 @@ module.exports = {
         let response = await fplDraftService.getLeagueDetails(processGameweekCompletedRequest.leagueId);
         let leagueDetails = response.data;
         let standings = leagueDetails.standings;
-        let gameweekUpdateParams = {
-            Item: {
-                "leagueId": {
-                    S: processGameweekCompletedRequest.leagueId
-                },
-                "gameweek": {
-                    N: processGameweekCompletedRequest.gameweekNum.toString()
-                },
-                "standings": {
-                    S: JSON.stringify(standings)
-                },
-                "fixtures": {
-                    S: JSON.stringify(gameweekFixtures)
-                },
-                "gameweekPlayerStats": {
-                    S: JSON.stringify(gameweekPlayerData)
-                }
-            },
-            TableName: processGameweekCompletedRequest.gameweekTableName
-        }
-        let gameweekUpdateResponse = await ddb.putItem(gameweekUpdateParams).promise();
-        console.log("Successfully saved gameweek with params " + gameweekUpdateParams);
+        let gameweekUpdateResponse = await gameweeksDao.putGameweek(processGameweekCompletedRequest.leagueId, processGameweekCompletedRequest.gameweekNum, standings, gameweekFixtures, gameweekPlayerData);
         
         // Fetch Teams for Each Participant for the gameweek and persist in history table
         let leagueEntries = leagueDetails.league_entries;
