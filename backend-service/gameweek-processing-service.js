@@ -4,64 +4,12 @@ var axios = require('axios');
 AWS.config.update({region: process.env.AWS_REGION});
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
-var lambda = new AWS.Lambda({apiVersion: '2015-03-31'});
 var s3 = new AWS.S3({apiVersion: '2006-03-01'});
 var badgesDao = require('./dao/badges-dao');
 var leagueDetailsDao = require('./dao/league-details-dao');
 var gameweeksDao = require('./dao/gameweeks-dao');
 
 module.exports = {
-    addNewLeague: async function(addNewLeagueRequest){
-        let newLeagueResponse = await leagueDetailsDao.addNewLeague(addNewLeagueRequest.leagueId);
-        console.log("Successfully added league with leagueId " + addNewLeagueRequest.leagueId);
-        return newLeagueResponse;
-    },
-
-    initiateLeague: async function(initiateLeagueRequest){
-        let dynamoDbEvent = initiateLeagueRequest.dynamoDbEvent;
-        if (dynamoDbEvent.eventName === "INSERT"){
-            let leagueDetailsDDB = dynamoDbEvent.dynamodb.NewImage;
-            let response = await axios.get('https://draft.premierleague.com/api/league/' + leagueDetailsDDB.leagueId.S + '/details');
-            let leagueDetails = response.data;
-            let updateLeagueResponse = await leagueDetailsDao.updateLeague(leagueDetailsDDB.leagueId.S, leagueDetailsDDB.isActive.BOOL, leagueDetailsDDB.year.S, leagueDetails.league, leagueDetails.league_entries);
-            console.log("Successfully saved league details for start of season");
-            let preseasonBadges = await this._addPreseasonBadges({
-                "leagueDetails": leagueDetails
-            });
-            return {
-                ddbResponse,
-                preseasonBadges
-            };
-        } else {
-            console.log("Cannot initiate league that has already been created");
-        }
-    },
-
-    _addPreseasonBadges: async function(addBadgesForLeagueUpdateRequest){
-        console.log("Beginning to badge league initiation badges: " + JSON.stringify(addBadgesForLeagueUpdateRequest));
-        let participantBadges = await this._badgeParticipants(addBadgesForLeagueUpdateRequest.leagueDetails);
-        return {
-            participantBadges
-        };
-    },
-
-    _badgeParticipants: async function(leagueDetails) {
-        console.log("Beginning to badge league participants: " + JSON.stringify(leagueDetails));
-        let participants = leagueDetails.league_entries
-        for (let i in participants){
-            let participant = participants[i];
-            let participantResponse = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + participant.id.toString() + "-Participant",
-                participant.id.toString(),
-                "Participant", 
-                {
-                    "year": leagueDetails.league.draft_dt.substring(0, 4),
-                    "detail": leagueDetails.league.draft_dt.substring(0, 4) + " - " + participant.entry_name,
-                },
-                leagueDetails);
-        }
-    },
-
     hasGameweekCompleted: async function(hasGameweekCompletedRequest){
         console.log("Beginning to check if a gameweek has completed");
         let activeLeague = await leagueDetailsDao.getActiveLeague();
@@ -423,52 +371,5 @@ module.exports = {
                 },
                 leagueDetails);
         }
-    },
-
-    getAllParticipants: async function() {
-        // Get and Sort all the Badges by participantId
-        let allBadges = await badgesDao.getAllBadges();
-        let badgeMap = {};
-        for (let i in allBadges.Items) {
-            let badge = allBadges.Items[i];
-            if (badgeMap[badge.participantId.S]){
-                let badges = badgeMap[badge.participantId.S];
-                badges.push(badge);
-                badgeMap[badge.participantId.S] = badges;
-            } else {
-                badgeMap[badge.participantId.S] = [badge];
-            }   
-        }
-
-        let allLeagueDetails = await leagueDetailsDao.getAllLeagueDetails();
-        let participantsResponse = {};
-        for (let i in allLeagueDetails.Items) {
-            let leagueDetails = allLeagueDetails.Items[i];
-            let participants = JSON.parse(leagueDetails.participants.S);
-            for (let j in participants) {
-                let participant = participants[j];
-                let participantId = participant.id.toString();
-                if (!participantsResponse[participantId]){
-                    participantsResponse[participantId] = {
-                        "participant": participant,
-                        "badges": badgeMap[participantId]
-                    };
-                }
-            }
-        }
-
-        return participantsResponse;
-    },
-
-    getLatestGameweek: async function() {
-        let activeLeague = await leagueDetailsDao.getActiveLeague();
-        let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
-        return lastCompletedGameweek;
-    },
-
-    getStandingsHistoryForActiveLeague: async function(){
-        let activeLeague = await leagueDetailsDao.getActiveLeague();
-        let allGameweeksForLeagueId = await gameweeksDao.getAllGameweeksForLeague(activeLeague);
-        return allGameweeksForLeagueId;
     }
 }
