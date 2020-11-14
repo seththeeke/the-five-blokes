@@ -23,15 +23,6 @@ module.exports = {
         let gameweekData = gameweekMetadataResponse.data;
         if (gameweekData.current_event_finished && (!lastCompletedGameweek || parseInt(gameweekData.current_event) > parseInt(lastCompletedGameweek.gameweek.N))) {
             console.log("New gameweek completed " + gameweekData);
-            if (gameweekData.current_event === 38) {
-                console.log("Season ended for league " + JSON.stringify(activeLeague));
-                var seasonCompletedMessage = {
-                    Message: activeLeague.leagueId.S,
-                    Subject: activeLeague.leagueId.S,
-                    TopicArn: hasGameweekCompletedRequest.seasonCompletedTopicArn
-                };
-                let seasonCompletedResponse = await sns.publish(seasonCompletedMessage).promise();
-            }
             var gameweekCompletedMessage = {
                 Message: gameweekData.current_event.toString(),
                 Subject: activeLeague.leagueId.S,
@@ -39,8 +30,17 @@ module.exports = {
             };
             let gameweekCompletedResponse = await sns.publish(gameweekCompletedMessage).promise();
             console.log("Finished publishing gameweek completed information for league " + JSON.stringify(activeLeague));
-        } else {
-            console.log("No new gameweek information for league " + JSON.stringify(activeLeague));
+            return {
+                "gameweek": gameweekData.current_event.toString(),
+                "league": activeLeague.leagueId.S,
+                "hasCompleted": true
+            }
+        }
+        console.log("No new gameweek information for league " + JSON.stringify(activeLeague));
+        return {
+            "gameweek": gameweekData.current_event.toString(),
+            "league": activeLeague.leagueId.S,
+            "hasCompleted": false
         }
     },
 

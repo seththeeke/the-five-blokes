@@ -14,7 +14,7 @@ exports.hasGameweekCompleted = async (event, context) => {
             "seasonCompletedTopicArn": process.env.SEASON_COMPLETED_TOPIC_ARN
         }
         let response = await gameweekProcessService.hasGameweekCompleted(hasGameweekCompletedRequest);
-        return respond(response);
+        return response;
     } catch (err) {
         console.log(err);
         let errorResponse = await errWithNotify(err);

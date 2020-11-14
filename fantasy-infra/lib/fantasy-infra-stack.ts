@@ -16,6 +16,7 @@ import { AuthenticatedRequestLambda } from './lambda/authenticated-request-lambd
 import { GetAllParticipantsLambda } from './lambda/get-all-participants-lambda';
 import { GetLatestGameweekLambda } from './lambda/get-latest-gameweek-lambda';
 import { GetStandingsHistoryForLeagueLambda } from './lambda/get-standings-history-for-league-lambda';
+import { GameweekProcessingMachine } from './step-function/gameweek-processing-machine';
 
 export class FantasyInfraStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -165,5 +166,11 @@ export class FantasyInfraStack extends cdk.Stack {
     });
     const getStandingsHistoryForLeagueLambdaIntegration = new apigateway.LambdaIntegration(getStandingsHistoryForLeagueLambda);
     standingsResource.addMethod('GET', getStandingsHistoryForLeagueLambdaIntegration);
+
+
+    // New Gameweek Processing State Machine
+    new GameweekProcessingMachine(this, "GameweekProcessing", {
+      hasGameweekCompletedLambda
+    });
   }
 }
