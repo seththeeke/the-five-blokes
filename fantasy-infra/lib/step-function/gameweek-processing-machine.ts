@@ -4,13 +4,19 @@ import * as stepFunctionTasks from '@aws-cdk/aws-stepfunctions-tasks';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as targets from '@aws-cdk/aws-events-targets';
 import * as events from '@aws-cdk/aws-events';
+import * as sns from '@aws-cdk/aws-sns';
 
 export interface GameweekProcessingMachineProps {
     hasGameweekCompletedLambda: lambda.Function;
+    gameweekCompletedTopic: sns.Topic;
 }
 export class GameweekProcessingMachine extends cdk.Construct{
   constructor(scope: cdk.Construct, id: string, props: GameweekProcessingMachineProps) {
     super(scope, id);
+
+    const noGameweekDataTopic = new sns.Topic(this, "NoGameweekUpdate", {
+        topicName: "NoGameweekDataTopic"
+    });
 
     const hasGameweekCompletedTask = new stepFunctions.Task(this, "HasGameweekCompletedTask", {
         task: new stepFunctionTasks.InvokeFunction(props.hasGameweekCompletedLambda),
@@ -22,17 +28,33 @@ export class GameweekProcessingMachine extends cdk.Construct{
         comment: "Checks the hasCompleted flag and if true, sends the state machine towards ETL process"
     });
     
-    const dummyTrueWaitState = new stepFunctions.Wait(this, "DummyWaitStateTrue", {
-        time: stepFunctions.WaitTime.duration(cdk.Duration.seconds(5))
+    const gameweekCompletedPublishTask = new stepFunctionTasks.SnsPublish(this, "GameweekCompletedProcessingStarted", {
+        message: {
+            type: stepFunctions.InputType.OBJECT,
+            value: stepFunctions.TaskInput.fromDataAt("$")
+        },
+        topic: props.gameweekCompletedTopic,
+        comment: "Publish notification of gameweek completed to gameweek completed topic",
+        subject: "Gameweek Completed"
     });
 
-    const dummyFalseWaitState = new stepFunctions.Wait(this, "DummyWaitStateFalse", {
+    const noGameweekDataPublishTask = new stepFunctionTasks.SnsPublish(this, "NoGameweekDataTask", {
+        message: {
+            type: stepFunctions.InputType.OBJECT,
+            value: stepFunctions.TaskInput.fromDataAt("$")
+        },
+        topic: noGameweekDataTopic,
+        comment: "Publish notification that there is no gameweek data",
+        subject: "No Gameweek Data"
+    });
+
+    const dummyWaitState = new stepFunctions.Wait(this, "DummyWaitState", {
         time: stepFunctions.WaitTime.duration(cdk.Duration.seconds(5))
     });
 
     hasGameweekCompletedTask.next(hasGameweekCompletedCheck);
-    hasGameweekCompletedCheck.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), dummyTrueWaitState);
-    hasGameweekCompletedCheck.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), dummyFalseWaitState);
+    hasGameweekCompletedCheck.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), gameweekCompletedPublishTask);
+    hasGameweekCompletedCheck.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
 
     const stateMachine = new stepFunctions.StateMachine(this, "GameweekProcessingStateMachine", {
         stateMachineName: "GameweekProcessingMachine",

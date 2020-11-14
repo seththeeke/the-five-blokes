@@ -30,8 +30,8 @@ exports.gameweekCompletedHandler = async (event, context) => {
             "gameweekTableName": process.env.GAMEWEEK_TABLE_NAME,
             "badgeTableName": process.env.BADGE_TABLE_NAME,
             "gameweekPlayerHistoryTableName": process.env.GAMEWEEK_PLAYER_HISTORY_TABLE_NAME,
-            "leagueId": event.Records[0].Sns.Subject,
-            "gameweekNum": event.Records[0].Sns.Message,
+            "leagueId": JSON.parse(event.Records[0].Sns.Message).value.league,
+            "gameweekNum": JSON.parse(event.Records[0].Sns.Message).value.gameweek,
             "staticContentBucketName": process.env.STATIC_CONTENT_BUCKET_NAME
         }
         let response = await gameweekProcessService.processGameweekCompleted(gameweekCompletedRequest);

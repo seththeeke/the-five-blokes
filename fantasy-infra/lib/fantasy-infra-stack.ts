@@ -170,7 +170,8 @@ export class FantasyInfraStack extends cdk.Stack {
 
     // New Gameweek Processing State Machine
     new GameweekProcessingMachine(this, "GameweekProcessing", {
-      hasGameweekCompletedLambda
+      hasGameweekCompletedLambda,
+      gameweekCompletedTopic
     });
   }
 }

@@ -23,13 +23,6 @@ module.exports = {
         let gameweekData = gameweekMetadataResponse.data;
         if (gameweekData.current_event_finished && (!lastCompletedGameweek || parseInt(gameweekData.current_event) > parseInt(lastCompletedGameweek.gameweek.N))) {
             console.log("New gameweek completed " + gameweekData);
-            var gameweekCompletedMessage = {
-                Message: gameweekData.current_event.toString(),
-                Subject: activeLeague.leagueId.S,
-                TopicArn: hasGameweekCompletedRequest.gameweekCompletedTopicArn
-            };
-            let gameweekCompletedResponse = await sns.publish(gameweekCompletedMessage).promise();
-            console.log("Finished publishing gameweek completed information for league " + JSON.stringify(activeLeague));
             return {
                 "gameweek": gameweekData.current_event.toString(),
                 "league": activeLeague.leagueId.S,
