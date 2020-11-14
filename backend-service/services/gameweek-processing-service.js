@@ -14,7 +14,7 @@ var BADGE_TYPE = require('./../util/badge-type');
  * All functions related to processing a particular gameweek, collecting data, normalizing, badging
  */
 module.exports = {
-    hasGameweekCompleted: async function(hasGameweekCompletedRequest){
+    hasGameweekCompleted: async function(){
         console.log("Beginning to check if a gameweek has completed");
         let activeLeague = await leagueDetailsDao.getActiveLeague();
         let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
@@ -35,31 +35,6 @@ module.exports = {
             "league": activeLeague.leagueId.S,
             "hasCompleted": false
         }
-    },
-
-    processGameweekCompleted: async function(processGameweekCompletedRequest){
-        console.log("Beginning to process gameweek: " + JSON.stringify(processGameweekCompletedRequest));
-        // GATHER DATA
-        let extractedData = await this.extractGameweekData(processGameweekCompletedRequest);
-        // fetch static content, persist and return a transformed list of player data for processing further
-        let playerMap = extractedData.playerMap;
-        // fetch fixtures and build a map of player data based on the fixture results in the gameweek
-        let gameweekData = extractedData.gameweekData;
-        let gameweekPlayerData = gameweekData.gameweekPlayerData;
-        // fetch league details and persist the league state for the gameweek
-        let leagueGameweekData = extractedData.leagueGameweekData;
-        let leagueDetails = leagueGameweekData.leagueDetails;
-        let standings = leagueGameweekData.standings;
-        // fetch teams for each participant for the gameweek and persist in history table
-        let leaguePicks = extractedData.leaguePicks;
-
-        // ASSIGN BADGES
-        // assign badges based on the standings at the end of the gameweek
-        let standingsBadges = await this._assignGameweekStandingsBadges(leagueDetails, processGameweekCompletedRequest.gameweekNum, standings);
-        // assign badge to the player who owns the MVP of the gameweek, if any
-        let weeklyMVP = await this._assignGameweekMVPBadge(leagueDetails, processGameweekCompletedRequest.gameweekNum, leaguePicks, playerMap);
-        // award badges based on the player statistics for points, goals, assists, and aggregations
-        let gameweekPlayerBadges = await this._assignGameweekPlayerStatBadges(leagueDetails, processGameweekCompletedRequest.gameweekNum, leaguePicks, playerMap, gameweekPlayerData);
     },
 
     extractGameweekData: async function(extractGameweekDataRequest){
@@ -107,6 +82,9 @@ module.exports = {
         let weeklyMVP = await this._assignGameweekMVPBadge(leagueDetails, gameweek, leaguePicks, playerMap);
         // award badges based on the player statistics for points, goals, assists, and aggregations
         let gameweekPlayerBadges = await this._assignGameweekPlayerStatBadges(leagueDetails, gameweek, leaguePicks, playerMap, gameweekPlayerData);
+        return {
+            "success": true
+        }
     },
 
     _assignGameweekStandingsBadges: async function(leagueDetails, gameweek, standings) {

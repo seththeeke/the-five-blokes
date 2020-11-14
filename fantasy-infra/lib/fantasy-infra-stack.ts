@@ -11,7 +11,6 @@ import { AddNewLeagueLambda } from './lambda/add-new-league-lambda';
 import { InitiateLeagueLambda } from './lambda/initiate-league-lambda';
 import { HasGameweekCompletedLambda } from './lambda/has-gameweek-completed-lambda';
 import { StartingPosition } from '@aws-cdk/aws-lambda';
-import { GameweekCompletedLambda } from './lambda/gameweek-completed-lambda';
 import { ExtractGameweekDataLambda } from './lambda/extract-gameweek-data-lambda';
 import { AssignGameweekBadgesLambda } from './lambda/assign-gameweek-badges-lambda';
 import { AuthenticatedRequestLambda } from './lambda/authenticated-request-lambda';
@@ -136,17 +135,6 @@ export class FantasyInfraStack extends cdk.Stack {
       description: "CloudWatch rule to run daily to check if the gameweek has completed",
       targets: [hasGameweekCompletedTarget]
     });
-
-    const gameweekCompletedLambda = new GameweekCompletedLambda(this, "GameweekCompletedLambda", {
-      gameweeksTable,
-      leagueDetailsTable,
-      badgeTable,
-      gameweekPlayerHistoryTable,
-      staticContentBucket,
-      errorTopic
-    });
-    const snsSubscription = new eventSource.SnsEventSource(gameweekCompletedTopic);
-    snsSubscription.bind(gameweekCompletedLambda);
 
     const extractGameweekDataLambda = new ExtractGameweekDataLambda(this, "ExtractGameweekDataLambda", {
       gameweeksTable,
