@@ -12,6 +12,8 @@ import { InitiateLeagueLambda } from './lambda/initiate-league-lambda';
 import { HasGameweekCompletedLambda } from './lambda/has-gameweek-completed-lambda';
 import { StartingPosition } from '@aws-cdk/aws-lambda';
 import { GameweekCompletedLambda } from './lambda/gameweek-completed-lambda';
+import { ExtractGameweekDataLambda } from './lambda/extract-gameweek-data-lambda';
+import { AssignGameweekBadgesLambda } from './lambda/assign-gameweek-badges-lambda';
 import { AuthenticatedRequestLambda } from './lambda/authenticated-request-lambda';
 import { GetAllParticipantsLambda } from './lambda/get-all-participants-lambda';
 import { GetLatestGameweekLambda } from './lambda/get-latest-gameweek-lambda';
@@ -146,6 +148,24 @@ export class FantasyInfraStack extends cdk.Stack {
     const snsSubscription = new eventSource.SnsEventSource(gameweekCompletedTopic);
     snsSubscription.bind(gameweekCompletedLambda);
 
+    const extractGameweekDataLambda = new ExtractGameweekDataLambda(this, "ExtractGameweekDataLambda", {
+      gameweeksTable,
+      leagueDetailsTable,
+      badgeTable,
+      gameweekPlayerHistoryTable,
+      staticContentBucket,
+      errorTopic
+    });
+
+    const assignGameweekBadgesLambda = new AssignGameweekBadgesLambda(this, "AssignGameweekBadgesLambda", {
+      gameweeksTable,
+      leagueDetailsTable,
+      badgeTable,
+      gameweekPlayerHistoryTable,
+      staticContentBucket,
+      errorTopic
+    });
+
     const getAllParticipantsLambda = new GetAllParticipantsLambda(this, "GetAllParticipantsLambda", {
       leagueDetailsTable,
       badgeTable
@@ -171,7 +191,9 @@ export class FantasyInfraStack extends cdk.Stack {
     // New Gameweek Processing State Machine
     new GameweekProcessingMachine(this, "GameweekProcessing", {
       hasGameweekCompletedLambda,
-      gameweekCompletedTopic
+      gameweekCompletedTopic,
+      extractGameweekDataLambda,
+      assignGameweekBadgesLambda
     });
   }
 }

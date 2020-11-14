@@ -5,7 +5,7 @@ import * as s3 from '@aws-cdk/aws-s3';
 import * as sns from '@aws-cdk/aws-sns';
 import path = require('path');
 
-export interface GameweekCompletedLambdaProps {
+export interface ExtractGameweekDataLambdaProps {
     leagueDetailsTable: ddb.Table
     gameweeksTable: ddb.Table
     badgeTable: ddb.Table
@@ -13,11 +13,11 @@ export interface GameweekCompletedLambdaProps {
     staticContentBucket: s3.Bucket
     errorTopic: sns.Topic
 }
-export class GameweekCompletedLambda extends lambda.Function {
-  constructor(scope: cdk.Construct, id: string, props: GameweekCompletedLambdaProps) {
+export class ExtractGameweekDataLambda extends lambda.Function {
+  constructor(scope: cdk.Construct, id: string, props: ExtractGameweekDataLambdaProps) {
     super(scope, id, {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
-      handler: "controller/gameweek-processing-controller.gameweekCompletedHandler",
+      handler: "controller/gameweek-processing-controller.extractGameweekDataHandler",
       runtime: lambda.Runtime.NODEJS_12_X,
       tracing: lambda.Tracing.ACTIVE,
       environment: {
@@ -29,8 +29,8 @@ export class GameweekCompletedLambda extends lambda.Function {
         "ERROR_TOPIC_ARN": props.errorTopic.topicArn
       },
       timeout: cdk.Duration.seconds(300),
-      functionName: "GameweekCompletedLambda",
-      description: "Processes a gameweek completion"
+      functionName: "ExtractGameweekDataLambda",
+      description: "Extracts data for a Gameweek"
     });
 
     props.leagueDetailsTable.grantReadData(this);

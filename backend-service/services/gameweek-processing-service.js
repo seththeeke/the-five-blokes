@@ -40,18 +40,18 @@ module.exports = {
     processGameweekCompleted: async function(processGameweekCompletedRequest){
         console.log("Beginning to process gameweek: " + JSON.stringify(processGameweekCompletedRequest));
         // GATHER DATA
+        let extractedData = await this.extractGameweekData(processGameweekCompletedRequest);
         // fetch static content, persist and return a transformed list of player data for processing further
-        let playerMap = await this._fetchAndPersistStaticData(processGameweekCompletedRequest.leagueId, processGameweekCompletedRequest.gameweekNum);
+        let playerMap = extractedData.playerMap;
         // fetch fixtures and build a map of player data based on the fixture results in the gameweek
-        let gameweekData = await this._fetchGameweekData(processGameweekCompletedRequest.gameweekNum);
-        let gameweekFixtures = gameweekData.gameweekFixtures;
+        let gameweekData = extractedData.gameweekData;
         let gameweekPlayerData = gameweekData.gameweekPlayerData;
         // fetch league details and persist the league state for the gameweek
-        let leagueGameweekData = await this._fetchLeagueDetailsAndPersistGameweek(processGameweekCompletedRequest.leagueId, processGameweekCompletedRequest.gameweekNum, gameweekFixtures, gameweekPlayerData);
+        let leagueGameweekData = extractedData.leagueGameweekData;
         let leagueDetails = leagueGameweekData.leagueDetails;
         let standings = leagueGameweekData.standings;
         // fetch teams for each participant for the gameweek and persist in history table
-        let leaguePicks = await this._fetchAndPersistPlayerPicksForGameweek(leagueDetails, processGameweekCompletedRequest.gameweekNum);
+        let leaguePicks = extractedData.leaguePicks;
 
         // ASSIGN BADGES
         // assign badges based on the standings at the end of the gameweek
@@ -60,6 +60,53 @@ module.exports = {
         let weeklyMVP = await this._assignGameweekMVPBadge(leagueDetails, processGameweekCompletedRequest.gameweekNum, leaguePicks, playerMap);
         // award badges based on the player statistics for points, goals, assists, and aggregations
         let gameweekPlayerBadges = await this._assignGameweekPlayerStatBadges(leagueDetails, processGameweekCompletedRequest.gameweekNum, leaguePicks, playerMap, gameweekPlayerData);
+    },
+
+    extractGameweekData: async function(extractGameweekDataRequest){
+        console.log("Beginning to extract data for gameweek: " + JSON.stringify(extractGameweekDataRequest));
+        // fetch static content, persist and return a transformed list of player data for processing further
+        let filteredPlayerDataKey = await this._fetchAndPersistStaticData(extractGameweekDataRequest.leagueId, extractGameweekDataRequest.gameweekNum);
+        // fetch fixtures and build a map of player data based on the fixture results in the gameweek
+        let gameweekData = await this._fetchGameweekData(extractGameweekDataRequest.gameweekNum);
+        let gameweekFixtures = gameweekData.gameweekFixtures;
+        let gameweekPlayerData = gameweekData.gameweekPlayerData;
+        // fetch league details and persist the league state for the gameweek
+        let leagueGameweekData = await this._fetchLeagueDetailsAndPersistGameweek(extractGameweekDataRequest.leagueId, extractGameweekDataRequest.gameweekNum, gameweekFixtures, gameweekPlayerData);
+        let leagueDetails = leagueGameweekData.leagueDetails;
+        // fetch teams for each participant for the gameweek and persist in history table
+        let leaguePicks = await this._fetchAndPersistPlayerPicksForGameweek(leagueDetails, extractGameweekDataRequest.gameweekNum);
+
+        return {
+            "filteredPlayerDataKey": filteredPlayerDataKey,
+            "gameweekData": gameweekData,
+            "leagueGameweekData": leagueGameweekData,
+            "leaguePicks": leaguePicks,
+            "gameweek": extractGameweekDataRequest.gameweekNum
+        };
+    },
+
+    assignGameweekBadges: async function(assignGameweekBadgesRequest) {
+        let filteredPlayers = await staticContentDao.getStaticContent(assignGameweekBadgesRequest.filteredPlayerDataKey);
+        let gameweekData = assignGameweekBadgesRequest.gameweekData;
+        let leagueGameweekData = assignGameweekBadgesRequest.leagueGameweekData;
+        let leaguePicks = assignGameweekBadgesRequest.leaguePicks;
+        let gameweek = assignGameweekBadgesRequest.gameweek;
+        let playerMap = {};
+        for (let k in filteredPlayers){
+            let player = filteredPlayers[k];
+            playerMap[player.id.toString()] = player;
+        }
+
+        let gameweekPlayerData = gameweekData.gameweekPlayerData;
+        let leagueDetails = leagueGameweekData.leagueDetails;
+        let standings = leagueGameweekData.standings;
+
+        // assign badges based on the standings at the end of the gameweek
+        let standingsBadges = await this._assignGameweekStandingsBadges(leagueDetails, gameweek, standings);
+        // assign badge to the player who owns the MVP of the gameweek, if any
+        let weeklyMVP = await this._assignGameweekMVPBadge(leagueDetails, gameweek, leaguePicks, playerMap);
+        // award badges based on the player statistics for points, goals, assists, and aggregations
+        let gameweekPlayerBadges = await this._assignGameweekPlayerStatBadges(leagueDetails, gameweek, leaguePicks, playerMap, gameweekPlayerData);
     },
 
     _assignGameweekStandingsBadges: async function(leagueDetails, gameweek, standings) {
@@ -248,12 +295,14 @@ module.exports = {
         let filteredPlayers = players.filter(player => player.minutes > 0);
         let s3Response = await staticContentDao.putStaticContent(filteredPlayers, leagueId.toString() + "/" + gameweek.toString());
         // converting the players into a player map for easier lookup downstream
-        let playerMap = {};
-        for (let k in filteredPlayers){
-            let player = filteredPlayers[k];
-            playerMap[player.id.toString()] = player;
-        }
-        return playerMap;
+        
+        // let playerMap = {};
+        // for (let k in filteredPlayers){
+        //     let player = filteredPlayers[k];
+        //     playerMap[player.id.toString()] = player;
+        // }
+        // return playerMap;
+        return leagueId.toString() + "/" + gameweek.toString();
     },
 
     _fetchGameweekData: async function(gameweek) {

@@ -9,6 +9,8 @@ import * as sns from '@aws-cdk/aws-sns';
 export interface GameweekProcessingMachineProps {
     hasGameweekCompletedLambda: lambda.Function;
     gameweekCompletedTopic: sns.Topic;
+    extractGameweekDataLambda: lambda.Function;
+    assignGameweekBadgesLambda: lambda.Function;
 }
 export class GameweekProcessingMachine extends cdk.Construct{
   constructor(scope: cdk.Construct, id: string, props: GameweekProcessingMachineProps) {
@@ -18,13 +20,13 @@ export class GameweekProcessingMachine extends cdk.Construct{
         topicName: "NoGameweekDataTopic"
     });
 
-    const hasGameweekCompletedTask = new stepFunctions.Task(this, "HasGameweekCompletedTask", {
+    const hasGameweekCompletedTask = new stepFunctions.Task(this, "HasGameweekCompletedPoller", {
         task: new stepFunctionTasks.InvokeFunction(props.hasGameweekCompletedLambda),
         timeout: cdk.Duration.minutes(3),
         comment: "Checks if the gameweek has completed"
     });
 
-    const hasGameweekCompletedCheck = new stepFunctions.Choice(this, "hasGameweekCompletedChoice", {
+    const hasGameweekCompletedCheck = new stepFunctions.Choice(this, "HasGameweekCompletedChoice", {
         comment: "Checks the hasCompleted flag and if true, sends the state machine towards ETL process"
     });
     
@@ -35,7 +37,8 @@ export class GameweekProcessingMachine extends cdk.Construct{
         },
         topic: props.gameweekCompletedTopic,
         comment: "Publish notification of gameweek completed to gameweek completed topic",
-        subject: "Gameweek Completed"
+        subject: "Gameweek Completed",
+        resultPath: stepFunctions.JsonPath.DISCARD
     });
 
     const noGameweekDataPublishTask = new stepFunctionTasks.SnsPublish(this, "NoGameweekDataTask", {
@@ -45,7 +48,20 @@ export class GameweekProcessingMachine extends cdk.Construct{
         },
         topic: noGameweekDataTopic,
         comment: "Publish notification that there is no gameweek data",
-        subject: "No Gameweek Data"
+        subject: "No Gameweek Data",
+        resultPath: stepFunctions.JsonPath.DISCARD
+    });
+
+    const extractGameweekDataTask = new stepFunctions.Task(this, "ExtractGameweekData", {
+        task: new stepFunctionTasks.InvokeFunction(props.extractGameweekDataLambda),
+        timeout: cdk.Duration.minutes(5),
+        comment: "Extracts and stores data from FPL for processing"
+    });
+
+    const assignGameweekBadgesTask = new stepFunctions.Task(this, "AssignGameweekBadges", {
+        task: new stepFunctionTasks.InvokeFunction(props.assignGameweekBadgesLambda),
+        timeout: cdk.Duration.minutes(10),
+        comment: "Assigns badges for the gameweek"
     });
 
     const dummyWaitState = new stepFunctions.Wait(this, "DummyWaitState", {
@@ -55,6 +71,9 @@ export class GameweekProcessingMachine extends cdk.Construct{
     hasGameweekCompletedTask.next(hasGameweekCompletedCheck);
     hasGameweekCompletedCheck.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), gameweekCompletedPublishTask);
     hasGameweekCompletedCheck.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
+    gameweekCompletedPublishTask.next(extractGameweekDataTask);
+    noGameweekDataPublishTask.next(extractGameweekDataTask);
+    extractGameweekDataTask.next(assignGameweekBadgesTask);
 
     const stateMachine = new stepFunctions.StateMachine(this, "GameweekProcessingStateMachine", {
         stateMachineName: "GameweekProcessingMachine",
