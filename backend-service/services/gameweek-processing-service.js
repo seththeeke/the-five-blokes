@@ -5,13 +5,21 @@ var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
 var fplDraftService = require('./fpl-draft-service');
 
 module.exports = {
-    hasGameweekCompleted: async function(){
+    hasGameweekCompleted: async function(forceGameweekReprocessing){
         console.log("Beginning to check if a gameweek has completed");
         let activeLeague = await leagueDetailsDao.getActiveLeague();
         let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
 
         let gameweekMetadataResponse = await fplDraftService.getGameweekMetadata();
         let gameweekData = gameweekMetadataResponse.data;
+        if (forceGameweekReprocessing) {
+            console.log("Gameweek completed check bypassed, reprocessing gameweek " + gameweekData);
+            return {
+                "gameweek": gameweekData.current_event.toString(),
+                "league": activeLeague.leagueId.S,
+                "hasCompleted": true
+            }
+        }
         if (gameweekData.current_event_finished && (!lastCompletedGameweek || parseInt(gameweekData.current_event) > parseInt(lastCompletedGameweek.gameweek.N))) {
             console.log("New gameweek completed " + gameweekData);
             return {

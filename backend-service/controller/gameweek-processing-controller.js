@@ -8,7 +8,7 @@ AWS.config.update({region: process.env.AWS_REGION});
 
 exports.hasGameweekCompleted = async (event) => {
     console.log(JSON.stringify(event));
-    let response = await gameweekProcessService.hasGameweekCompleted();
+    let response = await gameweekProcessService.hasGameweekCompleted(event.forceGameweekReprocessing);
     return response;
 }
 
