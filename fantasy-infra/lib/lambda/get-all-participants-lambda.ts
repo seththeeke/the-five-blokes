@@ -19,7 +19,7 @@ export class GetAllParticipantsLambda extends lambda.Function {
         "BADGE_TABLE_NAME": props.badgeTable.tableName
       },
       timeout: cdk.Duration.seconds(300),
-      functionName: "GetAllParticipantsLambda",
+      functionName: "GetAllParticipantsLambdaV2",
       description: "Gets all participants and their badges"
     });
 

@@ -18,6 +18,7 @@ import { GetAllParticipantsLambda } from './lambda/get-all-participants-lambda';
 import { GetLatestGameweekLambda } from './lambda/get-latest-gameweek-lambda';
 import { GetStandingsHistoryForLeagueLambda } from './lambda/get-standings-history-for-league-lambda';
 import { GameweekProcessingMachine } from './step-function/gameweek-processing-machine';
+import { LastOfTheMohigansRestService } from './rest-service/last-of-the-mohigans-rest-service';
 
 export class FantasyInfraStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -94,14 +95,6 @@ export class FantasyInfraStack extends cdk.Stack {
       topicName: "ErrorTopic"
     });
 
-    const fantasyApiGateway = new apigateway.RestApi(this, "FantasyApiGateway", {
-      restApiName: "FantasyApiGateway"
-    });
-    fantasyApiGateway.root.addMethod('ANY');
-    const participantResource = fantasyApiGateway.root.addResource('participants');
-    const gameweeksResource = fantasyApiGateway.root.addResource('gameweeks');
-    const standingsResource = fantasyApiGateway.root.addResource('standings');
-
     const addNewLeagueLambda = new AddNewLeagueLambda(this, "AddNewLeagueLambda", {
       leagueDetailsTable
     });
@@ -123,17 +116,6 @@ export class FantasyInfraStack extends cdk.Stack {
       gameweeksTable, 
       seasonCompletedTopic,
       errorTopic
-    });
-    const hasGameweekCompletedTarget = new targets.LambdaFunction(hasGameweekCompletedLambda);
-    new events.Rule(this, "CloudWatchEventTrigger", {
-      ruleName: "HasGameweekCompletedTrigger",
-      schedule: events.Schedule.cron({
-        minute: "0",
-        hour: "14",
-        day: "1/1"
-      }),
-      description: "CloudWatch rule to run daily to check if the gameweek has completed",
-      targets: [hasGameweekCompletedTarget]
     });
 
     const extractGameweekDataLambda = new ExtractGameweekDataLambda(this, "ExtractGameweekDataLambda", {
@@ -179,33 +161,18 @@ export class FantasyInfraStack extends cdk.Stack {
       }));
     }
 
-    const getAllParticipantsLambda = new GetAllParticipantsLambda(this, "GetAllParticipantsLambda", {
-      leagueDetailsTable,
-      badgeTable
-    });
-    const getAllParticipantsLambdaIntegration = new apigateway.LambdaIntegration(getAllParticipantsLambda);
-    participantResource.addMethod('GET', getAllParticipantsLambdaIntegration);
-
-    const getLatestGameweekLambda = new GetLatestGameweekLambda(this, "GetLatestGameweekLambda", {
-      leagueDetailsTable,
-      gameweeksTable
-    });
-    const getLatestGameweekLambdaIntegration = new apigateway.LambdaIntegration(getLatestGameweekLambda);
-    gameweeksResource.addMethod('GET', getLatestGameweekLambdaIntegration);
-
-    const getStandingsHistoryForLeagueLambda = new GetStandingsHistoryForLeagueLambda(this, "GetStandingsHistoryForLeagueLambda", {
-      leagueDetailsTable,
-      gameweeksTable
-    });
-    const getStandingsHistoryForLeagueLambdaIntegration = new apigateway.LambdaIntegration(getStandingsHistoryForLeagueLambda);
-    standingsResource.addMethod('GET', getStandingsHistoryForLeagueLambdaIntegration);
-
     new GameweekProcessingMachine(this, "GameweekProcessing", {
       hasGameweekCompletedLambda,
       gameweekCompletedTopic,
       extractGameweekDataLambda,
       gameweekBadgeLambdas,
       seasonCompletedTopic
+    });
+
+    new LastOfTheMohigansRestService(this, "LastOfTheMohigansRestService", {
+      leagueDetailsTable,
+      badgeTable,
+      gameweeksTable
     });
   }
 }

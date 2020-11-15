@@ -19,7 +19,7 @@ export class GetStandingsHistoryForLeagueLambda extends lambda.Function {
         "GAMEWEEK_TABLE_NAME": props.gameweeksTable.tableName,
       },
       timeout: cdk.Duration.seconds(300),
-      functionName: "GetStandingsHistoryForLeagueLambda",
+      functionName: "GetStandingsHistoryForLeagueLambdaV2",
       description: "Gets the full standings history for the active league"
     });
 
