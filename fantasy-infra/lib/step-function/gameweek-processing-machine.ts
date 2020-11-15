@@ -11,6 +11,7 @@ export interface GameweekProcessingMachineProps {
     gameweekCompletedTopic: sns.Topic;
     extractGameweekDataLambda: lambda.Function;
     gameweekBadgeLambdas: lambda.Function[];
+    seasonCompletedTopic: sns.Topic;
 }
 export class GameweekProcessingMachine extends cdk.Construct{
   constructor(scope: cdk.Construct, id: string, props: GameweekProcessingMachineProps) {
@@ -76,18 +77,26 @@ export class GameweekProcessingMachine extends cdk.Construct{
         comment: "Checks the gameweek value and if 38, begins season completed processing",
     });
 
-    const dummyWaitState = new stepFunctions.Wait(this, "DummyWaitState", {
-        time: stepFunctions.WaitTime.duration(cdk.Duration.seconds(5))
+    const seasonCompletedPublishTask = new stepFunctionTasks.SnsPublish(this, "SeasonCompletedNotification", {
+        message: {
+            type: stepFunctions.InputType.OBJECT,
+            value: stepFunctions.TaskInput.fromDataAt("$")
+        },
+        topic: props.seasonCompletedTopic,
+        comment: "Publish notification of season completed to season completed topic",
+        subject: "Season Completed",
+        resultPath: stepFunctions.JsonPath.DISCARD
     });
 
     hasGameweekCompletedTask.next(hasGameweekCompletedChoice);
     hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), gameweekCompletedPublishTask);
     hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
     gameweekCompletedPublishTask.next(extractGameweekDataTask);
-    noGameweekDataPublishTask.next(extractGameweekDataTask);
+    // Uncomment to make testing easier
+    // noGameweekDataPublishTask.next(extractGameweekDataTask);
     extractGameweekDataTask.next(parallelGameweekBadgeProcessor);
     parallelGameweekBadgeProcessor.next(hasSeasonCompletedChoice);
-    hasSeasonCompletedChoice.when(stepFunctions.Condition.stringEquals("$.gameweek", "38"), dummyWaitState);
+    hasSeasonCompletedChoice.when(stepFunctions.Condition.stringEquals("$.gameweek", "38"), seasonCompletedPublishTask);
     hasSeasonCompletedChoice.when(stepFunctions.Condition.not(stepFunctions.Condition.stringEquals("$.gameweek", "38")), new stepFunctions.Succeed(this, "SucceedMachine"));
 
     const stateMachine = new stepFunctions.StateMachine(this, "GameweekProcessingStateMachine", {

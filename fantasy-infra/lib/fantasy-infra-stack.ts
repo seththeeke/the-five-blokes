@@ -200,13 +200,12 @@ export class FantasyInfraStack extends cdk.Stack {
     const getStandingsHistoryForLeagueLambdaIntegration = new apigateway.LambdaIntegration(getStandingsHistoryForLeagueLambda);
     standingsResource.addMethod('GET', getStandingsHistoryForLeagueLambdaIntegration);
 
-
-    // New Gameweek Processing State Machine
     new GameweekProcessingMachine(this, "GameweekProcessing", {
       hasGameweekCompletedLambda,
       gameweekCompletedTopic,
       extractGameweekDataLambda,
-      gameweekBadgeLambdas
+      gameweekBadgeLambdas,
+      seasonCompletedTopic
     });
   }
 }
