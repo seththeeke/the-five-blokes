@@ -106,7 +106,8 @@ export class FantasyInfraStack extends cdk.Stack {
       gameweeksTable,
       badgeTable,
       gameweekPlayerHistoryTable,
-      staticContentBucket
+      staticContentBucket,
+      errorTopic
     });
 
     new LastOfTheMohigansRestService(this, "LastOfTheMohigansRestService", {

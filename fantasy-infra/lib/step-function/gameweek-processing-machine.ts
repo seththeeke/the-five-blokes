@@ -7,6 +7,8 @@ import * as events from '@aws-cdk/aws-events';
 import * as sns from '@aws-cdk/aws-sns';
 import * as ddb from '@aws-cdk/aws-dynamodb';
 import * as s3 from '@aws-cdk/aws-s3';
+import * as cw from '@aws-cdk/aws-cloudwatch';
+import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
 import { HasGameweekCompletedLambda } from '../lambda/has-gameweek-completed-lambda';
 import { ExtractGameweekDataLambda } from '../lambda/extract-gameweek-data-lambda';
 import { AssignGameweekBadgesLambda } from '../lambda/assign-gameweek-badges-lambda';
@@ -19,6 +21,7 @@ export interface GameweekProcessingMachineProps {
     badgeTable: ddb.Table;
     gameweekPlayerHistoryTable: ddb.Table;
     staticContentBucket: s3.Bucket;
+    errorTopic: sns.Topic;
 }
 export class GameweekProcessingMachine extends cdk.Construct{
 
@@ -117,6 +120,15 @@ export class GameweekProcessingMachine extends cdk.Construct{
             definition: hasGameweekCompletedTask,
             stateMachineType: stepFunctions.StateMachineType.STANDARD
         });
+
+        const alarm = new cw.Alarm(this, 'StepFunctionFailureAlarm', {
+            metric: stateMachine.metricFailed(),
+            threshold: 1,
+            evaluationPeriods: 1,
+            datapointsToAlarm: 1,
+            treatMissingData: cw.TreatMissingData.MISSING
+        });
+        alarm.addAlarmAction(new cwActions.SnsAction(props.errorTopic));
 
         const stateMachineTarget = new targets.SfnStateMachine(stateMachine);
 
