@@ -6,18 +6,21 @@ import * as sns from '@aws-cdk/aws-sns';
 import path = require('path');
 
 export interface AssignGameweekBadgesLambdaProps {
-    leagueDetailsTable: ddb.Table
-    gameweeksTable: ddb.Table
-    badgeTable: ddb.Table
-    gameweekPlayerHistoryTable: ddb.Table
-    staticContentBucket: s3.Bucket
-    errorTopic: sns.Topic
+    leagueDetailsTable: ddb.Table;
+    gameweeksTable: ddb.Table;
+    badgeTable: ddb.Table;
+    gameweekPlayerHistoryTable: ddb.Table;
+    staticContentBucket: s3.Bucket;
+    errorTopic: sns.Topic;
+    handler: string;
+    functionName: string;
+    description: string;
 }
 export class AssignGameweekBadgesLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: AssignGameweekBadgesLambdaProps) {
     super(scope, id, {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
-      handler: "controller/gameweek-processing-controller.assignGameweekBadgesHandler",
+      handler: props.handler,
       runtime: lambda.Runtime.NODEJS_12_X,
       tracing: lambda.Tracing.ACTIVE,
       environment: {
@@ -29,8 +32,8 @@ export class AssignGameweekBadgesLambda extends lambda.Function {
         "ERROR_TOPIC_ARN": props.errorTopic.topicArn
       },
       timeout: cdk.Duration.seconds(300),
-      functionName: "AssignGameweekBadgesLambda",
-      description: "Assigns badges for the gameweek"
+      functionName: props.functionName,
+      description: props.description
     });
 
     props.leagueDetailsTable.grantReadData(this);

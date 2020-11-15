@@ -60,7 +60,7 @@ module.exports = {
         };
     },
 
-    assignGameweekBadges: async function(assignGameweekBadgesRequest) {
+    assignGameweekPlayerStatBadges: async function(assignGameweekBadgesRequest) {
         let filteredPlayers = await staticContentDao.getStaticContent(assignGameweekBadgesRequest.filteredPlayerDataKey);
         let gameweekData = assignGameweekBadgesRequest.gameweekData;
         let leagueGameweekData = assignGameweekBadgesRequest.leagueGameweekData;
@@ -74,16 +74,47 @@ module.exports = {
 
         let gameweekPlayerData = gameweekData.gameweekPlayerData;
         let leagueDetails = leagueGameweekData.leagueDetails;
+
+        // award badges based on the player statistics for points, goals, assists, and aggregations
+        let gameweekPlayerBadges = await this._assignGameweekPlayerStatBadges(leagueDetails, gameweek, leaguePicks, playerMap, gameweekPlayerData);
+        return {
+            "success": true,
+            "gameweek": gameweek
+        }
+    },
+
+    assignGameweekMVPBadge: async function(assignGameweekBadgesRequest) {
+        let filteredPlayers = await staticContentDao.getStaticContent(assignGameweekBadgesRequest.filteredPlayerDataKey);
+        let leagueGameweekData = assignGameweekBadgesRequest.leagueGameweekData;
+        let leaguePicks = assignGameweekBadgesRequest.leaguePicks;
+        let gameweek = assignGameweekBadgesRequest.gameweek;
+        let playerMap = {};
+        for (let k in filteredPlayers){
+            let player = filteredPlayers[k];
+            playerMap[player.id.toString()] = player;
+        }
+
+        let leagueDetails = leagueGameweekData.leagueDetails;
+
+        // assign badge to the player who owns the MVP of the gameweek, if any
+        let weeklyMVP = await this._assignGameweekMVPBadge(leagueDetails, gameweek, leaguePicks, playerMap);
+        return {
+            "success": true,
+            "gameweek": gameweek
+        }
+    },
+
+    assignGameweekStandingsBadges: async function(assignGameweekBadgesRequest) {
+        let gameweek = assignGameweekBadgesRequest.gameweek;
+        let leagueGameweekData = assignGameweekBadgesRequest.leagueGameweekData;
+        let leagueDetails = leagueGameweekData.leagueDetails;
         let standings = leagueGameweekData.standings;
 
         // assign badges based on the standings at the end of the gameweek
         let standingsBadges = await this._assignGameweekStandingsBadges(leagueDetails, gameweek, standings);
-        // assign badge to the player who owns the MVP of the gameweek, if any
-        let weeklyMVP = await this._assignGameweekMVPBadge(leagueDetails, gameweek, leaguePicks, playerMap);
-        // award badges based on the player statistics for points, goals, assists, and aggregations
-        let gameweekPlayerBadges = await this._assignGameweekPlayerStatBadges(leagueDetails, gameweek, leaguePicks, playerMap, gameweekPlayerData);
         return {
-            "success": true
+            "success": true,
+            "gameweek": gameweek
         }
     },
 

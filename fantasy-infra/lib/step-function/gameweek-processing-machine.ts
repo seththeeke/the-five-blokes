@@ -10,7 +10,7 @@ export interface GameweekProcessingMachineProps {
     hasGameweekCompletedLambda: lambda.Function;
     gameweekCompletedTopic: sns.Topic;
     extractGameweekDataLambda: lambda.Function;
-    assignGameweekBadgesLambda: lambda.Function;
+    gameweekBadgeLambdas: lambda.Function[];
 }
 export class GameweekProcessingMachine extends cdk.Construct{
   constructor(scope: cdk.Construct, id: string, props: GameweekProcessingMachineProps) {
@@ -26,11 +26,11 @@ export class GameweekProcessingMachine extends cdk.Construct{
         comment: "Checks if the gameweek has completed"
     });
 
-    const hasGameweekCompletedCheck = new stepFunctions.Choice(this, "HasGameweekCompletedChoice", {
+    const hasGameweekCompletedChoice = new stepFunctions.Choice(this, "HasGameweekCompletedChoice", {
         comment: "Checks the hasCompleted flag and if true, sends the state machine towards ETL process"
     });
     
-    const gameweekCompletedPublishTask = new stepFunctionTasks.SnsPublish(this, "GameweekCompletedProcessingStarted", {
+    const gameweekCompletedPublishTask = new stepFunctionTasks.SnsPublish(this, "GameweekCompletedNotification", {
         message: {
             type: stepFunctions.InputType.OBJECT,
             value: stepFunctions.TaskInput.fromDataAt("$")
@@ -58,22 +58,37 @@ export class GameweekProcessingMachine extends cdk.Construct{
         comment: "Extracts and stores data from FPL for processing"
     });
 
-    const assignGameweekBadgesTask = new stepFunctions.Task(this, "AssignGameweekBadges", {
-        task: new stepFunctionTasks.InvokeFunction(props.assignGameweekBadgesLambda),
-        timeout: cdk.Duration.minutes(10),
-        comment: "Assigns badges for the gameweek"
+    const parallelGameweekBadgeProcessor = new stepFunctions.Parallel(this, "GameweekBadgeProcessors", {
+        resultPath: stepFunctions.JsonPath.DISCARD
+    });
+    for (let i in props.gameweekBadgeLambdas) {
+        let gameweekBadgeLambda = props.gameweekBadgeLambdas[i];
+        let constructId = "Processor" + i;
+        let stepFunctionTask = new stepFunctions.Task(this, constructId, {
+            task: new stepFunctionTasks.InvokeFunction(gameweekBadgeLambda),
+            timeout: cdk.Duration.minutes(10)
+        });
+        stepFunctionTask.addPrefix(gameweekBadgeLambda.functionName);
+        parallelGameweekBadgeProcessor.branch(stepFunctionTask);
+    }
+
+    const hasSeasonCompletedChoice = new stepFunctions.Choice(this, "HasSeasonCompletedChoice", {
+        comment: "Checks the gameweek value and if 38, begins season completed processing",
     });
 
     const dummyWaitState = new stepFunctions.Wait(this, "DummyWaitState", {
         time: stepFunctions.WaitTime.duration(cdk.Duration.seconds(5))
     });
 
-    hasGameweekCompletedTask.next(hasGameweekCompletedCheck);
-    hasGameweekCompletedCheck.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), gameweekCompletedPublishTask);
-    hasGameweekCompletedCheck.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
+    hasGameweekCompletedTask.next(hasGameweekCompletedChoice);
+    hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), gameweekCompletedPublishTask);
+    hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
     gameweekCompletedPublishTask.next(extractGameweekDataTask);
     noGameweekDataPublishTask.next(extractGameweekDataTask);
-    extractGameweekDataTask.next(assignGameweekBadgesTask);
+    extractGameweekDataTask.next(parallelGameweekBadgeProcessor);
+    parallelGameweekBadgeProcessor.next(hasSeasonCompletedChoice);
+    hasSeasonCompletedChoice.when(stepFunctions.Condition.stringEquals("$.gameweek", "38"), dummyWaitState);
+    hasSeasonCompletedChoice.when(stepFunctions.Condition.not(stepFunctions.Condition.stringEquals("$.gameweek", "38")), new stepFunctions.Succeed(this, "SucceedMachine"));
 
     const stateMachine = new stepFunctions.StateMachine(this, "GameweekProcessingStateMachine", {
         stateMachineName: "GameweekProcessingMachine",

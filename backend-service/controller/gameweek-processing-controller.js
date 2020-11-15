@@ -19,7 +19,9 @@ exports.extractGameweekDataHandler = async (event) => {
     return response;
 }
 
-exports.assignGameweekBadgesHandler = async (event) => {
+// ASSIGN BADGE HANDLERS
+
+exports.assignGameweekStandingsBadgesHandler = async (event) => {
     console.log(JSON.stringify(event));
     let assignGameweekBadgesRequest = {
         "gameweek": event.gameweek,
@@ -28,6 +30,32 @@ exports.assignGameweekBadgesHandler = async (event) => {
         "leagueGameweekData": event.leagueGameweekData,
         "leaguePicks": event.leaguePicks
     }
-    let response = await gameweekProcessService.assignGameweekBadges(assignGameweekBadgesRequest);
+    let response = await gameweekProcessService.assignGameweekStandingsBadges(assignGameweekBadgesRequest);
+    return response;
+}
+
+exports.assignGameweekMVPBadgeHandler = async (event) => {
+    console.log(JSON.stringify(event));
+    let assignGameweekBadgesRequest = {
+        "gameweek": event.gameweek,
+        "filteredPlayerDataKey": event.filteredPlayerDataKey,
+        "gameweekData": event.gameweekData,
+        "leagueGameweekData": event.leagueGameweekData,
+        "leaguePicks": event.leaguePicks
+    }
+    let response = await gameweekProcessService.assignGameweekMVPBadge(assignGameweekBadgesRequest);
+    return response;
+}
+
+exports.assignGameweekPlayerStatBadgesHandler = async (event) => {
+    console.log(JSON.stringify(event));
+    let assignGameweekBadgesRequest = {
+        "gameweek": event.gameweek,
+        "filteredPlayerDataKey": event.filteredPlayerDataKey,
+        "gameweekData": event.gameweekData,
+        "leagueGameweekData": event.leagueGameweekData,
+        "leaguePicks": event.leaguePicks
+    }
+    let response = await gameweekProcessService.assignGameweekPlayerStatBadges(assignGameweekBadgesRequest);
     return response;
 }

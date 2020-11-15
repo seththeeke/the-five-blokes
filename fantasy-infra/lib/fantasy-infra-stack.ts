@@ -145,14 +145,39 @@ export class FantasyInfraStack extends cdk.Stack {
       errorTopic
     });
 
-    const assignGameweekBadgesLambda = new AssignGameweekBadgesLambda(this, "AssignGameweekBadgesLambda", {
-      gameweeksTable,
-      leagueDetailsTable,
-      badgeTable,
-      gameweekPlayerHistoryTable,
-      staticContentBucket,
-      errorTopic
-    });
+    const gameweekBadgeMetadatas = [
+      {
+        functionName: "AssignGWPlayerStatBadges",
+        handler: "controller/gameweek-processing-controller.assignGameweekPlayerStatBadgesHandler",
+        description: "Assigns badges based on player stats for the gameweek"
+      },
+      {
+        functionName: "AssignGWMVPBadge",
+        handler: "controller/gameweek-processing-controller.assignGameweekMVPBadgeHandler",
+        description: "Assigns badges based on MVP data for the gameweek"
+      },
+      {
+        functionName: "AssignGWStandingsBadges",
+        handler: "controller/gameweek-processing-controller.assignGameweekStandingsBadgesHandler",
+        description: "Assigns badges based on standings for the gameweek"
+      }
+    ];
+    let gameweekBadgeLambdas = [];
+    for (let i in gameweekBadgeMetadatas) {
+      let gameweekBadgeMetadata = gameweekBadgeMetadatas[i];
+      let constructId = "AssignBadgeLambda" + i;
+      gameweekBadgeLambdas.push(new AssignGameweekBadgesLambda(this, constructId, {
+        gameweeksTable,
+        leagueDetailsTable,
+        badgeTable,
+        gameweekPlayerHistoryTable,
+        staticContentBucket,
+        errorTopic,
+        functionName: gameweekBadgeMetadata.functionName,
+        description: gameweekBadgeMetadata.description,
+        handler: gameweekBadgeMetadata.handler
+      }));
+    }
 
     const getAllParticipantsLambda = new GetAllParticipantsLambda(this, "GetAllParticipantsLambda", {
       leagueDetailsTable,
@@ -181,7 +206,7 @@ export class FantasyInfraStack extends cdk.Stack {
       hasGameweekCompletedLambda,
       gameweekCompletedTopic,
       extractGameweekDataLambda,
-      assignGameweekBadgesLambda
+      gameweekBadgeLambdas
     });
   }
 }
