@@ -4,11 +4,15 @@ const awsmobile = {
         endpoints: [
             {
                 name: "FPLService",
-                endpoint: "https://up06f2598k.execute-api.us-east-1.amazonaws.com/prod"
+                endpoint: "https://rw6djv4nwe.execute-api.us-east-1.amazonaws.com/prod"
+            },
+            {
+                name: "FPLServiceProdRaw",
+                endpoint: "https://hzjqhnruqh.execute-api.us-east-1.amazonaws.com/prod"
             },
             {
                 name: "FPLServiceProd",
-                endpoint: "https://mgxy6ytn19.execute-api.us-east-1.amazonaws.com/prod"
+                endpoint: "https://api.lastofthemohigans.com"
             }
         ]
     }
