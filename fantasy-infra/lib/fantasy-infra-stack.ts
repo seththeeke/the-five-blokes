@@ -110,10 +110,12 @@ export class FantasyInfraStack extends cdk.Stack {
       errorTopic
     });
 
+    const shouldUseDomainName = this.node.tryGetContext('shouldUseDomainName');
     new LastOfTheMohigansRestService(this, "LastOfTheMohigansRestService", {
       leagueDetailsTable,
       badgeTable,
-      gameweeksTable
+      gameweeksTable,
+      shouldUseDomainName
     });
   }
 }

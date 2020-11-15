@@ -46,7 +46,7 @@ To deploy the backend:
 ```
 $ cd $BASE_DIR/fantasy-infra
 $ npm run build
-$ cdk deploy
+$ cdk deploy --profile lotm --context shouldUseDomainName=<should-use-domain-name>
 ```
 
 The webapp cloudformation template has parameters for the domain related information that can be configured as needed.

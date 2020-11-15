@@ -4,7 +4,7 @@ import * as ddb from '@aws-cdk/aws-dynamodb';
 import * as s3 from '@aws-cdk/aws-s3';
 import path = require('path');
 
-export interface AssignGameweekBadgesLambdaProps {
+export interface AssignSeasonBadgesLambdaProps {
     leagueDetailsTable: ddb.Table;
     gameweeksTable: ddb.Table;
     badgeTable: ddb.Table;
@@ -14,8 +14,8 @@ export interface AssignGameweekBadgesLambdaProps {
     functionName: string;
     description: string;
 }
-export class AssignGameweekBadgesLambda extends lambda.Function {
-  constructor(scope: cdk.Construct, id: string, props: AssignGameweekBadgesLambdaProps) {
+export class AssignSeasonBadgesLambda extends lambda.Function {
+  constructor(scope: cdk.Construct, id: string, props: AssignSeasonBadgesLambdaProps) {
     super(scope, id, {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
       handler: props.handler,
@@ -29,7 +29,7 @@ export class AssignGameweekBadgesLambda extends lambda.Function {
         "STATIC_CONTENT_BUCKET_NAME": props.staticContentBucket.bucketName,
       },
       timeout: cdk.Duration.seconds(300),
-      functionName: props.functionName + "V3",
+      functionName: props.functionName,
       description: props.description
     });
 
