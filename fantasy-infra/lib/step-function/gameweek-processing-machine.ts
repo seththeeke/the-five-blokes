@@ -106,11 +106,11 @@ export class GameweekProcessingMachine extends cdk.Construct{
         hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
         gameweekCompletedPublishTask.next(extractGameweekDataTask);
         // Uncomment to make testing easier
-        // noGameweekDataPublishTask.next(extractGameweekDataTask);
+        noGameweekDataPublishTask.next(extractGameweekDataTask);
         extractGameweekDataTask.next(parallelGameweekBadgeProcessor);
         parallelGameweekBadgeProcessor.next(hasSeasonCompletedChoice);
         hasSeasonCompletedChoice.when(stepFunctions.Condition.stringEquals("$.gameweek", "38"), seasonCompletedPublishTask);
-        hasSeasonCompletedChoice.when(stepFunctions.Condition.not(stepFunctions.Condition.stringEquals("$.gameweek", "38")), new stepFunctions.Succeed(this, "SucceedMachine"));
+        hasSeasonCompletedChoice.when(stepFunctions.Condition.not(stepFunctions.Condition.stringEquals("$.gameweek", "38")), new stepFunctions.Succeed(this, "SeasonDidNotCompleteSoSkipToEnd"));
 
         const stateMachine = new stepFunctions.StateMachine(this, "GameweekProcessingStateMachine", {
             stateMachineName: "GameweekProcessingMachine",

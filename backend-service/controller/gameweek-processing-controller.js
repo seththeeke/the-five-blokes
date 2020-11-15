@@ -1,6 +1,9 @@
 var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
 var gameweekProcessService = require('./../services/gameweek-processing-service');
+var gameweekMVPBadgeProcessor = require('./../gameweek-badge-processors/gameweek-mvp-badge-processor');
+var gameweekStandingsBadgeProcessor = require('./../gameweek-badge-processors/gameweek-standings-badge-processor');
+var gameweekPlayerStatsBadgeProcessor = require('./../gameweek-badge-processors/gameweek-player-stats-badge-processor');
 AWS.config.update({region: process.env.AWS_REGION});
 
 exports.hasGameweekCompleted = async (event) => {
@@ -19,8 +22,7 @@ exports.extractGameweekDataHandler = async (event) => {
     return response;
 }
 
-// ASSIGN BADGE HANDLERS
-
+// BADGE Processors
 exports.assignGameweekStandingsBadgesHandler = async (event) => {
     console.log(JSON.stringify(event));
     let assignGameweekBadgesRequest = {
@@ -30,7 +32,7 @@ exports.assignGameweekStandingsBadgesHandler = async (event) => {
         "leagueGameweekData": event.leagueGameweekData,
         "leaguePicks": event.leaguePicks
     }
-    let response = await gameweekProcessService.assignGameweekStandingsBadges(assignGameweekBadgesRequest);
+    let response = await gameweekStandingsBadgeProcessor.assignGameweekStandingsBadges(assignGameweekBadgesRequest);
     return response;
 }
 
@@ -43,7 +45,7 @@ exports.assignGameweekMVPBadgeHandler = async (event) => {
         "leagueGameweekData": event.leagueGameweekData,
         "leaguePicks": event.leaguePicks
     }
-    let response = await gameweekProcessService.assignGameweekMVPBadge(assignGameweekBadgesRequest);
+    let response = await gameweekMVPBadgeProcessor.assignGameweekMVPBadge(assignGameweekBadgesRequest);
     return response;
 }
 
@@ -56,6 +58,6 @@ exports.assignGameweekPlayerStatBadgesHandler = async (event) => {
         "leagueGameweekData": event.leagueGameweekData,
         "leaguePicks": event.leaguePicks
     }
-    let response = await gameweekProcessService.assignGameweekPlayerStatBadges(assignGameweekBadgesRequest);
+    let response = await gameweekPlayerStatsBadgeProcessor.assignGameweekPlayerStatBadges(assignGameweekBadgesRequest);
     return response;
 }
