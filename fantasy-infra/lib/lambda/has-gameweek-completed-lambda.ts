@@ -7,9 +7,6 @@ import path = require('path');
 export interface HasGameweekCompletedLambdaProps {
     leagueDetailsTable: ddb.Table
     gameweeksTable: ddb.Table
-    gameweekCompletedTopic: sns.Topic
-    seasonCompletedTopic: sns.Topic
-    errorTopic: sns.Topic
 }
 export class HasGameweekCompletedLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: HasGameweekCompletedLambdaProps) {
@@ -21,19 +18,13 @@ export class HasGameweekCompletedLambda extends lambda.Function {
       environment: {
         "LEAGUE_DETAILS_TABLE_NAME": props.leagueDetailsTable.tableName,
         "GAMEWEEK_TABLE_NAME": props.gameweeksTable.tableName,
-        "GAMEWEEK_COMPLETED_TOPIC_ARN": props.gameweekCompletedTopic.topicArn,
-        "SEASON_COMPLETED_TOPIC_ARN": props.seasonCompletedTopic.topicArn,
-        "ERROR_TOPIC_ARN": props.errorTopic.topicArn
       },
       timeout: cdk.Duration.seconds(300),
-      functionName: "HasGameweekCompletedLambda",
-      description: "Checks if the gameweek has completed, and if so, pushes data to related topics to process gameweek comletion"
+      functionName: "HasGameweekCompletedLambdaV2",
+      description: "Checks if the gameweek has completed, and if so, returns json representing the gameweek and true or false as to whether the gameweek has completed"
     });
 
     props.leagueDetailsTable.grantReadData(this);
     props.gameweeksTable.grantReadData(this);
-    props.gameweekCompletedTopic.grantPublish(this);
-    props.seasonCompletedTopic.grantPublish(this);
-    props.errorTopic.grantPublish(this);
   }
 }

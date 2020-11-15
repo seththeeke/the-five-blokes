@@ -1,22 +1,11 @@
 import * as cdk from '@aws-cdk/core';
 import * as ddb from '@aws-cdk/aws-dynamodb';
-import * as apigateway from '@aws-cdk/aws-apigateway';
 import * as eventSource from '@aws-cdk/aws-lambda-event-sources';
 import * as sns from '@aws-cdk/aws-sns';
-import * as secretsmanager from '@aws-cdk/aws-secretsmanager';
-import * as targets from '@aws-cdk/aws-events-targets';
-import * as events from '@aws-cdk/aws-events';
 import * as s3 from '@aws-cdk/aws-s3';
 import { AddNewLeagueLambda } from './lambda/add-new-league-lambda';
 import { InitiateLeagueLambda } from './lambda/initiate-league-lambda';
-import { HasGameweekCompletedLambda } from './lambda/has-gameweek-completed-lambda';
 import { StartingPosition } from '@aws-cdk/aws-lambda';
-import { ExtractGameweekDataLambda } from './lambda/extract-gameweek-data-lambda';
-import { AssignGameweekBadgesLambda } from './lambda/assign-gameweek-badges-lambda';
-import { AuthenticatedRequestLambda } from './lambda/authenticated-request-lambda';
-import { GetAllParticipantsLambda } from './lambda/get-all-participants-lambda';
-import { GetLatestGameweekLambda } from './lambda/get-latest-gameweek-lambda';
-import { GetStandingsHistoryForLeagueLambda } from './lambda/get-standings-history-for-league-lambda';
 import { GameweekProcessingMachine } from './step-function/gameweek-processing-machine';
 import { LastOfTheMohigansRestService } from './rest-service/last-of-the-mohigans-rest-service';
 
@@ -110,63 +99,14 @@ export class FantasyInfraStack extends cdk.Stack {
     });
     leagueDetailsStreamEventSource.bind(initiateLeagueLambda);
 
-    const hasGameweekCompletedLambda = new HasGameweekCompletedLambda(this, "HasGameweekCompletedLambda", {
-      leagueDetailsTable,
+    new GameweekProcessingMachine(this, "GameweekProcessing", {
       gameweekCompletedTopic,
-      gameweeksTable, 
       seasonCompletedTopic,
-      errorTopic
-    });
-
-    const extractGameweekDataLambda = new ExtractGameweekDataLambda(this, "ExtractGameweekDataLambda", {
-      gameweeksTable,
       leagueDetailsTable,
+      gameweeksTable,
       badgeTable,
       gameweekPlayerHistoryTable,
-      staticContentBucket,
-      errorTopic
-    });
-
-    const gameweekBadgeMetadatas = [
-      {
-        functionName: "AssignGWPlayerStatBadges",
-        handler: "controller/gameweek-processing-controller.assignGameweekPlayerStatBadgesHandler",
-        description: "Assigns badges based on player stats for the gameweek"
-      },
-      {
-        functionName: "AssignGWMVPBadge",
-        handler: "controller/gameweek-processing-controller.assignGameweekMVPBadgeHandler",
-        description: "Assigns badges based on MVP data for the gameweek"
-      },
-      {
-        functionName: "AssignGWStandingsBadges",
-        handler: "controller/gameweek-processing-controller.assignGameweekStandingsBadgesHandler",
-        description: "Assigns badges based on standings for the gameweek"
-      }
-    ];
-    let gameweekBadgeLambdas = [];
-    for (let i in gameweekBadgeMetadatas) {
-      let gameweekBadgeMetadata = gameweekBadgeMetadatas[i];
-      let constructId = "AssignBadgeLambda" + i;
-      gameweekBadgeLambdas.push(new AssignGameweekBadgesLambda(this, constructId, {
-        gameweeksTable,
-        leagueDetailsTable,
-        badgeTable,
-        gameweekPlayerHistoryTable,
-        staticContentBucket,
-        errorTopic,
-        functionName: gameweekBadgeMetadata.functionName,
-        description: gameweekBadgeMetadata.description,
-        handler: gameweekBadgeMetadata.handler
-      }));
-    }
-
-    new GameweekProcessingMachine(this, "GameweekProcessing", {
-      hasGameweekCompletedLambda,
-      gameweekCompletedTopic,
-      extractGameweekDataLambda,
-      gameweekBadgeLambdas,
-      seasonCompletedTopic
+      staticContentBucket
     });
 
     new LastOfTheMohigansRestService(this, "LastOfTheMohigansRestService", {
