@@ -4,9 +4,6 @@ var staticContentDao = require('./../dao/static-content-dao');
 var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
 var fplDraftService = require('./fpl-draft-service');
 
-/**
- * All functions related to processing a particular gameweek, collecting data, normalizing, badging
- */
 module.exports = {
     hasGameweekCompleted: async function(){
         console.log("Beginning to check if a gameweek has completed");

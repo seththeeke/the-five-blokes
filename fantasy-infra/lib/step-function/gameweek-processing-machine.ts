@@ -106,7 +106,7 @@ export class GameweekProcessingMachine extends cdk.Construct{
         hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
         gameweekCompletedPublishTask.next(extractGameweekDataTask);
         // Uncomment to make testing easier
-        noGameweekDataPublishTask.next(extractGameweekDataTask);
+        // noGameweekDataPublishTask.next(extractGameweekDataTask);
         extractGameweekDataTask.next(parallelGameweekBadgeProcessor);
         parallelGameweekBadgeProcessor.next(hasSeasonCompletedChoice);
         hasSeasonCompletedChoice.when(stepFunctions.Condition.stringEquals("$.gameweek", "38"), seasonCompletedPublishTask);
