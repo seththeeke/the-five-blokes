@@ -12,6 +12,7 @@ import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
 import { HasGameweekCompletedLambda } from '../lambda/has-gameweek-completed-lambda';
 import { ExtractGameweekDataLambda } from '../lambda/extract-gameweek-data-lambda';
 import { AssignGameweekBadgesLambda } from '../lambda/assign-gameweek-badges-lambda';
+import { AssignSeasonBadgesLambda } from '../lambda/assign-season-badges-lambda';
 
 export interface GameweekProcessingMachineProps {
     gameweekCompletedTopic: sns.Topic;
@@ -28,6 +29,7 @@ export class GameweekProcessingMachine extends cdk.Construct{
     hasGameweekCompletedLambda: lambda.Function;
     extractGameweekDataLambda: lambda.Function;
     gameweekBadgeLambdas: lambda.Function[];
+    seasonBadgeLambdas: lambda.Function[];
 
     constructor(scope: cdk.Construct, id: string, props: GameweekProcessingMachineProps) {
         super(scope, id);
@@ -104,6 +106,20 @@ export class GameweekProcessingMachine extends cdk.Construct{
             resultPath: stepFunctions.JsonPath.DISCARD
         });
 
+        const parallelSeasonBadgeProcessor = new stepFunctions.Parallel(this, "SeasonBadgeProcessors", {
+            resultPath: stepFunctions.JsonPath.DISCARD
+        });
+        for (let i in this.seasonBadgeLambdas) {
+            let seasonBadgeLambda = this.seasonBadgeLambdas[i];
+            let constructId = "SeasonProcessor" + i;
+            let stepFunctionTask = new stepFunctions.Task(this, constructId, {
+                task: new stepFunctionTasks.InvokeFunction(seasonBadgeLambda),
+                timeout: cdk.Duration.minutes(10)
+            });
+            stepFunctionTask.addPrefix(seasonBadgeLambda.functionName);
+            parallelSeasonBadgeProcessor.branch(stepFunctionTask);
+        }
+
         hasGameweekCompletedTask.next(hasGameweekCompletedChoice);
         hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), gameweekCompletedPublishTask);
         hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
@@ -114,6 +130,7 @@ export class GameweekProcessingMachine extends cdk.Construct{
         parallelGameweekBadgeProcessor.next(hasSeasonCompletedChoice);
         hasSeasonCompletedChoice.when(stepFunctions.Condition.stringEquals("$.gameweek", "38"), seasonCompletedPublishTask);
         hasSeasonCompletedChoice.when(stepFunctions.Condition.not(stepFunctions.Condition.stringEquals("$.gameweek", "38")), new stepFunctions.Succeed(this, "SeasonDidNotCompleteSoSkipToEnd"));
+        seasonCompletedPublishTask.next(parallelSeasonBadgeProcessor);
 
         const stateMachine = new stepFunctions.StateMachine(this, "GameweekProcessingStateMachine", {
             stateMachineName: "GameweekProcessingMachine",
@@ -179,7 +196,7 @@ export class GameweekProcessingMachine extends cdk.Construct{
         this.gameweekBadgeLambdas = [];
         for (let i in gameweekBadgeMetadatas) {
             let gameweekBadgeMetadata = gameweekBadgeMetadatas[i];
-            let constructId = "AssignBadgeLambda" + i;
+            let constructId = "GameweekAssignBadgeLambda" + i;
             this.gameweekBadgeLambdas.push(new AssignGameweekBadgesLambda(this, constructId, {
                 gameweeksTable: props.gameweeksTable,
                 leagueDetailsTable: props.leagueDetailsTable,
@@ -189,6 +206,29 @@ export class GameweekProcessingMachine extends cdk.Construct{
                 functionName: gameweekBadgeMetadata.functionName,
                 description: gameweekBadgeMetadata.description,
                 handler: gameweekBadgeMetadata.handler
+            }));
+        }
+
+        const seasonBadgeMetadatas = [
+            {
+                functionName: "AssignSeasonBadges",
+                handler: "controller/season-processing-controller.assignSeasonBadgesHandler",
+                description: "Assigns badges based on the season ending"
+            }
+        ];
+        this.seasonBadgeLambdas = [];
+        for (let i in seasonBadgeMetadatas) {
+            let seasonBadgeMetadata = seasonBadgeMetadatas[i];
+            let constructId = "SeasonAssignBadgeLambda" + i;
+            this.seasonBadgeLambdas.push(new AssignSeasonBadgesLambda(this, constructId, {
+                gameweeksTable: props.gameweeksTable,
+                leagueDetailsTable: props.leagueDetailsTable,
+                badgeTable: props.badgeTable,
+                gameweekPlayerHistoryTable: props.gameweekPlayerHistoryTable,
+                staticContentBucket: props.staticContentBucket,
+                functionName: seasonBadgeMetadata.functionName,
+                description: seasonBadgeMetadata.description,
+                handler: seasonBadgeMetadata.handler
             }));
         }
     }
