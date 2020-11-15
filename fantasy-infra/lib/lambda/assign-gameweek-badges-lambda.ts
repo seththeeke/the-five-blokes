@@ -2,23 +2,23 @@ import * as cdk from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ddb from '@aws-cdk/aws-dynamodb';
 import * as s3 from '@aws-cdk/aws-s3';
-import * as sns from '@aws-cdk/aws-sns';
 import path = require('path');
-import { propertyValidator } from '@aws-cdk/core';
 
-export interface GameweekCompletedLambdaProps {
-    leagueDetailsTable: ddb.Table
-    gameweeksTable: ddb.Table
-    badgeTable: ddb.Table
-    gameweekPlayerHistoryTable: ddb.Table
-    staticContentBucket: s3.Bucket
-    errorTopic: sns.Topic
+export interface AssignGameweekBadgesLambdaProps {
+    leagueDetailsTable: ddb.Table;
+    gameweeksTable: ddb.Table;
+    badgeTable: ddb.Table;
+    gameweekPlayerHistoryTable: ddb.Table;
+    staticContentBucket: s3.Bucket;
+    handler: string;
+    functionName: string;
+    description: string;
 }
-export class GameweekCompletedLambda extends lambda.Function {
-  constructor(scope: cdk.Construct, id: string, props: GameweekCompletedLambdaProps) {
+export class AssignGameweekBadgesLambda extends lambda.Function {
+  constructor(scope: cdk.Construct, id: string, props: AssignGameweekBadgesLambdaProps) {
     super(scope, id, {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
-      handler: "controller/gameweek-processing-controller.gameweekCompletedHandler",
+      handler: props.handler,
       runtime: lambda.Runtime.NODEJS_12_X,
       tracing: lambda.Tracing.ACTIVE,
       environment: {
@@ -27,11 +27,10 @@ export class GameweekCompletedLambda extends lambda.Function {
         "BADGE_TABLE_NAME": props.badgeTable.tableName,
         "GAMEWEEK_PLAYER_HISTORY_TABLE_NAME": props.gameweekPlayerHistoryTable.tableName,
         "STATIC_CONTENT_BUCKET_NAME": props.staticContentBucket.bucketName,
-        "ERROR_TOPIC_ARN": props.errorTopic.topicArn
       },
       timeout: cdk.Duration.seconds(300),
-      functionName: "GameweekCompletedLambda",
-      description: "Processes a gameweek completion"
+      functionName: props.functionName + "V2",
+      description: props.description
     });
 
     props.leagueDetailsTable.grantReadData(this);
@@ -39,6 +38,5 @@ export class GameweekCompletedLambda extends lambda.Function {
     props.badgeTable.grantReadWriteData(this);
     props.gameweekPlayerHistoryTable.grantWriteData(this);
     props.staticContentBucket.grantReadWrite(this);
-    props.errorTopic.grantPublish(this);
   }
 }

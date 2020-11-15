@@ -16,5 +16,15 @@ module.exports = {
         let s3Response = await s3.putObject(putObjectS3BucketParams).promise();
         console.log("Completed posting static content to s3 with params: " + JSON.stringify(putObjectS3BucketParams));
         return s3Response;
+    },
+
+    getStaticContent: async function(key){
+        let getObjectS3BucketParams = {
+            Bucket: process.env.STATIC_CONTENT_BUCKET_NAME, 
+            Key: key
+        }
+        let s3Response = await s3.getObject(getObjectS3BucketParams).promise();
+        console.log("Completed fetching static content to s3 with params: " + JSON.stringify(getObjectS3BucketParams));
+        return JSON.parse(s3Response.Body);
     }
 }

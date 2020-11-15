@@ -19,7 +19,7 @@ export class GetLatestGameweekLambda extends lambda.Function {
         "GAMEWEEK_TABLE_NAME": props.gameweeksTable.tableName,
       },
       timeout: cdk.Duration.seconds(300),
-      functionName: "GetLatestGameweekLambda",
+      functionName: "GetLatestGameweekLambdaV2",
       description: "Gets the latest completed gameweek and details"
     });
 
