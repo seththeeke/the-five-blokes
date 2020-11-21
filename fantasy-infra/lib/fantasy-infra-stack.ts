@@ -48,8 +48,8 @@ export class FantasyInfraStack extends cdk.Stack {
         name: "leagueId",
         type: ddb.AttributeType.STRING
       },
-      readCapacity: 0,
-      writeCapacity: 0,
+      readCapacity: 1,
+      writeCapacity: 1,
       stream: ddb.StreamViewType.NEW_AND_OLD_IMAGES,
       sortKey: {
         name: "gameweek",
@@ -63,8 +63,8 @@ export class FantasyInfraStack extends cdk.Stack {
         name: "leagueIdTeamId",
         type: ddb.AttributeType.STRING
       },
-      readCapacity: 0,
-      writeCapacity: 0,
+      readCapacity: 1,
+      writeCapacity: 1,
       stream: ddb.StreamViewType.NEW_AND_OLD_IMAGES,
       sortKey: {
         name: "gameweek",
