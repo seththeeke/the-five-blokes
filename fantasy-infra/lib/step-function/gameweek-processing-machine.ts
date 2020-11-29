@@ -13,6 +13,7 @@ import { HasGameweekCompletedLambda } from '../lambda/has-gameweek-completed-lam
 import { ExtractGameweekDataLambda } from '../lambda/extract-gameweek-data-lambda';
 import { AssignGameweekBadgesLambda } from '../lambda/assign-gameweek-badges-lambda';
 import { AssignSeasonBadgesLambda } from '../lambda/assign-season-badges-lambda';
+import { GameweekProcessingCompletedEmailLambda } from '../lambda/gameweek-processing-completed-email-lambda';
 
 export interface GameweekProcessingMachineProps {
     gameweekCompletedTopic: sns.Topic;
@@ -30,6 +31,7 @@ export class GameweekProcessingMachine extends cdk.Construct{
     extractGameweekDataLambda: lambda.Function;
     gameweekBadgeLambdas: lambda.Function[];
     seasonBadgeLambdas: lambda.Function[];
+    gameweekProcessingCompletedEmailLambda: lambda.Function;
 
     constructor(scope: cdk.Construct, id: string, props: GameweekProcessingMachineProps) {
         super(scope, id);
@@ -231,5 +233,16 @@ export class GameweekProcessingMachine extends cdk.Construct{
                 handler: seasonBadgeMetadata.handler
             }));
         }
+
+        this.gameweekProcessingCompletedEmailLambda = new GameweekProcessingCompletedEmailLambda(this, "GameweekCompletedEmailLambda", {
+            gameweeksTable: props.gameweeksTable,
+            leagueDetailsTable: props.leagueDetailsTable,
+            badgeTable: props.badgeTable,
+            gameweekPlayerHistoryTable: props.gameweekPlayerHistoryTable,
+            staticContentBucket: props.staticContentBucket,
+            functionName: "GameweekProcessingCompletedEmailLambda",
+            description: "Controller for email sent after gameweek processing has completed",
+            handler: "controller/email-controller.sendGameweekProcessingCompletedEmailController"
+        });
     }
 }
