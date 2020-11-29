@@ -15,10 +15,7 @@ module.exports = {
         console.log("Beginning to form and send gameweek processing email");
         let activeLeague = await leagueDetailsDao.getActiveLeague();
         let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
-        // let allBadges = await gameweekBadgesDao.getAllBadges();
 
-        console.log(JSON.stringify(activeLeague));
-        console.log(JSON.stringify(lastCompletedGameweek));
         let participants = JSON.parse(activeLeague.participants.S);
         let standings = JSON.parse(lastCompletedGameweek.standings.S);
         let gameweekPlayerStats = JSON.parse(lastCompletedGameweek.gameweekPlayerStats.S);
@@ -29,8 +26,8 @@ module.exports = {
         });
         let gameweek = lastCompletedGameweek.gameweek.N;
         let gameweekPlayerHistoryForGameweek = await gameweekPlayerDataDao.getGameweekPlayerDataForGameweek(activeLeague.leagueId.S, gameweek);
-        console.log(gameweekPlayerHistoryForGameweek);
 
+        // Aggregate the data for the gameweek by player
         let aggregatedData = {};
         let mostGoals = -1;
         let mostAssists = -1;
@@ -57,6 +54,8 @@ module.exports = {
                 }
             }
         }
+
+        // find the best and worst performers of the week
         let mostGoalsFirstNames = [];
         let leastGoalsFirstNames = [];
         let mostAssistsFirstNames = [];
