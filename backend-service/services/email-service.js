@@ -1,14 +1,20 @@
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');
-var staticContentDao = require('./../dao/static-content-dao');
-var gameweekBadgesDao = require('./../dao/badges-dao');
 var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
-var fplDraftService = require('./fpl-draft-service');
 
 var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
 AWS.config.update({region: process.env.AWS_REGION});
 var ses = new AWS.SES({apiVersion: '2010-12-01'});
+
+var MEDIA_ASSETS_BASE_URL = process.env.MEDIA_ASSETS_BUCKET_URL;
+var headerIcon = MEDIA_ASSETS_BASE_URL + "/circular-prem-lion.png";
+var thumbsUpIcon = MEDIA_ASSETS_BASE_URL + "/thumbs-up.png";
+var thumbsDownIcon = MEDIA_ASSETS_BASE_URL + "/thumbs-down.png";
+var pointsIcon = MEDIA_ASSETS_BASE_URL + "/gameweek-winner.png";
+var goalsIcon = MEDIA_ASSETS_BASE_URL + "/football-ball.png";
+var assistsIcon = MEDIA_ASSETS_BASE_URL + "/kick-ball.png";
+var podiumImg = MEDIA_ASSETS_BASE_URL + "/podium.png";
 
 module.exports = {
     sendGameweekProcessingCompletedEmail: async function(){
@@ -93,7 +99,7 @@ module.exports = {
             TemplateData: JSON.stringify(
                 {
                     "gameweek": gameweek,
-                    "podiumImg": "https://lastofthemohigans-test-media.s3.amazonaws.com/img/podium.png",
+                    "podiumImg": podiumImg,
                     "firstPlace": this._getParticipantFirstName(participants, standings[0].league_entry),
                     "secondPlace": this._getParticipantFirstName(participants, standings[1].league_entry),
                     "thirdPlace": this._getParticipantFirstName(participants, standings[2].league_entry),
@@ -118,12 +124,12 @@ module.exports = {
                     "game2Away": "Chelsea",
                     "game3Home": "Leicester",
                     "game3Away": "Burnley",
-                    "headerIcon": "https://lastofthemohigans-test-media.s3.amazonaws.com/img/circular-prem-lion.png",
-                    "thumbsUpIcon": "https://lastofthemohigans-test-media.s3.amazonaws.com/img/icons-scaffolding/thumbs-up.png",
-                    "thumbsDownIcon": "https://lastofthemohigans-test-media.s3.amazonaws.com/img/icons-scaffolding/thumbs-down.png",
-                    "pointsIcon": "https://lastofthemohigans-test-media.s3.amazonaws.com/img/gameweek-winner.png",
-                    "goalsIcon": "https://lastofthemohigans-test-media.s3.amazonaws.com/img/icons-scaffolding/football-ball.png",
-                    "assistsIcon": "https://lastofthemohigans-test-media.s3.amazonaws.com/img/icons-scaffolding/kick-ball.png"
+                    "headerIcon": headerIcon,
+                    "thumbsUpIcon": thumbsUpIcon,
+                    "thumbsDownIcon": thumbsDownIcon,
+                    "pointsIcon": pointsIcon,
+                    "goalsIcon": goalsIcon,
+                    "assistsIcon": assistsIcon,
                 }
             ),
             Source: 'seththeekelastofthemohigans@gmail.com', // should be env var

@@ -11,3 +11,12 @@ aws ses update-template --cli-input-json file://mytemplate.json
 ```
 
 Its easier to maintain the email template as an HTML file so once it is done in there, I move use https://www.textfixer.com/html/compress-html-compression.php to compress the html into a single line and then escape the string characters manually
+
+The templates are dependent on icons being available and need to be uploaded to the assets s3 bucket.
+
+```
+aws s3 ls
+aws s3 sync email-icons/ s3://<bucket_name> --acl public-read
+// gamma 
+aws s3 sync email-icons/ s3://fantasyinfrastack-mediaassetsbucketd4253741-1srfmprg1dt8c --acl public-read
+```

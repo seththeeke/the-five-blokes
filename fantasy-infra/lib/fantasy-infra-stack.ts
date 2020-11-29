@@ -73,6 +73,7 @@ export class FantasyInfraStack extends cdk.Stack {
     });
 
     const staticContentBucket = new s3.Bucket(this, "StaticContentBucket");
+    const mediaAssetsBucket = new s3.Bucket(this, "MediaAssetsBucket");
 
     const gameweekCompletedTopic = new sns.Topic(this, "GameweekCompletedTopic", {
       topicName: "GameweekCompletedTopic"
@@ -107,7 +108,8 @@ export class FantasyInfraStack extends cdk.Stack {
       badgeTable,
       gameweekPlayerHistoryTable,
       staticContentBucket,
-      errorTopic
+      errorTopic,
+      mediaAssetsBucket
     });
 
     const shouldUseDomainName = this.node.tryGetContext('shouldUseDomainName');

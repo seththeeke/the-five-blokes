@@ -14,6 +14,7 @@ export interface GameweekProcessingCompletedEmailLambdaProps {
     handler: string;
     functionName: string;
     description: string;
+    mediaAssetsBucket: s3.Bucket;
 }
 export class GameweekProcessingCompletedEmailLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: GameweekProcessingCompletedEmailLambdaProps) {
@@ -28,6 +29,7 @@ export class GameweekProcessingCompletedEmailLambda extends lambda.Function {
         "BADGE_TABLE_NAME": props.badgeTable.tableName,
         "GAMEWEEK_PLAYER_HISTORY_TABLE_NAME": props.gameweekPlayerHistoryTable.tableName,
         "STATIC_CONTENT_BUCKET_NAME": props.staticContentBucket.bucketName,
+        "MEDIA_ASSETS_BUCKET_URL": props.mediaAssetsBucket.bucketDomainName
       },
       timeout: cdk.Duration.seconds(300),
       functionName: props.functionName,

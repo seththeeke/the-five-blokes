@@ -24,6 +24,7 @@ export interface GameweekProcessingMachineProps {
     gameweekPlayerHistoryTable: ddb.Table;
     staticContentBucket: s3.Bucket;
     errorTopic: sns.Topic;
+    mediaAssetsBucket: s3.Bucket;
 }
 export class GameweekProcessingMachine extends cdk.Construct{
 
@@ -249,7 +250,8 @@ export class GameweekProcessingMachine extends cdk.Construct{
             staticContentBucket: props.staticContentBucket,
             functionName: "GameweekProcessingCompletedEmailLambda",
             description: "Controller for email sent after gameweek processing has completed",
-            handler: "controller/email-controller.sendGameweekProcessingCompletedEmailController"
+            handler: "controller/email-controller.sendGameweekProcessingCompletedEmailController",
+            mediaAssetsBucket: props.mediaAssetsBucket
         });
     }
 }
