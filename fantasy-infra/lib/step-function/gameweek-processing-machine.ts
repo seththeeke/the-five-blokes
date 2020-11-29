@@ -97,7 +97,8 @@ export class GameweekProcessingMachine extends cdk.Construct{
         const sendGameweekProcessingCompleteEmailTask = new stepFunctions.Task(this, "GameweekCompletedEmail", {
             task: new stepFunctionTasks.InvokeFunction(this.gameweekProcessingCompletedEmailLambda),
             timeout: cdk.Duration.minutes(5),
-            comment: "Sends email notification of the gameweek processing completed"
+            comment: "Sends email notification of the gameweek processing completed",
+            resultPath: stepFunctions.JsonPath.DISCARD
         });
 
         const hasSeasonCompletedChoice = new stepFunctions.Choice(this, "HasSeasonCompletedChoice", {

@@ -12,6 +12,12 @@ This architecture, like many others I've made utilizes serverless tech as much a
 
 ![Gameweek Processing State Machine](stepfunctions_graph.png)
 
+### Emails
+
+Every week, an email is sent out to notify everyone of the week's results. A sample email from gameweek 9 can be seen below.
+
+![Sample Email](sample-email.png)
+
 ## Setup
 
 ### Infrastructure
