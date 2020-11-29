@@ -22,5 +22,22 @@ module.exports = {
         let gameweekPlayerHistoryResponse = await ddb.putItem(gameweekPlayerHistoryParams).promise();
         console.log("Persisted player history for teamId: " + teamId);
         return gameweekPlayerHistoryResponse;
+    },
+
+    getGameweekPlayerDataForGameweek: async function(leagueId, gameweek) {
+        let gameweekPlayerScanParams = {
+            TableName: process.env.GAMEWEEK_PLAYER_HISTORY_TABLE_NAME
+        }
+        let gameweekPlayerDetails = await ddb.scan(gameweekPlayerScanParams).promise();
+        let gameweekPlayerItems = gameweekPlayerDetails.Items;
+        let playerHistoryForGameweek = [];
+        for (let i in gameweekPlayerItems){
+            let gameweekPlayerData = gameweekPlayerItems[i];
+            if (gameweekPlayerData.leagueIdTeamId.S.indexOf(leagueId) === 0 && gameweekPlayerData.gameweek.N === gameweek.toString()){
+                playerHistoryForGameweek.push(gameweekPlayerData);
+            }
+        }
+        console.log("Found gameweek data: " + JSON.stringify(playerHistoryForGameweek));
+        return playerHistoryForGameweek;
     }
 }

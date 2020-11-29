@@ -35,10 +35,10 @@ export class GameweekProcessingCompletedEmailLambda extends lambda.Function {
     });
 
     props.leagueDetailsTable.grantReadData(this);
-    props.gameweeksTable.grantReadWriteData(this);
-    props.badgeTable.grantReadWriteData(this);
-    props.gameweekPlayerHistoryTable.grantWriteData(this);
-    props.staticContentBucket.grantReadWrite(this);
+    props.gameweeksTable.grantReadData(this);
+    props.badgeTable.grantReadData(this);
+    props.gameweekPlayerHistoryTable.grantReadData(this);
+    props.staticContentBucket.grantRead(this);
 
     const emailPolicyStatement = new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,

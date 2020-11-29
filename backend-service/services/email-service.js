@@ -15,20 +15,74 @@ module.exports = {
         console.log("Beginning to form and send gameweek processing email");
         let activeLeague = await leagueDetailsDao.getActiveLeague();
         let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
-        let allBadges = await gameweekBadgesDao.getAllBadges();
+        // let allBadges = await gameweekBadgesDao.getAllBadges();
 
         console.log(JSON.stringify(activeLeague));
         console.log(JSON.stringify(lastCompletedGameweek));
         let participants = JSON.parse(activeLeague.participants.S);
         let standings = JSON.parse(lastCompletedGameweek.standings.S);
+        let gameweekPlayerStats = JSON.parse(lastCompletedGameweek.gameweekPlayerStats.S);
+        let gameweekStandings = JSON.parse(lastCompletedGameweek.standings.S);
+        // sort by gameweek total, standings come sorted by league standings
+        gameweekStandings.sort(function(a, b) {
+            return b.event_total - a.event_total
+        });
         let gameweek = lastCompletedGameweek.gameweek.N;
+        let gameweekPlayerHistoryForGameweek = await gameweekPlayerDataDao.getGameweekPlayerDataForGameweek(activeLeague.leagueId.S, gameweek);
+        console.log(gameweekPlayerHistoryForGameweek);
 
-        // "standings": {
-        //     "S": "[{\"event_total\":58,\"last_rank\":2,\"league_entry\":209662,\"rank\":1,\"rank_sort\":1,\"total\":374},{\"event_total\":47,\"last_rank\":1,\"league_entry\":166334,\"rank\":2,\"rank_sort\":2,\"total\":372},{\"event_total\":36,\"last_rank\":3,\"league_entry\":116756,\"rank\":3,\"rank_sort\":3,\"total\":320},{\"event_total\":28,\"last_rank\":4,\"league_entry\":165252,\"rank\":4,\"rank_sort\":4,\"total\":308},{\"event_total\":53,\"last_rank\":8,\"league_entry\":156040,\"rank\":5,\"rank_sort\":5,\"total\":303},{\"event_total\":36,\"last_rank\":5,\"league_entry\":38803,\"rank\":6,\"rank_sort\":6,\"total\":298},{\"event_total\":34,\"last_rank\":7,\"league_entry\":207715,\"rank\":7,\"rank_sort\":7,\"total\":292},{\"event_total\":28,\"last_rank\":6,\"league_entry\":155849,\"rank\":8,\"rank_sort\":8,\"total\":287},{\"event_total\":40,\"last_rank\":10,\"league_entry\":165985,\"rank\":9,\"rank_sort\":9,\"total\":266},{\"event_total\":18,\"last_rank\":9,\"league_entry\":154148,\"rank\":10,\"rank_sort\":10,\"total\":260}]"
-        // },
-        // "gameweek": {
-        //     "N": "8"
-        // }
+        let aggregatedData = {};
+        let mostGoals = -1;
+        let mostAssists = -1;
+        for (let i in gameweekPlayerHistoryForGameweek) {
+            let gameweekDataForEntry = gameweekPlayerHistoryForGameweek[i];
+            let picks = JSON.parse(gameweekDataForEntry.picks.S);
+            let teamId = gameweekDataForEntry.leagueIdTeamId.S.substring(gameweekDataForEntry.leagueIdTeamId.S.indexOf("-") + 1);
+            aggregatedData[teamId] = {
+                "goals": 0,
+                "assists": 0
+            };
+            for (let j in picks){
+                let pick = picks[j];
+                let playerData = gameweekPlayerStats[pick.element.toString()];
+                if (playerData){
+                    if (playerData.goals_scored){
+                        aggregatedData[teamId].goals = aggregatedData[teamId].goals + playerData.goals_scored;
+                        mostGoals = Math.max(mostGoals, aggregatedData[teamId].goals);
+                    }
+                    if (playerData.assists) {
+                        aggregatedData[teamId].assists = aggregatedData[teamId].assists + playerData.assists;
+                        mostAssists = Math.max(mostAssists, aggregatedData[teamId].assists);
+                    }
+                }
+            }
+        }
+        let mostGoalsFirstNames = [];
+        let leastGoalsFirstNames = [];
+        let mostAssistsFirstNames = [];
+        let leastAssistsFirstNames = [];
+        let leastGoals = 100;
+        let leastAssists = 100;
+        for (let teamId in aggregatedData) {
+            let teamData = aggregatedData[teamId];
+            leastGoals = Math.min(leastGoals, teamData.goals);
+            leastAssists = Math.min(leastAssists, teamData.assists);
+            if (teamData.goals === mostGoals) {
+                mostGoalsFirstNames.push(this._getParticipantFirstNameByEntryId(participants, teamId));
+            }
+            if (teamData.assists === mostAssists) {
+                mostAssistsFirstNames.push(this._getParticipantFirstNameByEntryId(participants, teamId));
+            }
+        }
+        for (let teamId in aggregatedData) {
+            let teamData = aggregatedData[teamId];
+            if (teamData.goals === leastGoals) {
+                leastGoalsFirstNames.push(this._getParticipantFirstNameByEntryId(participants, teamId));
+            }
+            if (teamData.assists === leastAssists) {
+                leastAssistsFirstNames.push(this._getParticipantFirstNameByEntryId(participants, teamId));
+            }
+        }
 
         var params = {
             Destination: {
@@ -47,18 +101,18 @@ module.exports = {
                     "firstPlacePoints": standings[0].total,
                     "secondPlacePoints": standings[1].total,
                     "thirdPlacePoints": standings[2].total,
-                    "mostGameweekPoints": "Seth",
-                    "mostGameweekPointsValue": "75",
-                    "leastGameweekPoints": "Nathan",
-                    "leastGameweekPointsValue": "12",
-                    "mostGameweekGoals": "Evan",
-                    "mostGameweekGoalsValue": "7",
-                    "leastGameweekGoals": "Jordan",
-                    "leastGameweekGoalsValue": "0",
-                    "mostGameweekAssists": "Liam",
-                    "mostGameweekAssistsValue": "10",
-                    "leastGameweekAssists": "Amine",
-                    "leastGameweekAssistsValue": "2",
+                    "mostGameweekPoints": this._getParticipantFirstName(participants, gameweekStandings[0].league_entry),
+                    "mostGameweekPointsValue": gameweekStandings[0].event_total,
+                    "leastGameweekPoints": this._getParticipantFirstName(participants, gameweekStandings[gameweekStandings.length - 1].league_entry),
+                    "leastGameweekPointsValue": gameweekStandings[gameweekStandings.length - 1].event_total,
+                    "mostGameweekGoals": this._getNameArrayValue(mostGoalsFirstNames),
+                    "mostGameweekGoalsValue": mostGoals,
+                    "leastGameweekGoals": this._getNameArrayValue(leastGoalsFirstNames),
+                    "leastGameweekGoalsValue": leastGoals,
+                    "mostGameweekAssists": this._getNameArrayValue(mostAssistsFirstNames),
+                    "mostGameweekAssistsValue": mostAssists,
+                    "leastGameweekAssists": this._getNameArrayValue(leastAssistsFirstNames),
+                    "leastGameweekAssistsValue": leastAssists,
                     "game1Home": "Man City",
                     "game1Away": "Arsenal",
                     "game2Home": "Man United",
@@ -81,12 +135,28 @@ module.exports = {
         // return params;
     },
 
-    _getParticipantFirstName: function(participants, entryId) {
+    _getParticipantFirstName: function(participants, participantId) {
         for (let i in participants) {
             let participant = participants[i];
-            if (participant.id.toString() === entryId.toString()) {
+            if (participant.id.toString() === participantId.toString()) {
                 return participant.player_first_name;
             }
         }
+    },
+
+    _getParticipantFirstNameByEntryId: function(participants, entryId) {
+        for (let i in participants) {
+            let participant = participants[i];
+            if (participant.entry_id.toString() === entryId.toString()) {
+                return participant.player_first_name;
+            }
+        }
+    },
+
+    _getNameArrayValue: function(nameArray) {
+        if (nameArray.length > 3) {
+            return nameArray.length + "-way tie"
+        }
+        return nameArray.join(", ");
     }
 }
