@@ -19,4 +19,6 @@ aws s3 ls
 aws s3 sync email-icons/ s3://<bucket_name> --acl public-read
 // gamma 
 aws s3 sync email-icons/ s3://fantasyinfrastack-mediaassetsbucketd4253741-1srfmprg1dt8c --acl public-read
+// prod
+aws s3 sync email-icons/ s3://fantasyinfrastack-mediaassetsbucketd4253741-1r3c3j7im1h2w --acl public-read --profile lotm --region us-east-1
 ```
