@@ -93,6 +93,12 @@ export class GameweekProcessingMachine extends cdk.Construct{
             parallelGameweekBadgeProcessor.branch(stepFunctionTask);
         }
 
+        const sendGameweekProcessingCompleteEmailTask = new stepFunctions.Task(this, "GameweekCompletedEmail", {
+            task: new stepFunctionTasks.InvokeFunction(this.gameweekProcessingCompletedEmailLambda),
+            timeout: cdk.Duration.minutes(5),
+            comment: "Sends email notification of the gameweek processing completed"
+        });
+
         const hasSeasonCompletedChoice = new stepFunctions.Choice(this, "HasSeasonCompletedChoice", {
             comment: "Checks the gameweek value and if 38, begins season completed processing",
         });
@@ -129,7 +135,8 @@ export class GameweekProcessingMachine extends cdk.Construct{
         // Uncomment to make testing easier
         // noGameweekDataPublishTask.next(extractGameweekDataTask);
         extractGameweekDataTask.next(parallelGameweekBadgeProcessor);
-        parallelGameweekBadgeProcessor.next(hasSeasonCompletedChoice);
+        parallelGameweekBadgeProcessor.next(sendGameweekProcessingCompleteEmailTask);
+        sendGameweekProcessingCompleteEmailTask.next(hasSeasonCompletedChoice);
         hasSeasonCompletedChoice.when(stepFunctions.Condition.stringEquals("$.gameweek", "38"), seasonCompletedPublishTask);
         hasSeasonCompletedChoice.when(stepFunctions.Condition.not(stepFunctions.Condition.stringEquals("$.gameweek", "38")), new stepFunctions.Succeed(this, "SeasonDidNotCompleteSoSkipToEnd"));
         seasonCompletedPublishTask.next(parallelSeasonBadgeProcessor);
