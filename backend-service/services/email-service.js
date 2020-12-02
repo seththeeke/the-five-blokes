@@ -134,7 +134,7 @@ module.exports = {
                         "pointsIcon": pointsIcon,
                         "goalsIcon": goalsIcon,
                         "assistsIcon": assistsIcon,
-                        "customUnsubscribeUrl": "https://lastofthemohigans.com?emailAddress=" + emailAddress
+                        "customUnsubscribeUrl": "https://lastofthemohigans.com/email-subscription-management?emailAddress=" + emailAddress
                     }
                 ),
                 Source: 'seththeekelastofthemohigans@gmail.com', // should be env var
