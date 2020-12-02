@@ -15,6 +15,7 @@ export interface GameweekProcessingCompletedEmailLambdaProps {
     functionName: string;
     description: string;
     mediaAssetsBucket: s3.Bucket;
+    emailSubscriptionTable: ddb.Table;
 }
 export class GameweekProcessingCompletedEmailLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: GameweekProcessingCompletedEmailLambdaProps) {
@@ -29,7 +30,8 @@ export class GameweekProcessingCompletedEmailLambda extends lambda.Function {
         "BADGE_TABLE_NAME": props.badgeTable.tableName,
         "GAMEWEEK_PLAYER_HISTORY_TABLE_NAME": props.gameweekPlayerHistoryTable.tableName,
         "STATIC_CONTENT_BUCKET_NAME": props.staticContentBucket.bucketName,
-        "MEDIA_ASSETS_BUCKET_URL": props.mediaAssetsBucket.bucketDomainName
+        "MEDIA_ASSETS_BUCKET_URL": props.mediaAssetsBucket.bucketDomainName,
+        "EMAIL_SUBSCRIPTION_TABLE": props.emailSubscriptionTable.tableName
       },
       timeout: cdk.Duration.seconds(300),
       functionName: props.functionName,
@@ -41,6 +43,7 @@ export class GameweekProcessingCompletedEmailLambda extends lambda.Function {
     props.badgeTable.grantReadData(this);
     props.gameweekPlayerHistoryTable.grantReadData(this);
     props.staticContentBucket.grantRead(this);
+    props.emailSubscriptionTable.grantReadData(this);
 
     const emailPolicyStatement = new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,

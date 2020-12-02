@@ -28,5 +28,13 @@ module.exports = {
         }
         let removeEmailAddressResponse = await ddb.deleteItem(removeEmailParams).promise();
         console.log("Removed email address: " + JSON.stringify(removeEmailParams));
+    },
+
+    getAllSubscriptions: async function() {
+        let emailSubscriptionScanParams = {
+            TableName: process.env.EMAIL_SUBSCRIPTION_TABLE
+        }
+        let allSubsResponse = await ddb.scan(emailSubscriptionScanParams).promise();
+        return allSubsResponse;
     }
 }

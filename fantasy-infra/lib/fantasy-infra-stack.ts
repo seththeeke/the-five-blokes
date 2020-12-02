@@ -120,7 +120,8 @@ export class FantasyInfraStack extends cdk.Stack {
       gameweekPlayerHistoryTable,
       staticContentBucket,
       errorTopic,
-      mediaAssetsBucket
+      mediaAssetsBucket,
+      emailSubscriptionTable
     });
 
     const shouldUseDomainName = this.node.tryGetContext('shouldUseDomainName');

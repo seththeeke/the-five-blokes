@@ -90,54 +90,63 @@ module.exports = {
             }
         }
 
-        var params = {
-            Destination: {
-              ToAddresses: [
-                'seththeeke@gmail.com',
-              ]
-            },
-            Template: 'GameweekCompleted', // should be env var
-            TemplateData: JSON.stringify(
-                {
-                    "gameweek": gameweek,
-                    "podiumImg": podiumImg,
-                    "firstPlace": this._getParticipantFirstName(participants, standings[0].league_entry),
-                    "secondPlace": this._getParticipantFirstName(participants, standings[1].league_entry),
-                    "thirdPlace": this._getParticipantFirstName(participants, standings[2].league_entry),
-                    "firstPlacePoints": standings[0].total,
-                    "secondPlacePoints": standings[1].total,
-                    "thirdPlacePoints": standings[2].total,
-                    "mostGameweekPoints": this._getParticipantFirstName(participants, gameweekStandings[0].league_entry),
-                    "mostGameweekPointsValue": gameweekStandings[0].event_total,
-                    "leastGameweekPoints": this._getParticipantFirstName(participants, gameweekStandings[gameweekStandings.length - 1].league_entry),
-                    "leastGameweekPointsValue": gameweekStandings[gameweekStandings.length - 1].event_total,
-                    "mostGameweekGoals": this._getNameArrayValue(mostGoalsFirstNames),
-                    "mostGameweekGoalsValue": mostGoals,
-                    "leastGameweekGoals": this._getNameArrayValue(leastGoalsFirstNames),
-                    "leastGameweekGoalsValue": leastGoals,
-                    "mostGameweekAssists": this._getNameArrayValue(mostAssistsFirstNames),
-                    "mostGameweekAssistsValue": mostAssists,
-                    "leastGameweekAssists": this._getNameArrayValue(leastAssistsFirstNames),
-                    "leastGameweekAssistsValue": leastAssists,
-                    "game1Home": "Man City",
-                    "game1Away": "Arsenal",
-                    "game2Home": "Man United",
-                    "game2Away": "Chelsea",
-                    "game3Home": "Leicester",
-                    "game3Away": "Burnley",
-                    "headerIcon": headerIcon,
-                    "thumbsUpIcon": thumbsUpIcon,
-                    "thumbsDownIcon": thumbsDownIcon,
-                    "pointsIcon": pointsIcon,
-                    "goalsIcon": goalsIcon,
-                    "assistsIcon": assistsIcon,
-                }
-            ),
-            Source: 'seththeekelastofthemohigans@gmail.com', // should be env var
-        };
-
-        let response = await ses.sendTemplatedEmail(params).promise();
-        return response;
+        let emailAddresses = await emailSubscriptionsDao.getAllSubscriptions();
+        for (let i in emailAddresses.Items) {
+            let emailAddress = emailAddresses.Items[i].emailAddress.S;
+            let sendEmailParams = {
+                Destination: {
+                  ToAddresses: [
+                    emailAddress,
+                  ]
+                },
+                Template: 'GameweekCompleted', // should be env var
+                TemplateData: JSON.stringify(
+                    {
+                        "gameweek": gameweek,
+                        "podiumImg": podiumImg,
+                        "firstPlace": this._getParticipantFirstName(participants, standings[0].league_entry),
+                        "secondPlace": this._getParticipantFirstName(participants, standings[1].league_entry),
+                        "thirdPlace": this._getParticipantFirstName(participants, standings[2].league_entry),
+                        "firstPlacePoints": standings[0].total,
+                        "secondPlacePoints": standings[1].total,
+                        "thirdPlacePoints": standings[2].total,
+                        "mostGameweekPoints": this._getParticipantFirstName(participants, gameweekStandings[0].league_entry),
+                        "mostGameweekPointsValue": gameweekStandings[0].event_total,
+                        "leastGameweekPoints": this._getParticipantFirstName(participants, gameweekStandings[gameweekStandings.length - 1].league_entry),
+                        "leastGameweekPointsValue": gameweekStandings[gameweekStandings.length - 1].event_total,
+                        "mostGameweekGoals": this._getNameArrayValue(mostGoalsFirstNames),
+                        "mostGameweekGoalsValue": mostGoals,
+                        "leastGameweekGoals": this._getNameArrayValue(leastGoalsFirstNames),
+                        "leastGameweekGoalsValue": leastGoals,
+                        "mostGameweekAssists": this._getNameArrayValue(mostAssistsFirstNames),
+                        "mostGameweekAssistsValue": mostAssists,
+                        "leastGameweekAssists": this._getNameArrayValue(leastAssistsFirstNames),
+                        "leastGameweekAssistsValue": leastAssists,
+                        "game1Home": "Man City",
+                        "game1Away": "Arsenal",
+                        "game2Home": "Man United",
+                        "game2Away": "Chelsea",
+                        "game3Home": "Leicester",
+                        "game3Away": "Burnley",
+                        "headerIcon": headerIcon,
+                        "thumbsUpIcon": thumbsUpIcon,
+                        "thumbsDownIcon": thumbsDownIcon,
+                        "pointsIcon": pointsIcon,
+                        "goalsIcon": goalsIcon,
+                        "assistsIcon": assistsIcon,
+                        "customUnsubscribeUrl": "https://lastofthemohigans.com?emailAddress=" + emailAddress
+                    }
+                ),
+                Source: 'seththeekelastofthemohigans@gmail.com', // should be env var
+            };
+    
+            try {
+                let response = await ses.sendTemplatedEmail(sendEmailParams).promise();
+                console.log("Successfully sent email to email address " + emailAddress);
+            } catch (error) {
+                console.log("Failed to send email to email address " + emailAddress);
+            }
+        }
     },
 
     subscribe: async function(emailAddress){
