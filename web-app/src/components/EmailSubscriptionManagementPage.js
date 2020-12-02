@@ -8,7 +8,8 @@ class EmailSubscriptionManagementPage extends React.Component {
         super(props);
         this.state = {
             isLoadingWebsite: true,
-            email: window.location.search.substring(window.location.search.indexOf("=") + 1)
+            email: window.location.search.substring(window.location.search.indexOf("=") + 1),
+            responseSuccessful: false
         }
 
         this.subscribe = this.subscribe.bind(this);
@@ -22,15 +23,29 @@ class EmailSubscriptionManagementPage extends React.Component {
     }
 
     subscribe(){
-        this.props.emailSubscriptionService.subscribe(document.getElementById("emailInput").value).then(function(event){
-            console.log("Success Subscribe");
+        this.setState({
+            isLoadingWebsite: true,
+            responseSuccessful: false
         });
+        this.props.emailSubscriptionService.subscribe(document.getElementById("emailInput").value).then(function(event){
+            this.setState({
+                isLoadingWebsite: false,
+                responseSuccessful: true
+            });
+        }.bind(this));
     }
 
     unsubscribe(){
-        this.props.emailSubscriptionService.unsubscribe(document.getElementById("emailInput").value).then(function(event){
-            console.log("Success Unsubscribe");
+        this.setState({
+            isLoadingWebsite: true,
+            responseSuccessful: false
         });
+        this.props.emailSubscriptionService.unsubscribe(document.getElementById("emailInput").value).then(function(event){
+            this.setState({
+                isLoadingWebsite: false,
+                responseSuccessful: true
+            });
+        }.bind(this));
     }
 
     render() {
@@ -51,6 +66,7 @@ class EmailSubscriptionManagementPage extends React.Component {
                             <button className="subscription-button" onClick={this.unsubscribe}>Unsubscribe</button>
                         </div>
                     </div>
+                    <div className="success-text" hidden={!this.state.responseSuccessful}>Success!</div>
                 </div>
             </div>
         );
