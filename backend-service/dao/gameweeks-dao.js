@@ -14,7 +14,7 @@ module.exports = {
         for (let i in gameweekItems){
             let gameweek = gameweekItems[i];
             if (gameweek.leagueId.S === activeLeague.leagueId.S && 
-                (!lastCompletedGameweek || gameweek.gameweek.N > lastCompletedGameweek.gameweek.N)){
+                (!lastCompletedGameweek || parseInt(gameweek.gameweek.N) > parseInt(lastCompletedGameweek.gameweek.N))){
                 lastCompletedGameweek = gameweek;
             }
         }
