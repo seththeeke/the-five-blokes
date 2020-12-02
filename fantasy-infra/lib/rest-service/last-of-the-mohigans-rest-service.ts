@@ -6,18 +6,27 @@ import * as r53 from '@aws-cdk/aws-route53';
 import { GetAllParticipantsLambda } from '../lambda/get-all-participants-lambda';
 import { GetLatestGameweekLambda } from '../lambda/get-latest-gameweek-lambda';
 import { GetStandingsHistoryForLeagueLambda } from '../lambda/get-standings-history-for-league-lambda';
+import { SubscribeEmailLambda } from '../lambda/subscribe-email-lambda';
+import { UnSubscribeEmailLambda } from '../lambda/unsubscribe-email-lambda';
 
 export interface LastOfTheMohigansRestServiceProps {
     leagueDetailsTable: ddb.Table;
     badgeTable: ddb.Table;
     gameweeksTable: ddb.Table;
     shouldUseDomainName?: boolean;
+    emailSubscriptionTable: ddb.Table;
 }
 export class LastOfTheMohigansRestService extends cdk.Construct {
   constructor(scope: cdk.Construct, id: string, props: LastOfTheMohigansRestServiceProps) {
     super(scope, id);
     const fantasyApiGateway = new apigateway.RestApi(this, "FantasyApiGateway", {
       restApiName: "FantasyApiGateway",
+      defaultCorsPreflightOptions: {
+        allowOrigins: ["*"],
+        allowMethods: ["*"],
+        allowHeaders: ["*"],
+        allowCredentials: true
+      }
     });
     if (props.shouldUseDomainName){
       const hostedZone = r53.HostedZone.fromHostedZoneAttributes(this, "DomainNameHostedZone", {
@@ -37,6 +46,7 @@ export class LastOfTheMohigansRestService extends cdk.Construct {
     const participantResource = fantasyApiGateway.root.addResource('participants');
     const gameweeksResource = fantasyApiGateway.root.addResource('gameweeks');
     const standingsResource = fantasyApiGateway.root.addResource('standings');
+    const emailsResource = fantasyApiGateway.root.addResource('emails');
 
     const getAllParticipantsLambda = new GetAllParticipantsLambda(this, "GetAllParticipantsLambda", {
         leagueDetailsTable: props.leagueDetailsTable,
@@ -58,5 +68,17 @@ export class LastOfTheMohigansRestService extends cdk.Construct {
     });
     const getStandingsHistoryForLeagueLambdaIntegration = new apigateway.LambdaIntegration(getStandingsHistoryForLeagueLambda);
     standingsResource.addMethod('GET', getStandingsHistoryForLeagueLambdaIntegration);
+
+    const subscribeEmailLambda = new SubscribeEmailLambda(this, "SubscribeEmailLambda", {
+      emailSubscriptionTable: props.emailSubscriptionTable
+    });
+    const subscribeEmailIntegration = new apigateway.LambdaIntegration(subscribeEmailLambda);
+    emailsResource.addMethod('POST', subscribeEmailIntegration); 
+
+    const unSubscribeEmailLambda = new UnSubscribeEmailLambda(this, "UnSubscribeEmailLambda", {
+      emailSubscriptionTable: props.emailSubscriptionTable
+    });
+    const unSubscribeEmailIntegration = new apigateway.LambdaIntegration(unSubscribeEmailLambda);
+    emailsResource.addMethod('DELETE', unSubscribeEmailIntegration);    
   }
 }

@@ -21,7 +21,7 @@ class AmplifyRequestService {
             return API.put(apiName, path, init);
         }
         if (method === "DELETE"){
-            return API.delete(apiName, path, init);
+            return API.del(apiName, path, init);
         }
     }
 

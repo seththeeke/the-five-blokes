@@ -72,6 +72,17 @@ export class FantasyInfraStack extends cdk.Stack {
       }
     });
 
+    const emailSubscriptionTable = new ddb.Table(this, "EmailSubscriptionTable", {
+      tableName: "EmailSubscriptions",
+      partitionKey: {
+        name: "emailAddress",
+        type: ddb.AttributeType.STRING
+      },
+      readCapacity: 1,
+      writeCapacity: 1,
+      stream: ddb.StreamViewType.NEW_AND_OLD_IMAGES
+    });
+
     const staticContentBucket = new s3.Bucket(this, "StaticContentBucket");
     const mediaAssetsBucket = new s3.Bucket(this, "MediaAssetsBucket");
 
@@ -117,7 +128,8 @@ export class FantasyInfraStack extends cdk.Stack {
       leagueDetailsTable,
       badgeTable,
       gameweeksTable,
-      shouldUseDomainName
+      shouldUseDomainName,
+      emailSubscriptionTable
     });
   }
 }

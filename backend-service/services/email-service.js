@@ -1,6 +1,7 @@
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');
 var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
+var emailSubscriptionsDao = require('./../dao/email-subscriptions-dao');
 
 var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
@@ -137,7 +138,26 @@ module.exports = {
 
         let response = await ses.sendTemplatedEmail(params).promise();
         return response;
-        // return params;
+    },
+
+    subscribe: async function(emailAddress){
+        console.log("Beginning to subscribe email address " + emailAddress);
+        if (this._validateEmail(emailAddress)) {
+            let response = await emailSubscriptionsDao.addEmailAddress(emailAddress);
+            return response;
+        }
+        throw new Error("Invalid email address");
+    },
+
+    unSubscribe: async function(emailAddress){
+        console.log("Beginning to unsubscribe email address " + emailAddress);
+        let response = await emailSubscriptionsDao.removeEmailAddress(emailAddress)
+        return response;
+    },
+
+    _validateEmail: function(email) {
+        const re = /\S+@\S+\.\S+/;
+        return re.test(String(email).toLowerCase());
     },
 
     _getParticipantFirstName: function(participants, participantId) {
