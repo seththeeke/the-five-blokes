@@ -14,7 +14,7 @@ Amplify.configure(config);
 class App extends React.Component {
   constructor(props){
     super(props);
-    this.fplServiceApiName = "FPLService";
+    this.fplServiceApiName = "FPLServiceProdRaw";
     this.amplifyRequestService = new AmplifyRequestService();
     this.fplService = new FPLService(this.amplifyRequestService, this.fplServiceApiName);
     this.emailSubscriptionService = new EmailSubscriptionService(this.amplifyRequestService, this.fplServiceApiName);
