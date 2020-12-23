@@ -41,20 +41,24 @@ module.exports = {
             }
         }
         console.log("Found top team: " + topTeam + " for player: " + topPlayer.element);
-        let leagueEntry = leagueDetails.league_entries.filter(leagueEntry => leagueEntry.entry_id.toString() === topTeam.toString());
-        if (leagueEntry[0]) {
-            let gameweekMVP = await badgesDao.addNewBadge(
-                leagueDetails.league.id.toString() + "-" + leagueEntry[0].id.toString() + "-" + BADGE_TYPE.GAMEWEEK_MVP + "-" + gameweek,
-                leagueEntry[0].id.toString(),
-                BADGE_TYPE.GAMEWEEK_MVP, 
-                {
-                    "year": leagueDetails.league.draft_dt.substring(0, 4),
-                    "gameweek": gameweek,
-                    "player": playerMap[topPlayer.element.toString()]
-                },
-                leagueDetails);
+        if (topTeam){
+            let leagueEntry = leagueDetails.league_entries.filter(leagueEntry => leagueEntry.entry_id.toString() === topTeam.toString());
+            if (leagueEntry[0]) {
+                let gameweekMVP = await badgesDao.addNewBadge(
+                    leagueDetails.league.id.toString() + "-" + leagueEntry[0].id.toString() + "-" + BADGE_TYPE.GAMEWEEK_MVP + "-" + gameweek,
+                    leagueEntry[0].id.toString(),
+                    BADGE_TYPE.GAMEWEEK_MVP, 
+                    {
+                        "year": leagueDetails.league.draft_dt.substring(0, 4),
+                        "gameweek": gameweek,
+                        "player": playerMap[topPlayer.element.toString()]
+                    },
+                    leagueDetails);
+            } else {
+                console.log("No participant owned the top player for gameweek: " + gameweek);
+            }
         } else {
-            console.log("No participant owned the top player for gameweek: " + gameweek);
+            console.log("No participant owned the top player for gameweek: " + JSON.stringify(playerMap[topPlayer.element.toString()]));
         }
     }
 }
