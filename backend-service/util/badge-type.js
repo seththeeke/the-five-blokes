@@ -1,4 +1,5 @@
 module.exports = {
+    // GAMEWEEK
     PARTICIPANT: "Participant",
     _50_POINT_GAMEWEEK: "50+ Point Gameweek",
     _75_POINT_GAMEWEEK: "75+ Point Gameweek",
@@ -20,5 +21,11 @@ module.exports = {
     _15_ASSIST_GAMEWEEK: "15+ Assist Gameweek",
     _10_ASSIST_GAMEWEEK: "10+ Assist Gameweek",
     _5_ASSIST_GAMEWEEK: "5+ Assist Gameweek",
-    _0_ASSIST_GAMEWEEK: "0 Assist Gameweek"
+    _0_ASSIST_GAMEWEEK: "0 Assist Gameweek",
+
+    // SEASON
+    GOLDEN_BOOT: "Golden Boot Winner",
+    GOLDEN_GLOVE: "Golden Glove Winner",
+    PLAYMAKER_OF_THE_SEASON_WINNER: "Playmaker of the Season Winner",
+    DREAM_TEAM_PLAYER: "Dreamteam Player"
 };

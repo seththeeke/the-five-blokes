@@ -22,11 +22,11 @@ module.exports = {
         const staticData = await fplService.getBootstapStatic();
         // Get Current Standings
         // Top Goal Scorers
-        let topTenScorers = statisticsCalculator.getTopTenScorers(staticData);
+        let topTenScorers = statisticsCalculator.getTopTenScorers(staticData.data.elements);
         // Top Assisters
-        let topTenAssisters = statisticsCalculator.getTopTenAssisters(staticData);
+        let topTenAssisters = statisticsCalculator.getTopTenAssisters(staticData.data.elements);
         // Top Clean Sheets
-        let topTenCleanSheets = statisticsCalculator.getTopTenCleanSheets(staticData);
+        let topTenCleanSheets = statisticsCalculator.getTopTenCleanSheets(staticData.data.elements);
         // Top 10 Fantasy Points Producers
         // Send Email
 
