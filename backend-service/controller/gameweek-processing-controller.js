@@ -8,7 +8,7 @@ AWS.config.update({region: process.env.AWS_REGION});
 
 exports.hasGameweekCompleted = async (event) => {
     console.log(JSON.stringify(event));
-    let response = await gameweekProcessService.hasGameweekCompleted(event.forceGameweekReprocessing);
+    let response = await gameweekProcessService.hasGameweekCompleted(event.forceGameweekReprocessing, event.shouldOverrideSeasonCompletedChoice);
     return response;
 }
 
@@ -16,7 +16,8 @@ exports.extractGameweekDataHandler = async (event) => {
     console.log(JSON.stringify(event));
     let extractGameweeDataRequest = {
         "leagueId": event.league,
-        "gameweekNum": event.gameweek
+        "gameweekNum": event.gameweek,
+        "shouldOverrideSeasonCompletedChoice": event.shouldOverrideSeasonCompletedChoice
     }
     let response = await gameweekProcessService.extractGameweekData(extractGameweeDataRequest);
     return response;

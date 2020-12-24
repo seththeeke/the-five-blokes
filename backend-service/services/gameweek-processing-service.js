@@ -5,35 +5,31 @@ var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
 var fplDraftService = require('./fpl-draft-service');
 
 module.exports = {
-    hasGameweekCompleted: async function(forceGameweekReprocessing){
+    hasGameweekCompleted: async function(forceGameweekReprocessing, shouldOverrideSeasonCompletedChoice){
         console.log("Beginning to check if a gameweek has completed");
         let activeLeague = await leagueDetailsDao.getActiveLeague();
         let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
 
         let gameweekMetadataResponse = await fplDraftService.getGameweekMetadata();
         let gameweekData = gameweekMetadataResponse.data;
+        let response = {
+            "gameweek": gameweekData.current_event.toString(),
+            "league": activeLeague.leagueId.S,
+            "hasCompleted": false,
+            "shouldOverrideSeasonCompletedChoice": shouldOverrideSeasonCompletedChoice
+        }
         if (forceGameweekReprocessing) {
             console.log("Gameweek completed check bypassed, reprocessing gameweek " + gameweekData);
-            return {
-                "gameweek": gameweekData.current_event.toString(),
-                "league": activeLeague.leagueId.S,
-                "hasCompleted": true
-            }
+            response.hasCompleted = true;
+            return response;
         }
         if (gameweekData.current_event_finished && (!lastCompletedGameweek || parseInt(gameweekData.current_event) > parseInt(lastCompletedGameweek.gameweek.N))) {
             console.log("New gameweek completed " + gameweekData);
-            return {
-                "gameweek": gameweekData.current_event.toString(),
-                "league": activeLeague.leagueId.S,
-                "hasCompleted": true
-            }
+            response.hasCompleted = true;
+            return response;
         }
         console.log("No new gameweek information for league " + JSON.stringify(activeLeague));
-        return {
-            "gameweek": gameweekData.current_event.toString(),
-            "league": activeLeague.leagueId.S,
-            "hasCompleted": false
-        }
+        return response;
     },
 
     extractGameweekData: async function(extractGameweekDataRequest){
@@ -55,7 +51,8 @@ module.exports = {
             "gameweekData": gameweekData,
             "leagueGameweekData": leagueGameweekData,
             "leaguePicks": leaguePicks,
-            "gameweek": extractGameweekDataRequest.gameweekNum
+            "gameweek": extractGameweekDataRequest.gameweekNum,
+            "shouldOverrideSeasonCompletedChoice": extractGameweekDataRequest.shouldOverrideSeasonCompletedChoice || false
         };
     },
 

@@ -140,8 +140,11 @@ export class GameweekProcessingMachine extends cdk.Construct{
         extractGameweekDataTask.next(parallelGameweekBadgeProcessor);
         parallelGameweekBadgeProcessor.next(sendGameweekProcessingCompleteEmailTask);
         sendGameweekProcessingCompleteEmailTask.next(hasSeasonCompletedChoice);
-        hasSeasonCompletedChoice.when(stepFunctions.Condition.stringEquals("$.gameweek", "38"), seasonCompletedPublishTask);
-        hasSeasonCompletedChoice.when(stepFunctions.Condition.not(stepFunctions.Condition.stringEquals("$.gameweek", "38")), new stepFunctions.Succeed(this, "SeasonDidNotCompleteSoSkipToEnd"));
+        const hasSeasonCompletedCondition = stepFunctions.Condition.or(
+            stepFunctions.Condition.stringEquals("$.gameweek", "38"),
+            stepFunctions.Condition.booleanEquals("$.shouldOverrideSeasonCompletedChoice", true));
+        hasSeasonCompletedChoice.when(hasSeasonCompletedCondition, seasonCompletedPublishTask);
+        hasSeasonCompletedChoice.when(stepFunctions.Condition.not(hasSeasonCompletedCondition), new stepFunctions.Succeed(this, "SeasonDidNotCompleteSoSkipToEnd"));
         seasonCompletedPublishTask.next(parallelSeasonBadgeProcessor);
 
         const stateMachine = new stepFunctions.StateMachine(this, "GameweekProcessingStateMachine", {
@@ -223,11 +226,37 @@ export class GameweekProcessingMachine extends cdk.Construct{
 
         const seasonBadgeMetadatas = [
             {
-                functionName: "AssignSeasonBadges",
-                handler: "controller/season-processing-controller.assignSeasonBadgesHandler",
-                description: "Assigns badges based on the season ending"
+                functionName: "AssignLeagueAwardsBadges",
+                handler: "controller/season-processing-controller.assignLeagueAwardsHandler",
+                description: "Assigns badges based on the league awards such as POTY and YPOTY"
+            },
+            {
+                functionName: "AssignPlayerAwardsBadges",
+                handler: "controller/season-processing-controller.assignPlayerAwardsHandler",
+                description: "Assigns badges based on awards such as golden glove, golden boot, etc for players"
+            },
+            {
+                functionName: "AssignPlayerPointsAwardsBadges",
+                handler: "controller/season-processing-controller.assignPlayerPointsAwardsHandler",
+                description: "Assigns badges based on the points earned by the players you own for the season"
+            },
+            {
+                functionName: "AssignTeamPointsAwardsBadges",
+                handler: "controller/season-processing-controller.assignTeamPointsAwardsHandler",
+                description: "Assigns badges based on points a team earns for the season"
+            },
+            {
+                functionName: "AssignTeamStatisticsAwardsBadges",
+                handler: "controller/season-processing-controller.assignTeamStatisticsAwardsHandler",
+                description: "Assigns badges based on the statistic for a team for the season like yellow and red cards, goals, assists, etc"
+            },
+            {
+                functionName: "AssignTransactionsAwardsBadges",
+                handler: "controller/season-processing-controller.assignTransactionsAwardsHandler",
+                description: "Assigns badges based on transaction data for the season"
             }
         ];
+
         this.seasonBadgeLambdas = [];
         for (let i in seasonBadgeMetadatas) {
             let seasonBadgeMetadata = seasonBadgeMetadatas[i];
