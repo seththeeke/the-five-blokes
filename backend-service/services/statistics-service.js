@@ -4,6 +4,7 @@ AWS.config.update({region: process.env.AWS_REGION});
 var ses = new AWS.SES({apiVersion: '2010-12-01'});
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var fplService = require('./fpl-draft-service');
+var statisticsCalculator = require('../util/statistics-calculator');
 
 module.exports = {
     triggerGenerateStatistics: async function(){
@@ -18,14 +19,21 @@ module.exports = {
 
     generateStatistics: async function(){
         console.log("Beginning to generate statistics on demand");
-        // Listen to Topic
-        // Get Static Bootstrap Content
-        // Current Standings
-        // Top 10 Goalscorers
-        // Top 10 Assists
-        // Top 10 Cleansheets
-        // Top 10 Tackles
+        const staticData = await fplService.getBootstapStatic();
+        // Get Current Standings
+        // Top Goal Scorers
+        let topTenScorers = statisticsCalculator.getTopTenScorers(staticData);
+        // Top Assisters
+        let topTenAssisters = statisticsCalculator.getTopTenAssisters(staticData);
+        // Top Clean Sheets
+        let topTenCleanSheets = statisticsCalculator.getTopTenCleanSheets(staticData);
         // Top 10 Fantasy Points Producers
         // Send Email
+
+        return {
+            topTenScorers,
+            topTenAssisters,
+            topTenCleanSheets
+        }
     }
 }
