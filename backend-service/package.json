@@ -1,7 +1,7 @@
 {
-  "name": "announcements-service",
+  "name": "last-of-the-mohigans-service",
   "version": "1.0.0",
-  "description": "monolithic-announcements-service",
+  "description": "monolithic-last-of-the-mohigans-service",
   "main": "index.js",
   "scripts": {
     "test": "mocha tests/unit/"

@@ -1,3 +1,4 @@
+// static value based on the API, can be looked up from bootstrap static if needed
 var GOALKEEPER_ELEMENT_TYPE = 1;
 
 module.exports = {

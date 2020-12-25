@@ -1,6 +1,5 @@
 var badgesDao = require('./../dao/badges-dao');
 var staticContentDao = require('./../dao/static-content-dao');
-var fplDraftService = require('./../services/fpl-draft-service');
 var BADGE_TYPE = require('./../util/badge-type');
 var badgeProcessorUtil = require('./../util/badge-processor-util');
 var statisticsCalculator = require('./../util/statistics-calculator');
@@ -61,7 +60,7 @@ module.exports = {
         for (let j in badges) {
             let badge = badges[j];
             if (badge.teamId && badge.player){
-                let playerBadge = await this._badgePlayer(badge.value, badge.player, leagueDetails, badge.teamId, badge.badgeType);
+                let playerBadge = await this._badgePlayerWithValue(badge.value, badge.player, leagueDetails, badge.teamId, badge.badgeType);
             }
         }
 
@@ -71,7 +70,7 @@ module.exports = {
         }
     },
 
-    _badgePlayer: async function(value, player, leagueDetails, teamId, badgeType){
+    _badgePlayerWithValue: async function(value, player, leagueDetails, teamId, badgeType){
         let leagueEntry = leagueDetails.league_entries.filter(leagueEntry => leagueEntry.entry_id.toString() === teamId.toString());
         let playerBadge = await badgesDao.addNewBadge(
             leagueDetails.league.id.toString() + "-" + leagueEntry[0].id.toString() + "-" + badgeType + "-" + player.id.toString(),

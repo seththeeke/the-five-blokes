@@ -34,5 +34,10 @@ module.exports = {
     getTopPlayers: async function() {
         let topPlayersResponse = await axios.get(BASE_PATH + '/top-elements');
         return topPlayersResponse;
+    },
+
+    getElementSummary: async function(elementId) {
+        let elementSummaryResponse = await axios.get(BASE_PATH + '/element-summary/' + elementId.toString());
+        return elementSummaryResponse;
     }
 }
