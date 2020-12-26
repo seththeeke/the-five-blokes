@@ -9,6 +9,7 @@ import { StartingPosition } from '@aws-cdk/aws-lambda';
 import { GameweekProcessingMachine } from './step-function/gameweek-processing-machine';
 import { LastOfTheMohigansRestService } from './rest-service/last-of-the-mohigans-rest-service';
 import { StatisticsApi } from './statistics-api/statistics-api';
+import { FantasyLeagueStateMachine } from './step-function/fantasy-league-state-machine';
 
 export class FantasyInfraStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -112,7 +113,7 @@ export class FantasyInfraStack extends cdk.Stack {
     });
     leagueDetailsStreamEventSource.bind(initiateLeagueLambda);
 
-    new GameweekProcessingMachine(this, "GameweekProcessing", {
+    new FantasyLeagueStateMachine(this, "GameweekProcessing", {
       gameweekCompletedTopic,
       seasonCompletedTopic,
       leagueDetailsTable,

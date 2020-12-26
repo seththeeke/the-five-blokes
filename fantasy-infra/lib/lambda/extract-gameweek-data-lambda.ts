@@ -27,7 +27,7 @@ export class ExtractGameweekDataLambda extends lambda.Function {
         "STATIC_CONTENT_BUCKET_NAME": props.staticContentBucket.bucketName,
       },
       timeout: cdk.Duration.seconds(300),
-      functionName: "ExtractGameweekDataLambdaV2",
+      functionName: "ExtractGameweekDataLambdaV3",
       description: "Extracts data for a Gameweek"
     });
 

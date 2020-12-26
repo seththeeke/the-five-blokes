@@ -20,7 +20,7 @@ export class HasGameweekCompletedLambda extends lambda.Function {
         "GAMEWEEK_TABLE_NAME": props.gameweeksTable.tableName,
       },
       timeout: cdk.Duration.seconds(300),
-      functionName: "HasGameweekCompletedLambdaV2",
+      functionName: "HasGameweekCompletedLambdaV3",
       description: "Checks if the gameweek has completed, and if so, returns json representing the gameweek and true or false as to whether the gameweek has completed"
     });
 
