@@ -14,6 +14,7 @@ import { ExtractGameweekDataLambda } from '../lambda/extract-gameweek-data-lambd
 import { AssignGameweekBadgesLambda } from '../lambda/assign-gameweek-badges-lambda';
 import { AssignSeasonBadgesLambda } from '../lambda/assign-season-badges-lambda';
 import { GameweekProcessingCompletedEmailLambda } from '../lambda/gameweek-processing-completed-email-lambda';
+import { SeasonProcessingMachine } from './season-processing-machine';
 
 export interface GameweekProcessingMachineProps {
     gameweekCompletedTopic: sns.Topic;
@@ -106,30 +107,40 @@ export class GameweekProcessingMachine extends cdk.Construct{
             comment: "Checks the gameweek value and if 38, begins season completed processing",
         });
 
-        const seasonCompletedPublishTask = new stepFunctionTasks.SnsPublish(this, "SeasonCompletedNotification", {
-            message: {
-                type: stepFunctions.InputType.OBJECT,
-                value: stepFunctions.TaskInput.fromDataAt("$")
-            },
-            topic: props.seasonCompletedTopic,
-            comment: "Publish notification of season completed to season completed topic",
-            subject: "Season Completed",
-            resultPath: stepFunctions.JsonPath.DISCARD
+        const seasonCompletedStateMachine = new SeasonProcessingMachine(this, "SeasonProcessingMachine", {
+            badgeTable: props.badgeTable,
+            errorTopic: props.errorTopic,
+            gameweekPlayerHistoryTable: props.gameweekPlayerHistoryTable,
+            gameweeksTable: props.gameweeksTable, 
+            leagueDetailsTable: props.leagueDetailsTable,
+            seasonCompletedTopic: props.seasonCompletedTopic,
+            staticContentBucket: props.staticContentBucket
         });
 
-        const parallelSeasonBadgeProcessor = new stepFunctions.Parallel(this, "SeasonBadgeProcessors", {
-            resultPath: stepFunctions.JsonPath.DISCARD
-        });
-        for (let i in this.seasonBadgeLambdas) {
-            let seasonBadgeLambda = this.seasonBadgeLambdas[i];
-            let constructId = "SeasonProcessor" + i;
-            let stepFunctionTask = new stepFunctions.Task(this, constructId, {
-                task: new stepFunctionTasks.InvokeFunction(seasonBadgeLambda),
-                timeout: cdk.Duration.minutes(10)
-            });
-            stepFunctionTask.addPrefix(seasonBadgeLambda.functionName);
-            parallelSeasonBadgeProcessor.branch(stepFunctionTask);
-        }
+        // const seasonCompletedPublishTask = new stepFunctionTasks.SnsPublish(this, "SeasonCompletedNotification", {
+        //     message: {
+        //         type: stepFunctions.InputType.OBJECT,
+        //         value: stepFunctions.TaskInput.fromDataAt("$")
+        //     },
+        //     topic: props.seasonCompletedTopic,
+        //     comment: "Publish notification of season completed to season completed topic",
+        //     subject: "Season Completed",
+        //     resultPath: stepFunctions.JsonPath.DISCARD
+        // });
+
+        // const parallelSeasonBadgeProcessor = new stepFunctions.Parallel(this, "SeasonBadgeProcessors", {
+        //     resultPath: stepFunctions.JsonPath.DISCARD
+        // });
+        // for (let i in this.seasonBadgeLambdas) {
+        //     let seasonBadgeLambda = this.seasonBadgeLambdas[i];
+        //     let constructId = "SeasonProcessor" + i;
+        //     let stepFunctionTask = new stepFunctions.Task(this, constructId, {
+        //         task: new stepFunctionTasks.InvokeFunction(seasonBadgeLambda),
+        //         timeout: cdk.Duration.minutes(10)
+        //     });
+        //     stepFunctionTask.addPrefix(seasonBadgeLambda.functionName);
+        //     parallelSeasonBadgeProcessor.branch(stepFunctionTask);
+        // }
 
         hasGameweekCompletedTask.next(hasGameweekCompletedChoice);
         hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), gameweekCompletedPublishTask);
@@ -143,9 +154,12 @@ export class GameweekProcessingMachine extends cdk.Construct{
         const hasSeasonCompletedCondition = stepFunctions.Condition.or(
             stepFunctions.Condition.stringEquals("$.gameweek", "38"),
             stepFunctions.Condition.booleanEquals("$.shouldOverrideSeasonCompletedChoice", true));
-        hasSeasonCompletedChoice.when(hasSeasonCompletedCondition, seasonCompletedPublishTask);
+        const seasonProcessingStateMachineExecution = new stepFunctionTasks.StepFunctionsStartExecution(this, "SeasonProcessingStateMachineTask", {
+            stateMachine: seasonCompletedStateMachine.seasonProcessingStateMachine
+        });
+        hasSeasonCompletedChoice.when(hasSeasonCompletedCondition, seasonProcessingStateMachineExecution);
         hasSeasonCompletedChoice.when(stepFunctions.Condition.not(hasSeasonCompletedCondition), new stepFunctions.Succeed(this, "SeasonDidNotCompleteSoSkipToEnd"));
-        seasonCompletedPublishTask.next(parallelSeasonBadgeProcessor);
+        // seasonCompletedPublishTask.next(parallelSeasonBadgeProcessor);
 
         const stateMachine = new stepFunctions.StateMachine(this, "GameweekProcessingStateMachine", {
             stateMachineName: "GameweekProcessingMachine",
