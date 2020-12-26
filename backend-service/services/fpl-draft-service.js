@@ -5,7 +5,6 @@ var BASE_PATH = "https://draft.premierleague.com/api";
  * Service for fetching data from fantasy premier draft api
  */
 module.exports = {
-
     getGameweekMetadata: async function() {
         let gameweekMetadataResponse = await axios.get(BASE_PATH + '/game');
         return gameweekMetadataResponse;
