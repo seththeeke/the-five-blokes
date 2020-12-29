@@ -5,25 +5,18 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as targets from '@aws-cdk/aws-events-targets';
 import * as events from '@aws-cdk/aws-events';
 import * as sns from '@aws-cdk/aws-sns';
-import * as ddb from '@aws-cdk/aws-dynamodb';
-import * as s3 from '@aws-cdk/aws-s3';
 import * as cw from '@aws-cdk/aws-cloudwatch';
 import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
 import { HasGameweekCompletedLambda } from '../lambda/has-gameweek-completed-lambda';
 import { SeasonProcessingMachine } from './season-processing-machine';
 import { GameweekProcessingMachine } from './gameweek-processing-machine';
+import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 
 export interface FantasyLeagueStateMachineProps {
     gameweekCompletedTopic: sns.Topic;
     seasonCompletedTopic: sns.Topic;
-    leagueDetailsTable: ddb.Table;
-    gameweeksTable: ddb.Table;
-    badgeTable: ddb.Table;
-    gameweekPlayerHistoryTable: ddb.Table;
-    staticContentBucket: s3.Bucket;
     errorTopic: sns.Topic;
-    mediaAssetsBucket: s3.Bucket;
-    emailSubscriptionTable: ddb.Table;
+    dataSourcesMap: DataSourcesMap;
 }
 export class FantasyLeagueStateMachine extends cdk.Construct{
 
@@ -59,15 +52,15 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
         });
 
         const gameweekCompletedStateMachine = new GameweekProcessingMachine(this, "GameweekProcessingStateMachine", {
-            badgeTable: props.badgeTable,
-            emailSubscriptionTable: props.emailSubscriptionTable,
+            badgeTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.BADGE_TABLE],
+            emailSubscriptionTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.EMAIL_SUBSCRIPTIONS_TABLE],
             errorTopic: props.errorTopic,
             gameweekCompletedTopic: props.gameweekCompletedTopic,
-            gameweekPlayerHistoryTable: props.gameweekPlayerHistoryTable,
-            gameweeksTable: props.gameweeksTable,
-            leagueDetailsTable: props.leagueDetailsTable,
-            mediaAssetsBucket: props.mediaAssetsBucket,
-            staticContentBucket: props.staticContentBucket
+            gameweekPlayerHistoryTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEK_PLAYER_HISTORY_TABLE],
+            gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE],
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
+            mediaAssetsBucket: props.dataSourcesMap.s3Buckets[DataSourceMapKeys.MEDIA_ASSET_BUCKET],
+            staticContentBucket: props.dataSourcesMap.s3Buckets[DataSourceMapKeys.STATIC_CONTENT_BUCKET]
         });
 
         const hasSeasonCompletedChoice = new stepFunctions.Choice(this, "HasSeasonCompletedChoice", {
@@ -75,13 +68,13 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
         });
 
         const seasonCompletedStateMachine = new SeasonProcessingMachine(this, "SeasonProcessingMachine", {
-            badgeTable: props.badgeTable,
+            badgeTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.BADGE_TABLE],
             errorTopic: props.errorTopic,
-            gameweekPlayerHistoryTable: props.gameweekPlayerHistoryTable,
-            gameweeksTable: props.gameweeksTable, 
-            leagueDetailsTable: props.leagueDetailsTable,
+            gameweekPlayerHistoryTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEK_PLAYER_HISTORY_TABLE],
+            gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE], 
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
             seasonCompletedTopic: props.seasonCompletedTopic,
-            staticContentBucket: props.staticContentBucket
+            staticContentBucket: props.dataSourcesMap.s3Buckets[DataSourceMapKeys.STATIC_CONTENT_BUCKET]
         });
 
         hasGameweekCompletedTask.next(hasGameweekCompletedChoice);
@@ -132,8 +125,8 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
 
     createLambdas(props: FantasyLeagueStateMachineProps): void {
         this.hasGameweekCompletedLambda = new HasGameweekCompletedLambda(this, "HasGameweekCompletedLambda", {
-            leagueDetailsTable: props.leagueDetailsTable,
-            gameweeksTable: props.gameweeksTable,
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
+            gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE],
         });
     }
 }
