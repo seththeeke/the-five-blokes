@@ -61,6 +61,5 @@ export class DataSources extends cdk.Construct {
             engine: rds.DatabaseClusterEngine.auroraMysql({ version: rds.AuroraMysqlEngineVersion.VER_5_7_12 }),
             vpc: props.vpc
         });
-
     }
 }

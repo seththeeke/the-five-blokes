@@ -14,8 +14,8 @@ export class DevelopmentResourcesStack extends cdk.Stack {
     // Navigate to security groups and note the security group ID of the cloud9 environment
     // Navigate to security groups and find the RDS Aurora Security Group, add an inbound rule for MySql Traffic for the security Group that was noted
     // Run the below in order to connect to the database
-    // mysql --user=admin --password -h testaurorastack-mytestauroradatabase54bfc2ea-7je3b58nks32.cluster-cpnwx33sv8cu.us-east-1.rds.amazonaws.com
-    new c9.Ec2Environment(this, "AuroraClient", {
+    // mysql --user=admin --password -h fantasyinfrastack-fantasyinfradatasourcespremierl-1k80385vyq4xu.cluster-cpnwx33sv8cu.us-east-1.rds.amazonaws.com
+    new c9.Ec2Environment(this, "FantasyInfraCloud9Environment", {
         vpc: props.vpc,
         description: "Cloud9 environment to use as Aurora Client"
     });
