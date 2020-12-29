@@ -1,6 +1,7 @@
 var badgesDao = require('./../dao/badges-dao');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var fplDraftService = require('./fpl-draft-service');
+var mysql = require('mysql2/promise');
 
 module.exports = {
     extractSeasonData: async function(extractSeasonDataRequest){
@@ -15,7 +16,21 @@ module.exports = {
         // Fixture and Player history for season given player id
         // https://draft.premierleague.com/api/element-summary/254
         let response = await fplDraftService.getBootstapStatic();
-        console.log(response);
-        return extractSeasonDataRequest;
-    }
+        let connection = await mysql.createConnection({
+            host     : process.env.AURORA_DB_ENDPOINT,
+            user     : process.env.USERNAME,
+            password : process.env.PASSWORD,
+            database : process.env.DATABASE_NAME
+        });
+        try {
+            let results = await connection.query('SELECT * from players');
+            console.log(JSON.stringify(results));
+            await connection.end();
+        } catch (err){
+            await connection.end();
+            return err;
+        }
+            console.log(response);
+            return extractSeasonDataRequest;
+        }
 }

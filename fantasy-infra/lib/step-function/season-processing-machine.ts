@@ -10,6 +10,7 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
 import { AssignSeasonBadgesLambda } from '../lambda/assign-season-badges-lambda';
 import { ExtractSeasonDataLambda } from '../lambda/extract-season-data-lambda';
+import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 
 export interface SeasonProcessingMachineProps {
     seasonCompletedTopic: sns.Topic;
@@ -20,6 +21,7 @@ export interface SeasonProcessingMachineProps {
     staticContentBucket: s3.Bucket;
     errorTopic: sns.Topic;
     vpc: ec2.Vpc;
+    dataSourcesMap: DataSourcesMap;
 }
 export class SeasonProcessingMachine extends cdk.Construct{
 
@@ -83,7 +85,8 @@ export class SeasonProcessingMachine extends cdk.Construct{
 
     createLambdas(props: SeasonProcessingMachineProps): void {
         this.extractSeasonDataLambda = new ExtractSeasonDataLambda(this, "ExtractSeasonDataLambdaFunction", {
-            vpc: props.vpc
+            vpc: props.vpc,
+            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER]
         });
         const seasonBadgeMetadatas = [
             {
