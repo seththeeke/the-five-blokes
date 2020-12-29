@@ -32,9 +32,11 @@ module.exports = {
         for (let i in gameweekItems){
             let gameweek = gameweekItems[i];
             if (gameweek.leagueId.S === activeLeague.leagueId.S){
+                // this is strange and not the same paradigm I use elsewhere, should probably try to fix this
                 allGameweeksForLeague.push({
                     "gameweek": gameweek.gameweek.N,
-                    "standings": gameweek.standings.S
+                    "standings": gameweek.standings.S,
+                    "fixtures": gameweek.fixtures.S
                 });
             }
         }

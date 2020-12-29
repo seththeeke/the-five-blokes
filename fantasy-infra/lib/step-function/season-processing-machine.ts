@@ -86,7 +86,9 @@ export class SeasonProcessingMachine extends cdk.Construct{
     createLambdas(props: SeasonProcessingMachineProps): void {
         this.extractSeasonDataLambda = new ExtractSeasonDataLambda(this, "ExtractSeasonDataLambdaFunction", {
             vpc: props.vpc,
-            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER]
+            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
+            gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE]
         });
         const seasonBadgeMetadatas = [
             {

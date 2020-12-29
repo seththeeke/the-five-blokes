@@ -3,11 +3,14 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as rds from '@aws-cdk/aws-rds';
 import * as iam from '@aws-cdk/aws-iam';
+import * as ddb from '@aws-cdk/aws-dynamodb';
 import path = require('path');
 
 export interface ExtractSeasonDataLambdaProps {
     vpc: ec2.Vpc;
     plRDSCluster: rds.ServerlessCluster;
+    leagueDetailsTable: ddb.Table;
+    gameweeksTable: ddb.Table;
 }
 export class ExtractSeasonDataLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: ExtractSeasonDataLambdaProps) {
@@ -21,7 +24,9 @@ export class ExtractSeasonDataLambda extends lambda.Function {
             "AURORA_DB_ENDPOINT": props.plRDSCluster.clusterEndpoint.hostname,
             "USERNAME": "admin",
             "PASSWORD": password,
-            "DATABASE_NAME": "premiere_league_data"
+            "DATABASE_NAME": "premiere_league_data",
+            "LEAGUE_DETAILS_TABLE_NAME": props.leagueDetailsTable.tableName,
+            "GAMEWEEK_TABLE_NAME": props.gameweeksTable.tableName,
         },
         timeout: cdk.Duration.seconds(300),
         functionName: "ExtractSeasonDataLambda",
@@ -43,5 +48,8 @@ export class ExtractSeasonDataLambda extends lambda.Function {
     this.addToRolePolicy(rdsStatement);
     const rdsSecurityGroup = props.plRDSCluster.connections.securityGroups[0];
     rdsSecurityGroup.addIngressRule(lambdaSecGroup, ec2.Port.allTraffic());
+
+    props.leagueDetailsTable.grantReadData(this);
+    props.gameweeksTable.grantReadData(this);
   }
 }
