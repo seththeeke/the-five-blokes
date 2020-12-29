@@ -135,6 +135,7 @@ export class FantasyInfraStack extends cdk.Stack {
       emailSubscriptionTable
     });
 
-    new StatisticsApi(this, "StatisticsApi");
+    // Statistics API should be broken into its own stack with the Last Of The Mohigans Service
+    // new StatisticsApi(this, "StatisticsApi");
   }
 }
