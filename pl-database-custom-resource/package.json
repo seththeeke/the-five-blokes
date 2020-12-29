@@ -1,0 +1,22 @@
+{
+  "name": "pl-database-custom-resource",
+  "version": "1.0.0",
+  "description": "pl-database-custom-resource",
+  "main": "app.js",
+  "scripts": {
+    "test": "mocha tests/unit/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.655.0",
+    "aws-xray-sdk": "^2.5.0",
+    "axios": "^0.18.0",
+    "mysql2": "^2.2.5"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "aws-sdk": "^2.655.0"
+  }
+}
