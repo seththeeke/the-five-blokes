@@ -7,6 +7,7 @@ import * as events from '@aws-cdk/aws-events';
 import * as sns from '@aws-cdk/aws-sns';
 import * as cw from '@aws-cdk/aws-cloudwatch';
 import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
+import * as ec2 from '@aws-cdk/aws-ec2';
 import { HasGameweekCompletedLambda } from '../lambda/has-gameweek-completed-lambda';
 import { SeasonProcessingMachine } from './season-processing-machine';
 import { GameweekProcessingMachine } from './gameweek-processing-machine';
@@ -17,6 +18,7 @@ export interface FantasyLeagueStateMachineProps {
     seasonCompletedTopic: sns.Topic;
     errorTopic: sns.Topic;
     dataSourcesMap: DataSourcesMap;
+    vpc: ec2.Vpc;
 }
 export class FantasyLeagueStateMachine extends cdk.Construct{
 
@@ -74,7 +76,8 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
             gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE], 
             leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
             seasonCompletedTopic: props.seasonCompletedTopic,
-            staticContentBucket: props.dataSourcesMap.s3Buckets[DataSourceMapKeys.STATIC_CONTENT_BUCKET]
+            staticContentBucket: props.dataSourcesMap.s3Buckets[DataSourceMapKeys.STATIC_CONTENT_BUCKET],
+            vpc: props.vpc
         });
 
         hasGameweekCompletedTask.next(hasGameweekCompletedChoice);

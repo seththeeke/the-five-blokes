@@ -6,8 +6,10 @@ import * as sns from '@aws-cdk/aws-sns';
 import * as ddb from '@aws-cdk/aws-dynamodb';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as cw from '@aws-cdk/aws-cloudwatch';
+import * as ec2 from '@aws-cdk/aws-ec2';
 import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
 import { AssignSeasonBadgesLambda } from '../lambda/assign-season-badges-lambda';
+import { ExtractSeasonDataLambda } from '../lambda/extract-season-data-lambda';
 
 export interface SeasonProcessingMachineProps {
     seasonCompletedTopic: sns.Topic;
@@ -17,9 +19,11 @@ export interface SeasonProcessingMachineProps {
     gameweekPlayerHistoryTable: ddb.Table;
     staticContentBucket: s3.Bucket;
     errorTopic: sns.Topic;
+    vpc: ec2.Vpc;
 }
 export class SeasonProcessingMachine extends cdk.Construct{
 
+    extractSeasonDataLambda: lambda.Function;
     seasonBadgeLambdas: lambda.Function[];
     seasonProcessingStateMachine: stepFunctions.StateMachine;
 
@@ -52,7 +56,14 @@ export class SeasonProcessingMachine extends cdk.Construct{
             parallelSeasonBadgeProcessor.branch(stepFunctionTask);
         }
 
-        seasonCompletedPublishTask.next(parallelSeasonBadgeProcessor);
+        const extractSeasonDataTask = new stepFunctions.Task(this, "ExtractSeasonData", {
+            task: new stepFunctionTasks.InvokeFunction(this.extractSeasonDataLambda),
+            timeout: cdk.Duration.minutes(5),
+            comment: "Extracts and stores data from FPL for processing season data"
+        });
+
+        seasonCompletedPublishTask.next(extractSeasonDataTask);
+        extractSeasonDataTask.next(parallelSeasonBadgeProcessor);
 
         this.seasonProcessingStateMachine = new stepFunctions.StateMachine(this, "SeasonProcessingStateMachine", {
             stateMachineName: "SeasonProcessingStateMachine",
@@ -71,6 +82,9 @@ export class SeasonProcessingMachine extends cdk.Construct{
     }
 
     createLambdas(props: SeasonProcessingMachineProps): void {
+        this.extractSeasonDataLambda = new ExtractSeasonDataLambda(this, "ExtractSeasonDataLambdaFunction", {
+            vpc: props.vpc
+        });
         const seasonBadgeMetadatas = [
             {
                 functionName: "AssignLeagueAwardsBadgesV2",

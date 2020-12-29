@@ -135,7 +135,8 @@ export class FantasyInfraStack extends cdk.Stack {
       gameweekCompletedTopic,
       seasonCompletedTopic,
       errorTopic,
-      dataSourcesMap: dataSources.dataSourcesMap
+      dataSourcesMap: dataSources.dataSourcesMap,
+      vpc: this.vpc
     });
 
     const shouldUseDomainName = this.node.tryGetContext('shouldUseDomainName');

@@ -14,6 +14,8 @@ module.exports = {
         // https://draft.premierleague.com/api/draft/league/11133/transactions
         // Fixture and Player history for season given player id
         // https://draft.premierleague.com/api/element-summary/254
+        let response = await fplDraftService.getBootstapStatic();
+        console.log(response);
         return extractSeasonDataRequest;
     }
 }
