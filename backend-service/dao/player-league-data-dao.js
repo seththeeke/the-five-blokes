@@ -14,7 +14,7 @@ module.exports = {
             return results;
         } catch (err){
             await connection.end();
-            return err;
+            throw err;
         }
     }
 }
