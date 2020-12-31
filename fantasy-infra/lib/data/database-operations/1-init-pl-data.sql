@@ -3,7 +3,7 @@ USE premiere_league_data;
 SET collation_connection = 'utf8_general_ci';
 ALTER DATABASE premiere_league_data CHARACTER SET utf8 COLLATE utf8_general_ci;
 CREATE TABLE players(
-    player_id INT NOT NULL AUTO_INCREMENT,
+    player_id VARCHAR(200) NOT NULL,
     position_id INT,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
@@ -12,15 +12,15 @@ CREATE TABLE players(
 );
 ALTER TABLE players CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
 CREATE TABLE player_season_data(
-    player_season_id INT NOT NULL AUTO_INCREMENT,
+    player_season_id VARCHAR(200) NOT NULL,
     foreign_id INT NOT NULL,
-    player_id INT NOT NULL,
+    player_id VARCHAR(200) NOT NULL,
     league_year VARCHAR(10),
     PRIMARY KEY ( player_season_id ),
     FOREIGN KEY (player_id) REFERENCES players(player_id)
 );
 CREATE TABLE teams(
-    team_id INT NOT NULL AUTO_INCREMENT,
+    team_id VARCHAR(200) NOT NULL,
     name VARCHAR(100),
     founded_year YEAR,
     PRIMARY KEY ( team_id )
@@ -28,9 +28,9 @@ CREATE TABLE teams(
 CREATE UNIQUE INDEX team_name_index
 ON teams(name);
 CREATE TABLE team_season_data(
-    team_season_id INT NOT NULL AUTO_INCREMENT,
+    team_season_id VARCHAR(200) NOT NULL,
     foreign_id INT NOT NULL,
-    team_id INT NOT NULL,
+    team_id VARCHAR(200) NOT NULL,
     league_year VARCHAR(10) NOT NULL,
     rank INT NOT NULL,
     wins INT NOT NULL,
@@ -43,10 +43,10 @@ CREATE TABLE team_season_data(
 CREATE UNIQUE INDEX foreign_id_league_year
 ON team_season_data(foreign_id,league_year);
 CREATE TABLE fixtures(
-    fixture_id INT NOT NULL AUTO_INCREMENT,
+    fixture_id VARCHAR(200) NOT NULL,
     foreign_id INT NOT NULL,
-    away_team_id INT NOT NULL,
-    home_team_id INT NOT NULL,
+    away_team_id VARCHAR(200) NOT NULL,
+    home_team_id VARCHAR(200) NOT NULL,
     date_played DATE,
     fixture_year VARCHAR(10),
     home_team_goals INT,
@@ -56,12 +56,14 @@ CREATE TABLE fixtures(
     FOREIGN KEY (away_team_id) REFERENCES teams(team_id),
     FOREIGN KEY (home_team_id) REFERENCES teams(team_id)
 );
+CREATE INDEX foreign_key_index
+ON fixtures(foreign_id);
 CREATE UNIQUE INDEX foreign_id_fixture_year
 ON fixtures(foreign_id,fixture_year);
 CREATE TABLE player_fixtures(
-    player_fixture_id INT NOT NULL AUTO_INCREMENT,
-    player_id INT NOT NULL,
-    fixture_id INT NOT NULL,
+    player_fixture_id VARCHAR(200) NOT NULL,
+    player_id VARCHAR(200) NOT NULL,
+    fixture_id VARCHAR(200) NOT NULL,
     goals INT,
     assists INT,
     fixture_year VARCHAR(10),
@@ -78,10 +80,10 @@ CREATE TABLE player_fixtures(
 CREATE UNIQUE INDEX player_id_fixture_id_fixture_year
 ON player_fixtures(player_id,fixture_id,fixture_year);
 CREATE TABLE player_transactions(
-    transaction_id INT NOT NULL AUTO_INCREMENT,
+    transaction_id VARCHAR(200) NOT NULL,
     transaction_alternate_id INT,
-    player_in_id INT NOT NULL,
-    player_out_id INT NOT NULL,
+    player_in_id VARCHAR(200) NOT NULL,
+    player_out_id VARCHAR(200) NOT NULL,
     result VARCHAR(50),
     leagueId INT NOT NULL,
     fantasy_team_id INT NOT NULL,

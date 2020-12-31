@@ -23,6 +23,23 @@ exports.extractGameweekDataHandler = async (event) => {
     return response;
 }
 
+exports.extractGameweekFixturesHandler = async (event) => {
+    console.log(JSON.stringify(event));
+    let extractGameweeDataRequest = {
+        "leagueId": event.league,
+        "gameweekNum": event.gameweek,
+        "shouldOverrideSeasonCompletedChoice": event.shouldOverrideSeasonCompletedChoice
+    }
+    let response = await gameweekProcessService.extractGameweekFixtures(extractGameweeDataRequest);
+    return response;
+}
+
+exports.extractGameweekPlayerFixturesHandler = async (event) => {
+    console.log(JSON.stringify(event));
+    let response = await gameweekProcessService.extractGameweekPlayerFixtures(event);
+    return response;
+}
+
 // BADGE Processors
 exports.assignGameweekStandingsBadgesHandler = async (event) => {
     console.log(JSON.stringify(event));
