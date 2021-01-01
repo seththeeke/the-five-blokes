@@ -38,5 +38,10 @@ module.exports = {
     getElementSummary: async function(elementId) {
         let elementSummaryResponse = await axios.get(BASE_PATH + '/element-summary/' + elementId.toString());
         return elementSummaryResponse;
+    },
+
+    getTransactionsForLeagueId: async function(leagueId) {
+        let transactionsResponse = await axios.get(BASE_PATH + '/draft/league/' + leagueId.toString() + '/transactions');
+        return transactionsResponse;
     }
 }

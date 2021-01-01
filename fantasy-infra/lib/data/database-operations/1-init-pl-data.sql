@@ -81,16 +81,3 @@ CREATE TABLE player_fixtures(
 );
 CREATE UNIQUE INDEX player_id_fixture_id_fixture_year
 ON player_fixtures(player_id,fixture_id,fixture_year);
--- This table will be moved to dynamodb
--- CREATE TABLE player_transactions(
---     transaction_id VARCHAR(200) NOT NULL,
---     transaction_alternate_id INT,
---     player_in_id VARCHAR(200) NOT NULL,
---     player_out_id VARCHAR(200) NOT NULL,
---     result VARCHAR(50),
---     leagueId INT NOT NULL,
---     fantasy_team_id INT NOT NULL,
---     PRIMARY KEY ( transaction_id ),
---     FOREIGN KEY (player_in_id) REFERENCES players(player_id),
---     FOREIGN KEY (player_out_id) REFERENCES players(player_id)
--- );

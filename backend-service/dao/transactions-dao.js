@@ -8,28 +8,28 @@ module.exports = {
         let newTransactionParams = {
             Item: {
                 "id": {
-                    S: id
+                    S: id.toString()
                 },
                 "foreignId": {
-                    S: foreignId
+                    S: foreignId.toString()
                 },
                 "foreignPlayerIdIn": {
-                    S: foreignPlayerIdIn
+                    S: foreignPlayerIdIn.toString()
                 },
                 "foreignPlayerIdOut": {
-                    S: foreignPlayerIdOut
+                    S: foreignPlayerIdOut.toString()
                 },
                 "leagueEntryId": {
-                    S: leagueEntryId
+                    S: leagueEntryId.toString()
                 },
                 "result": {
-                    S: result
+                    S: result.toString()
                 },
                 "leagueId": {
-                    S: leagueId
+                    S: leagueId.toString()
                 },
                 "transactionRequestedDateTime": {
-                    S: transactionRequestedDateTime
+                    S: transactionRequestedDateTime.toString()
                 }
             },
             TableName: process.env.TRANSACTIONS_TABLE_NAME

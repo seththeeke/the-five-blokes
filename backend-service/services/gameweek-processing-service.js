@@ -4,6 +4,7 @@ var staticContentDao = require('./../dao/static-content-dao');
 var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
 var fplDraftService = require('./fpl-draft-service');
 var premiereLeagueDataDao = require('./../dao/premiere-league-data-dao');
+var transactionsDao = require('./../dao/transactions-dao');
 
 module.exports = {
     hasGameweekCompleted: async function(forceGameweekReprocessing, shouldOverrideSeasonCompletedChoice){
@@ -131,9 +132,24 @@ module.exports = {
     },
 
     extractTransactions: async function(extractGameweekDataRequest) {
-        console.log("Starting to extract transaction date for league: " + extractGameweekDataRequest.leagueId);
-        let leagueId = await extractGameweekDataRequest.leagueId;
-
+        console.log("Starting to extract transaction date for league: " + extractGameweekDataRequest.league);
+        let leagueId = extractGameweekDataRequest.league;
+        let transactionsResponse = await fplDraftService.getTransactionsForLeagueId(leagueId);
+        let transactions =  transactionsResponse.data.transactions;
+        for (let i in transactions){
+            let transaction = transactions[i];
+            let insertTransactionResponse = await transactionsDao.addNewTransaction(
+                transaction.id + "-" + transaction.entry + "-" + leagueId,
+                transaction.id,
+                transaction.element_in,
+                transaction.element_out,
+                transaction.entry,
+                transaction.result,
+                leagueId,
+                transaction.added
+            );
+            console.log("Added new transaction for transaction id: " + transaction.id + " for league: " + leagueId);
+        }
     },
 
     _getLeagueYear: function(leagueDetails){
