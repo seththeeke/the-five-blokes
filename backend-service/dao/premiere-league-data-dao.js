@@ -269,7 +269,8 @@ module.exports = {
 
     upsertFixture: async function(foreign_id, away_team_id, home_team_id, date_played, fixture_year, home_team_goals, away_team_goals, gameweek){
         let sql = 'INSERT INTO fixtures (fixture_id, foreign_id, away_team_id, home_team_id, date_played, fixture_year, home_team_goals, away_team_goals, gameweek) VALUES (:fixtureId, :foreignId, :awayTeamId, :homeTeamId, :datePlayed, :fixtureYear, :homeTeamGoals, :awayTeamGoals, :gameweek) ON DUPLICATE KEY UPDATE foreign_id= :foreignId';
-        let stringDate = (date_played.getFullYear() + "-" + (parseInt(date_played.getMonth()) + 1) + "-" + date_played.getDate()).toString();
+        let monthValue = (parseInt(date_played.getMonth()) + 1) >= 10 ? (parseInt(date_played.getMonth()) + 1).toString() : "0" + (parseInt(date_played.getMonth()) + 1).toString();
+        let stringDate = (date_played.getFullYear() + "-" + monthValue + "-" + date_played.getDate()).toString();
         let injectedParamaters = [
             {
                 name: 'fixtureId',
@@ -445,10 +446,11 @@ module.exports = {
 
     createConnection: async function() {
         let connection = await mysql.createConnection({
-            host     : process.env.AURORA_DB_ENDPOINT,
-            user     : process.env.USERNAME,
-            password : process.env.PASSWORD,
-            database : process.env.DATABASE_NAME
+            host           : process.env.AURORA_DB_ENDPOINT,
+            user           : process.env.USERNAME,
+            password       : process.env.PASSWORD,
+            database       : process.env.DATABASE_NAME,
+            connectTimeout : 20000
         });
         return connection;
     }

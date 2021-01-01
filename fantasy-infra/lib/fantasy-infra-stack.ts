@@ -4,6 +4,7 @@ import * as eventSource from '@aws-cdk/aws-lambda-event-sources';
 import * as sns from '@aws-cdk/aws-sns';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as ec2 from '@aws-cdk/aws-ec2';
+import * as lambda from '@aws-cdk/aws-lambda';
 import { AddNewLeagueLambda } from './lambda/add-new-league-lambda';
 import { InitiateLeagueLambda } from './lambda/initiate-league-lambda';
 import { StartingPosition } from '@aws-cdk/aws-lambda';
@@ -131,7 +132,7 @@ export class FantasyInfraStack extends cdk.Stack {
     });
     leagueDetailsStreamEventSource.bind(initiateLeagueLambda);
 
-    new FantasyLeagueStateMachine(this, "GameweekProcessing", {
+    const fantasyLeagueStateMachine = new FantasyLeagueStateMachine(this, "GameweekProcessing", {
       gameweekCompletedTopic,
       seasonCompletedTopic,
       errorTopic,

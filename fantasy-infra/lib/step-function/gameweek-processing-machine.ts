@@ -12,7 +12,6 @@ import { ExtractGameweekDataLambda } from '../lambda/extract-gameweek-data-lambd
 import { AssignGameweekBadgesLambda } from '../lambda/assign-gameweek-badges-lambda';
 import { GameweekProcessingCompletedEmailLambda } from '../lambda/gameweek-processing-completed-email-lambda';
 import { PremiereLeagueRDSDataLambda } from '../lambda/premier-league-rds-data-lambda';
-import { Ec2Environment } from '@aws-cdk/aws-cloud9';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 import { ExtractGameweekFixturesLambda } from '../lambda/extract-gameweek-fixtures-lambda';
 
@@ -32,6 +31,7 @@ export interface GameweekProcessingMachineProps {
 export class GameweekProcessingMachine extends cdk.Construct{
 
     extractGameweekFixturesLambda: lambda.Function;
+    extractPlayerFixtureLambda: lambda.Function;
     extractGameweekDataLambda: lambda.Function;
     gameweekBadgeLambdas: lambda.Function[];
     gameweekProcessingCompletedEmailLambda: lambda.Function;
@@ -59,13 +59,7 @@ export class GameweekProcessingMachine extends cdk.Construct{
             comment: "Extracts and stores data from FPL for processing"
         });
         const extractGameweekPlayerFixtureTask = new stepFunctions.Task(this, "ExtractGameweekPlayerFixtureTask", {
-            task: new stepFunctionTasks.InvokeFunction(new PremiereLeagueRDSDataLambda(this, "ExtractGameweekPlayerFixtureLambda", {
-                vpc: props.vpc,
-                functionName: "ExtractGameweekPlayerFixtureLambda",
-                description: "Extracts all fixture data per player for the gameweek",
-                plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
-                handler: "controller/gameweek-processing-controller.extractGameweekPlayerFixturesHandler"
-            })),
+            task: new stepFunctionTasks.InvokeFunction(this.extractPlayerFixtureLambda),
             timeout: cdk.Duration.minutes(5),
             comment: "Extracts and stores gameweek player fixture data from FPL for processing"
         });
@@ -135,6 +129,14 @@ export class GameweekProcessingMachine extends cdk.Construct{
             plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
             vpc: props.vpc
         });
+
+        this.extractPlayerFixtureLambda = new PremiereLeagueRDSDataLambda(this, "ExtractGameweekPlayerFixtureLambda", {
+            vpc: props.vpc,
+            functionName: "ExtractGameweekPlayerFixtureLambda",
+            description: "Extracts all fixture data per player for the gameweek",
+            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
+            handler: "controller/gameweek-processing-controller.extractGameweekPlayerFixturesHandler"
+        })
     
         const gameweekBadgeMetadatas = [
             {
