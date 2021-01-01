@@ -15,6 +15,7 @@ export interface ExtractSeasonDataLambdaProps {
 export class ExtractSeasonDataLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: ExtractSeasonDataLambdaProps) {
     let password = props.plRDSCluster.secret?.secretValueFromJson("password").toString() || "";
+    let secretArn = props.plRDSCluster.secret?.secretArn || "";
     super(scope, id, {
         code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
         handler: "controller/season-processing-controller.extractSeasonDataHandler",
@@ -26,6 +27,8 @@ export class ExtractSeasonDataLambda extends lambda.Function {
             "PASSWORD": password,
             "DATABASE_NAME": "premiere_league_data",
             "LEAGUE_DETAILS_TABLE_NAME": props.leagueDetailsTable.tableName,
+            "RDS_CLUSTER_ARN": props.plRDSCluster.clusterArn,
+            "RDS_SECRET_ARN": secretArn,
             "GAMEWEEK_TABLE_NAME": props.gameweeksTable.tableName,
         },
         timeout: cdk.Duration.seconds(300),
@@ -49,6 +52,7 @@ export class ExtractSeasonDataLambda extends lambda.Function {
     const rdsSecurityGroup = props.plRDSCluster.connections.securityGroups[0];
     rdsSecurityGroup.addIngressRule(lambdaSecGroup, ec2.Port.allTraffic());
 
+    props.plRDSCluster.grantDataApiAccess(this);
     props.leagueDetailsTable.grantReadData(this);
     props.gameweeksTable.grantReadData(this);
   }

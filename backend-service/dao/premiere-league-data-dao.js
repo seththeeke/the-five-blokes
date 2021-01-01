@@ -1,5 +1,9 @@
 var mysql = require('mysql2/promise');
 var { v4: uuidv4 } = require('uuid');
+var AWSXRay = require('aws-xray-sdk');
+var AWS = AWSXRay.captureAWS(require('aws-sdk'));
+AWS.config.update({region: process.env.AWS_REGION});
+var rdsdataservice = new AWS.RDSDataService({apiVersion: '2018-08-01'});
 var foreignIdToTeamIdCache = {};
 var foreignIdToFixtureCache = {};
 var foreignIdToPlayerIdCache = {};
@@ -63,33 +67,116 @@ module.exports = {
         }
     },
 
-    insertTeam: async function(name, founded_year) {
-        let connection = await this.createConnection();
-        try {
-            let results = await connection.execute('INSERT INTO teams (team_id, name, founded_year) VALUES (?,?,?)', [uuidv4(), name, founded_year]);
-            await connection.end();
-            return results;
-        } catch (err){
-            await connection.end();
-            throw err;
+    upsertTeam: async function(name, founded_year) {
+        let sql = 'INSERT INTO teams (team_id, name) VALUES (:teamId,:name) ON DUPLICATE KEY UPDATE name=:name';
+        let injectedParamaters = [
+            {
+                name: 'teamId',
+                value: {
+                  stringValue: uuidv4()
+                }
+            },
+            {
+                name: 'name',
+                value: {
+                    stringValue: name
+                }
+            }
+        ];
+        if (founded_year && founded_year != -1){
+            injectedParamaters.push(
+                {
+                    name: 'foundedYear',
+                    typeHint: "DATE",
+                    value: {
+                        stringValue: founded_year
+                    }
+                }
+            );
+            sql = 'INSERT INTO teams (team_id, name, founded_year) VALUES (:teamId,:name,:foundedYear) ON DUPLICATE KEY UPDATE name=:name,founded_year=:foundedYear';
         }
+        var params = {
+            resourceArn: process.env.RDS_CLUSTER_ARN,
+            secretArn: process.env.RDS_SECRET_ARN,
+            sql: sql,
+            continueAfterTimeout: false,
+            database: process.env.DATABASE_NAME,
+            includeResultMetadata: true,
+            parameters: injectedParamaters
+        };
+        let results = await rdsdataservice.executeStatement(params).promise();
+        return results;
     },
 
-    insertTeamSeasonData: async function(foreign_id, team_id, league_year, rank, wins, loses, ties, points) {
-        let connection = await this.createConnection();
-        try {
-            let results = await connection.execute('INSERT INTO team_season_data (team_season_id, foreign_id, team_id, league_year, rank, wins, loses, ties, points) VALUES (?,?,?,?,?,?,?,?,?)', [uuidv4(), foreign_id, team_id, league_year, rank | 0, wins | 0, loses | 0, ties | 0, points | 0]);
-            await connection.end();
-            return results;
-        } catch (err){
-            await connection.end();
-            if (err.message.indexOf("Duplicate entry") != -1){
-                // TODO: handle this case better, maybe an upsert
-                console.log("Team season data already exists");
-            } else {
-                throw err;
+    upsertTeamSeasonData: async function(foreign_id, team_id, league_year, rank, wins, loses, ties, points) {
+        let sql = 'INSERT INTO team_season_data (team_season_id, foreign_id, team_id, league_year, rank, wins, loses, ties, points) VALUES (:teamSeasonId, :foreignId, :teamId, :leagueYear, :rank, :wins, :loses, :ties, :points) ON DUPLICATE KEY UPDATE rank=:rank, wins=:wins, loses=:loses, ties=:ties, points=:points';
+        let injectedParamaters = [
+            {
+                name: 'teamSeasonId',
+                value: {
+                  stringValue: uuidv4()
+                }
+            },
+            {
+                name: 'foreignId',
+                value: {
+                    stringValue: foreign_id.toString()
+                }
+            },
+            {
+                name: 'teamId',
+                value: {
+                    stringValue: team_id.toString()
+                }
+            },
+            {
+                name: 'leagueYear',
+                value: {
+                    stringValue: league_year
+                }
+            },
+            {
+                name: 'rank',
+                value: {
+                    stringValue: rank ? rank.toString() : "0"
+                }
+            },
+            {
+                name: 'wins',
+                value: {
+                    stringValue: wins ? wins.toString() : "0"
+                }
+            },
+            {
+                name: 'loses',
+                value: {
+                    stringValue: loses ? loses.toString() : "0"
+                }
+            },
+            {
+                name: 'ties',
+                value: {
+                    stringValue: ties ? ties.toString() : "0"
+                }
+            },
+            {
+                name: 'points',
+                value: {
+                    stringValue: points ? points.toString() : "0"
+                }
             }
-        }
+        ];
+        var params = {
+            resourceArn: process.env.RDS_CLUSTER_ARN,
+            secretArn: process.env.RDS_SECRET_ARN,
+            sql: sql,
+            continueAfterTimeout: false,
+            database: process.env.DATABASE_NAME,
+            includeResultMetadata: true,
+            parameters: injectedParamaters
+        };
+        let results = await rdsdataservice.executeStatement(params).promise();
+        return results;
     },
 
     insertPlayer: async function(position_id, first_name, last_name, foreign_team_id){

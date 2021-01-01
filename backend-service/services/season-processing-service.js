@@ -17,17 +17,17 @@ module.exports = {
             // Team Data should likely be gathered at league initiation rather than season completion
             let teamObject = await this._persistTeamIfNotExists(team);
             // for each team, insert team_season data into team_season_data table for the season
-            let teamSeasonInsertResults = await premiereLeagueDataDao.insertTeamSeasonData(team.id, teamObject.team_id, this._getLeagueYear(activeLeague));
+            let teamSeasonInsertResults = await premiereLeagueDataDao.upsertTeamSeasonData(team.id, teamObject.team_id, this._getLeagueYear(activeLeague));
         }
 
         // iterate through players, insert the basic player data into the players table and into the player_season_data table to use as a mapping
-        let players = bootstrapStatic.data.elements;
-        for (let i in players){
-            let player = players[i];
-            let playerObject = await this._persistPlayerIfNotExists(player);
-            // for each player, insert a player_season row for the season
-            let playerSeasonInsertResults = await premiereLeagueDataDao.insertPlayerSeasonData(player.id, playerObject.player_id, this._getLeagueYear(activeLeague));
-        }
+        // let players = bootstrapStatic.data.elements;
+        // for (let i in players){
+        //     let player = players[i];
+        //     let playerObject = await this._persistPlayerIfNotExists(player);
+        //     // for each player, insert a player_season row for the season
+        //     let playerSeasonInsertResults = await premiereLeagueDataDao.insertPlayerSeasonData(player.id, playerObject.player_id, this._getLeagueYear(activeLeague));
+        // }
         
         // All transactions
         // https://draft.premierleague.com/api/draft/league/11133/transactions
@@ -40,11 +40,8 @@ module.exports = {
     },
 
     _persistTeamIfNotExists: async function(team) {
+        let teamInsertResults = await premiereLeagueDataDao.upsertTeam(team.name, "-1");
         let teamObjectResults = await premiereLeagueDataDao.getTeamByTeamName(team.name);
-        if (teamObjectResults[0].length <= 0){
-            let teamInsertResults = await premiereLeagueDataDao.insertTeam(team.name, "-1");
-            teamObjectResults = await premiereLeagueDataDao.getTeamByTeamName(team.name);
-        }
         return teamObjectResults[0][0];
     },
 
