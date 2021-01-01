@@ -1,5 +1,4 @@
 var leagueDetailsDao = require('./../dao/league-details-dao');
-var gameweeksDao = require('./../dao/gameweeks-dao');
 var fplDraftService = require('./fpl-draft-service');
 var premiereLeagueDataDao = require('./../dao/premiere-league-data-dao');
 
@@ -21,13 +20,14 @@ module.exports = {
         }
 
         // iterate through players, insert the basic player data into the players table and into the player_season_data table to use as a mapping
-        // let players = bootstrapStatic.data.elements;
-        // for (let i in players){
-        //     let player = players[i];
-        //     let playerObject = await this._persistPlayerIfNotExists(player);
-        //     // for each player, insert a player_season row for the season
-        //     let playerSeasonInsertResults = await premiereLeagueDataDao.insertPlayerSeasonData(player.id, playerObject.player_id, this._getLeagueYear(activeLeague));
-        // }
+        let players = bootstrapStatic.data.elements;
+        for (let i in players){
+            let player = players[i];
+            let playerObject = await this._persistPlayerIfNotExists(player);
+            console.log(JSON.stringify(playerObject));
+            // for each player, insert a player_season row for the season
+            let playerSeasonInsertResults = await premiereLeagueDataDao.upsertPlayerSeasonData(player.id, playerObject.player_id, this._getLeagueYear(activeLeague));
+        }
         
         // All transactions
         // https://draft.premierleague.com/api/draft/league/11133/transactions
@@ -45,7 +45,7 @@ module.exports = {
         return teamObjectResults[0][0];
     },
 
-    _persistPlayerIfNotExists: async function(player, team_id) {
+    _persistPlayerIfNotExists: async function(player) {
         let playerObjectResults = await premiereLeagueDataDao.getPlayerByNameAndPosition(player.first_name, player.second_name, player.element_type);
         if (playerObjectResults[0].length <= 0){
             let playerInsertResults = await premiereLeagueDataDao.insertPlayer(player.element_type, player.first_name, player.second_name, player.team); 

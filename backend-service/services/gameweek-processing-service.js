@@ -17,7 +17,7 @@ module.exports = {
             "gameweek": gameweekData.current_event.toString(),
             "league": activeLeague.leagueId.S,
             "hasCompleted": false,
-            "shouldOverrideSeasonCompletedChoice": shouldOverrideSeasonCompletedChoice
+            "shouldOverrideSeasonCompletedChoice": shouldOverrideSeasonCompletedChoice || false
         }
         if (forceGameweekReprocessing) {
             console.log("Gameweek completed check bypassed, reprocessing gameweek " + gameweekData);
@@ -69,7 +69,7 @@ module.exports = {
             let awayTeamIdResults = await premiereLeagueDataDao.getTeamIdByForeignId(fixture.team_a);
             let fixturesInsertResults = await premiereLeagueDataDao.upsertFixture(fixture.id, 
                 awayTeamIdResults[0][0].team_id, homeTeamIdResults[0][0].team_id, 
-                fixture.kickoff_time, this._getLeagueYear(activeLeague), 
+                new Date(fixture.kickoff_time), this._getLeagueYear(activeLeague), 
                 fixture.team_h_score, fixture.team_a_score, 
                 parseInt(extractGameweekDataRequest.gameweekNum));
             foreignFixtureIds.push(fixture.id);
@@ -111,7 +111,7 @@ module.exports = {
                 let gameweek = (fixtureResults[0].length > 0) ? fixtureResults[0][0].gameweek: undefined;
                 if (fixtureId) {
                     console.log("Adding fixture for playerId: " + playerId + " and fixtureId: " + fixtureId);
-                    let playerFixtureResult = await premiereLeagueDataDao.insertPlayerFixture(playerId,
+                    let playerFixtureResult = await premiereLeagueDataDao.upsertPlayerFixture(playerId,
                         fixtureId, fixture.goals_scored, fixture.assists,
                         this._getLeagueYear(extractGameweekPlayerFixturesRequest.activeLeague), gameweek, 
                         fixture.clean_sheets, fixture.total_points, 

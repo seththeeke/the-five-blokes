@@ -2,7 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import * as ddb from '@aws-cdk/aws-dynamodb';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as rds from '@aws-cdk/aws-rds';
-import { PremiereLeagueRDSDataLambda, PremiereLeagueRDSDataLambdaProps } from './premier-league-rds-data-lambda';
+import { PremiereLeagueRDSDataLambda } from './premier-league-rds-data-lambda';
 
 export interface ExtractGameweekFixturesLambdaProps {
     leagueDetailsTable: ddb.Table;

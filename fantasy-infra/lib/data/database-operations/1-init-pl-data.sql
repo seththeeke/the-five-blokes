@@ -19,6 +19,8 @@ CREATE TABLE player_season_data(
     PRIMARY KEY ( player_season_id ),
     FOREIGN KEY (player_id) REFERENCES players(player_id)
 );
+CREATE UNIQUE INDEX foreign_id_league_year
+ON player_season_data(foreign_id,league_year);
 CREATE TABLE teams(
     team_id VARCHAR(200) NOT NULL,
     name VARCHAR(100),

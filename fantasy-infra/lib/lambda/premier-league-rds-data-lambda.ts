@@ -18,6 +18,7 @@ export interface PremiereLeagueRDSDataLambdaProps {
 export class PremiereLeagueRDSDataLambda extends lambda.Function {
   constructor(scope: cdk.Construct, id: string, props: PremiereLeagueRDSDataLambdaProps) {
     let password = props.plRDSCluster.secret?.secretValueFromJson("password").toString() || "";
+    let secretArn = props.plRDSCluster.secret?.secretArn || "";
     super(scope, id, {
         code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
         handler: props.handler,
@@ -27,9 +28,11 @@ export class PremiereLeagueRDSDataLambda extends lambda.Function {
             "AURORA_DB_ENDPOINT": props.plRDSCluster.clusterEndpoint.hostname,
             "USERNAME": "admin",
             "PASSWORD": password,
-            "DATABASE_NAME": "premiere_league_data"
+            "DATABASE_NAME": "premiere_league_data",
+            "RDS_CLUSTER_ARN": props.plRDSCluster.clusterArn,
+            "RDS_SECRET_ARN": secretArn,
         },
-        timeout: cdk.Duration.seconds(300),
+        timeout: cdk.Duration.seconds(600),
         functionName: props.functionName,
         description: props.description,
         vpc: props.vpc
@@ -55,5 +58,6 @@ export class PremiereLeagueRDSDataLambda extends lambda.Function {
     this.addToRolePolicy(rdsStatement);
     const rdsSecurityGroup = props.plRDSCluster.connections.securityGroups[0];
     rdsSecurityGroup.addIngressRule(lambdaSecGroup, ec2.Port.allTraffic());
+    props.plRDSCluster.grantDataApiAccess(this);
   }
 }
