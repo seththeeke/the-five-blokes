@@ -270,7 +270,8 @@ module.exports = {
     upsertFixture: async function(foreign_id, away_team_id, home_team_id, date_played, fixture_year, home_team_goals, away_team_goals, gameweek){
         let sql = 'INSERT INTO fixtures (fixture_id, foreign_id, away_team_id, home_team_id, date_played, fixture_year, home_team_goals, away_team_goals, gameweek) VALUES (:fixtureId, :foreignId, :awayTeamId, :homeTeamId, :datePlayed, :fixtureYear, :homeTeamGoals, :awayTeamGoals, :gameweek) ON DUPLICATE KEY UPDATE foreign_id= :foreignId';
         let monthValue = (parseInt(date_played.getMonth()) + 1) >= 10 ? (parseInt(date_played.getMonth()) + 1).toString() : "0" + (parseInt(date_played.getMonth()) + 1).toString();
-        let stringDate = (date_played.getFullYear() + "-" + monthValue + "-" + date_played.getDate()).toString();
+        let dateValue = (parseInt(date_played.getDate())) >= 10 ? (parseInt(date_played.getDate())).toString() : "0" + (parseInt(date_played.getDate())).toString();
+        let stringDate = (date_played.getFullYear() + "-" + monthValue + "-" + dateValue).toString();
         let injectedParamaters = [
             {
                 name: 'fixtureId',

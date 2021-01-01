@@ -3,7 +3,6 @@ import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { FantasyInfraStack } from '../lib/fantasy-infra-stack';
 import { DevelopmentResourcesStack } from '../lib/development-resources-stack';
-import { DataMigrationStack } from '../lib/data-migration-stack';
 
 const app = new cdk.App();
 const fantasyInfraStack = new FantasyInfraStack(app, 'FantasyInfraStack');
