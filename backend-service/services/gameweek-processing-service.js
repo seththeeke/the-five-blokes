@@ -130,6 +130,12 @@ module.exports = {
         }
     },
 
+    extractTransactions: async function(extractGameweekDataRequest) {
+        console.log("Starting to extract transaction date for league: " + extractGameweekDataRequest.leagueId);
+        let leagueId = await extractGameweekDataRequest.leagueId;
+
+    },
+
     _getLeagueYear: function(leagueDetails){
         return leagueDetails.year.S + "/" + (parseInt(leagueDetails.year.S) + 1).toString();
     },

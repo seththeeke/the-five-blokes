@@ -14,6 +14,7 @@ module.exports = {
         let playerMap = badgeProcessorUtil.createPlayerMap(filteredPlayers);
         let leagueDetails = leagueGameweekData.leagueDetails;
 
+        // iterate league details standings and create badges
         // LeagueChampion - participant with the most total points
         // SeasonLoser - participant with the fewest total points
         // 1000 points - given to any participant who earns at least 1000 points

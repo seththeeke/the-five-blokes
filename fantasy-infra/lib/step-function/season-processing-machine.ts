@@ -58,14 +58,14 @@ export class SeasonProcessingMachine extends cdk.Construct{
             parallelSeasonBadgeProcessor.branch(stepFunctionTask);
         }
 
-        const extractSeasonDataTask = new stepFunctions.Task(this, "ExtractSeasonData", {
-            task: new stepFunctionTasks.InvokeFunction(this.extractSeasonDataLambda),
-            timeout: cdk.Duration.minutes(5),
-            comment: "Extracts and stores data from FPL for processing season data"
-        });
+        // The currently season data extraction lambda is used for instantiating the basic objects for the league, no additional data extraction at this point
+        // const extractSeasonDataTask = new stepFunctions.Task(this, "ExtractSeasonData", {
+        //     task: new stepFunctionTasks.InvokeFunction(this.extractSeasonDataLambda),
+        //     timeout: cdk.Duration.minutes(5),
+        //     comment: "Extracts and stores data from FPL for processing season data"
+        // });
 
-        seasonCompletedPublishTask.next(extractSeasonDataTask);
-        extractSeasonDataTask.next(parallelSeasonBadgeProcessor);
+        seasonCompletedPublishTask.next(parallelSeasonBadgeProcessor);
 
         this.seasonProcessingStateMachine = new stepFunctions.StateMachine(this, "SeasonProcessingStateMachine", {
             stateMachineName: "SeasonProcessingStateMachine",

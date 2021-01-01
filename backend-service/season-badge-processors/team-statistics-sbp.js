@@ -44,6 +44,11 @@ module.exports = {
             }
         }
 
+        // get all players for team
+        // get the sum of the various stats for each player
+        // get the sum of the sums from the players
+        // determine who has the highest value for each stat
+        // May be more efficient to query all player fixtures for the season??? Can a lambda hold all that in memory???
         // MostYellowCards
         // MostRedCards
         // MostGoals

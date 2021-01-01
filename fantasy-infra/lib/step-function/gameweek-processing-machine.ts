@@ -14,6 +14,7 @@ import { GameweekProcessingCompletedEmailLambda } from '../lambda/gameweek-proce
 import { PremiereLeagueRDSDataLambda } from '../lambda/premier-league-rds-data-lambda';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 import { ExtractGameweekFixturesLambda } from '../lambda/extract-gameweek-fixtures-lambda';
+import { ExtractFantasyTransactionsLambda } from '../lambda/extract-fantasy-transactions-lambda';
 
 export interface GameweekProcessingMachineProps {
     gameweekCompletedTopic: sns.Topic;
@@ -33,6 +34,7 @@ export class GameweekProcessingMachine extends cdk.Construct{
     extractGameweekFixturesLambda: lambda.Function;
     extractPlayerFixtureLambda: lambda.Function;
     extractGameweekDataLambda: lambda.Function;
+    extractTransactionsLambda: lambda.Function;
     gameweekBadgeLambdas: lambda.Function[];
     gameweekProcessingCompletedEmailLambda: lambda.Function;
     gameweekProcessingStateMachine: stepFunctions.StateMachine;
@@ -63,8 +65,14 @@ export class GameweekProcessingMachine extends cdk.Construct{
             timeout: cdk.Duration.minutes(5),
             comment: "Extracts and stores gameweek player fixture data from FPL for processing"
         });
+        const extractTransactionsTask = new stepFunctions.Task(this, "ExtractTransactionsTask", {
+            task: new stepFunctionTasks.InvokeFunction(this.extractTransactionsLambda),
+            timeout: cdk.Duration.minutes(5),
+            comment: "Extracts and stores transactions for the league"
+        });
         extractGameweekFixturesTask.next(extractGameweekPlayerFixtureTask);
         parallelGameweekDataExtraction.branch(extractGameweekFixturesTask);
+        parallelGameweekDataExtraction.branch(extractTransactionsTask);
 
         const extractGameweekDataTask = new stepFunctions.Task(this, "ExtractGameweekData", {
             task: new stepFunctionTasks.InvokeFunction(this.extractGameweekDataLambda),
@@ -136,7 +144,11 @@ export class GameweekProcessingMachine extends cdk.Construct{
             description: "Extracts all fixture data per player for the gameweek",
             plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
             handler: "controller/gameweek-processing-controller.extractGameweekPlayerFixturesHandler"
-        })
+        });
+
+        this.extractTransactionsLambda = new ExtractFantasyTransactionsLambda(this, "ExtractFantasyTransactionsLambda", {
+            fantasyTransactionsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.FANTASY_TRANSACTIONS_TABLE]
+        });
     
         const gameweekBadgeMetadatas = [
             {

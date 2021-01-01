@@ -40,7 +40,8 @@ export const DataSourceMapKeys = {
     EMAIL_SUBSCRIPTIONS_TABLE: "EmailSubscriptions",
     STATIC_CONTENT_BUCKET: "StaticContentBucket",
     MEDIA_ASSET_BUCKET: "MediaAssetsBucket",
-    PREMIER_LEAGUE_RDS_CLUSTER: "PremierLeagueRDSCluster"
+    PREMIER_LEAGUE_RDS_CLUSTER: "PremierLeagueRDSCluster",
+    FANTASY_TRANSACTIONS_TABLE: "FantasyTransactions",
 }
 export class DataSources extends cdk.Construct {
 
@@ -60,6 +61,21 @@ export class DataSources extends cdk.Construct {
         this.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER] = new rds.ServerlessCluster(this, "PremierLeagueRDSCluster", {
             engine: rds.DatabaseClusterEngine.auroraMysql({ version: rds.AuroraMysqlEngineVersion.VER_5_7_12 }),
             vpc: props.vpc
+        });
+
+        this.dataSourcesMap.ddbTables[DataSourceMapKeys.FANTASY_TRANSACTIONS_TABLE] = new ddb.Table(this, "FantasyTransactions", {
+            tableName: "FantasyTransactions",
+            partitionKey: {
+              name: "id",
+              type: ddb.AttributeType.STRING
+            },
+            readCapacity: 1,
+            writeCapacity: 1,
+            stream: ddb.StreamViewType.NEW_AND_OLD_IMAGES,
+            sortKey: {
+              name: "leagueId",
+              type: ddb.AttributeType.STRING
+            }
         });
     }
 }

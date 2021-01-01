@@ -14,9 +14,13 @@ module.exports = {
         let playerMap = badgeProcessorUtil.createPlayerMap(filteredPlayers);
         let leagueDetails = leagueGameweekData.leagueDetails;
 
+        // get top ten goal scorers from rds
         let topTenScorers = statisticsCalculator.getTopTenScorers(filteredPlayers);
+        // get top ten assists from rds
         let topTenAssisters = statisticsCalculator.getTopTenAssisters(filteredPlayers);
+        // get top ten clean sheets from rds where position = 0
         let topTenCleanSheets = statisticsCalculator.getTopTenCleanSheets(filteredPlayers);
+        // get all players with dreamteam set to true from rds
         let dreamTeam = statisticsCalculator.getDreamTeamPlayers(filteredPlayers);
         let goldenBootWinner = topTenScorers[0];
         let playmakerOfTheSeasonWinner = topTenAssisters[0];

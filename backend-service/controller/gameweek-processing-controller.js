@@ -40,6 +40,12 @@ exports.extractGameweekPlayerFixturesHandler = async (event) => {
     return response;
 }
 
+exports.extractTransactionsHandler = async (event) => {
+    console.log(JSON.stringify(event));
+    let response = await gameweekProcessService.extractTransactions(event);
+    return response;
+}
+
 // BADGE Processors
 exports.assignGameweekStandingsBadgesHandler = async (event) => {
     console.log(JSON.stringify(event));

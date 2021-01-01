@@ -14,6 +14,7 @@ module.exports = {
         let playerMap = badgeProcessorUtil.createPlayerMap(filteredPlayers);
         let leagueDetails = leagueGameweekData.leagueDetails;
 
+        // get all players with at least the minimum point threshold from rds
         // Season MVP - given to the participant who owns the player who earned the most points
         // Season LVP - given to the participant who owns the player who earned the fewest points
         // 150 point player

@@ -14,6 +14,7 @@ module.exports = {
         let playerMap = badgeProcessorUtil.createPlayerMap(filteredPlayers);
         let leagueDetails = leagueGameweekData.leagueDetails;
 
+        // query sum of transactions grouped by participant
         // Most Transactions
         // Most Transactions Denied
 
