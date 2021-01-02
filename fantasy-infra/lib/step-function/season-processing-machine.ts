@@ -135,7 +135,9 @@ export class SeasonProcessingMachine extends cdk.Construct{
                 staticContentBucket: props.staticContentBucket,
                 functionName: seasonBadgeMetadata.functionName,
                 description: seasonBadgeMetadata.description,
-                handler: seasonBadgeMetadata.handler
+                handler: seasonBadgeMetadata.handler,
+                vpc: props.vpc,
+                plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER]
             }));
         }
     }
