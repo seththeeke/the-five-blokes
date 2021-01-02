@@ -75,7 +75,7 @@ module.exports = {
 
         return {
             "success": true,
-            "gameweek": gameweek
+            // "gameweek": gameweek
         }
     },
 

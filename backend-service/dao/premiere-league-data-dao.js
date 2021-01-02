@@ -449,7 +449,7 @@ module.exports = {
         limit = limit ? limit : 10;
         let connection = await this.createConnection();
         try {
-            let results = await connection.execute('select player_fixtures.player_id,SUM(?) as total,players.first_name,players.last_name from player_fixtures inner join players on players.player_id = player_fixtures.player_id and fixture_year = ? group by player_id order by total desc limit ?', [columnName, season_year, limit]);
+            let results = await connection.execute('select player_fixtures.player_id,SUM(' + columnName + ') as total,players.first_name,players.last_name from player_fixtures inner join players on players.player_id = player_fixtures.player_id and fixture_year = ? group by player_id order by total desc limit ?', [season_year, limit]);
             await connection.end();
             return results[0];
         } catch (err){
