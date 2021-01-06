@@ -7,13 +7,14 @@ var badgeProcessorUtil = require('./../util/badge-processor-util');
 module.exports = {
 
     assignBadges: async function(assignSeasonBadgesRequest) {
-        let filteredPlayers = await staticContentDao.getStaticContent(assignSeasonBadgesRequest.filteredPlayerDataKey);
-        let leagueGameweekData = assignSeasonBadgesRequest.leagueGameweekData;
-        let leaguePicks = assignSeasonBadgesRequest.leaguePicks;
-        let gameweek = assignSeasonBadgesRequest.gameweek;
-        let playerMap = badgeProcessorUtil.createPlayerMap(filteredPlayers);
-        let leagueDetails = leagueGameweekData.leagueDetails;
+        // let filteredPlayers = await staticContentDao.getStaticContent(assignSeasonBadgesRequest.filteredPlayerDataKey);
+        // let leagueGameweekData = assignSeasonBadgesRequest.leagueGameweekData;
+        // let leaguePicks = assignSeasonBadgesRequest.leaguePicks;
+        // let gameweek = assignSeasonBadgesRequest.gameweek;
+        // let playerMap = badgeProcessorUtil.createPlayerMap(filteredPlayers);
+        // let leagueDetails = leagueGameweekData.leagueDetails;
 
+        // No need for RDS in this case
         // iterate league details standings and create badges
         // LeagueChampion - participant with the most total points
         // SeasonLoser - participant with the fewest total points
@@ -23,7 +24,7 @@ module.exports = {
 
         return {
             "success": true,
-            "gameweek": gameweek
+            // "gameweek": gameweek
         }
     }
 }
