@@ -103,25 +103,30 @@ module.exports = {
                 return extractGameweekPlayerFixturesRequest.foreignFixtureIds.includes(fixture.fixture);
             });
             let playerIdResponse = await premiereLeagueDataDao.getPlayerIdByForeignId(playerForeignId);
-            let playerId = playerIdResponse[0][0].player_id;
-            for (let i in filteredFixtureHistory){
-                let fixture = filteredFixtureHistory[i];
-                // fixture ids are different than player history fixture ids, fixture.fixture appears to be the link
-                let fixtureResults = await premiereLeagueDataDao.getFixtureByForeignId(fixture.fixture);
-                let fixtureId = (fixtureResults[0].length > 0) ? fixtureResults[0][0].fixture_id : undefined;
-                let gameweek = (fixtureResults[0].length > 0) ? fixtureResults[0][0].gameweek: undefined;
-                if (fixtureId) {
-                    console.log("Adding fixture for playerId: " + playerId + " and fixtureId: " + fixtureId);
-                    let playerFixtureResult = await premiereLeagueDataDao.upsertPlayerFixture(playerId,
-                        fixtureId, fixture.goals_scored, fixture.assists,
-                        this._getLeagueYear(extractGameweekPlayerFixturesRequest.activeLeague), gameweek, 
-                        fixture.clean_sheets, fixture.total_points, 
-                        fixture.minutes, fixture.yellow_cards, fixture.red_cards, fixture.bonus,
-                        fixture.goals_conceded, fixture.own_goals, fixture.penalties_missed,
-                        fixture.penalties_saved, fixture.saves);
-                } else {
-                    console.log("FixtureId does not exist in database for foreign_id: " + fixture.fixture + ". This is likely because of test data and shouldn't happen in production");
+            if (playerIdResponse[0].length > 0){
+                let playerId = playerIdResponse[0][0].player_id;
+                for (let i in filteredFixtureHistory){
+                    let fixture = filteredFixtureHistory[i];
+                    // fixture ids are different than player history fixture ids, fixture.fixture appears to be the link
+                    let fixtureResults = await premiereLeagueDataDao.getFixtureByForeignId(fixture.fixture);
+                    let fixtureId = (fixtureResults[0].length > 0) ? fixtureResults[0][0].fixture_id : undefined;
+                    let gameweek = (fixtureResults[0].length > 0) ? fixtureResults[0][0].gameweek: undefined;
+                    if (fixtureId) {
+                        console.log("Adding fixture for playerId: " + playerId + " and fixtureId: " + fixtureId);
+                        let playerFixtureResult = await premiereLeagueDataDao.upsertPlayerFixture(playerId,
+                            fixtureId, fixture.goals_scored, fixture.assists,
+                            this._getLeagueYear(extractGameweekPlayerFixturesRequest.activeLeague), gameweek, 
+                            fixture.clean_sheets, fixture.total_points, 
+                            fixture.minutes, fixture.yellow_cards, fixture.red_cards, fixture.bonus,
+                            fixture.goals_conceded, fixture.own_goals, fixture.penalties_missed,
+                            fixture.penalties_saved, fixture.saves);
+                    } else {
+                        console.log("FixtureId does not exist in database for foreign_id: " + fixture.fixture + ". This is likely because of test data and shouldn't happen in production");
+                    }
                 }
+            } else {
+                // Need to be able to handle the case when a player does not exist in my database
+                console.log("Did not find player for foreignId: " + playerForeignId);
             }
         }
 

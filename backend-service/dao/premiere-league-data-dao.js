@@ -445,11 +445,17 @@ module.exports = {
         }
     },
 
-    getTopTenPlayersByStatistic: async function(columnName, season_year, limit) {
+    getTopPlayersByStatistic: async function(columnName, season_year, position_id, limit) {
         limit = limit ? limit : 10;
+        let sql = 'select player_fixtures.player_id,SUM(' + columnName + ') as total,players.first_name,players.last_name,player_season_data.foreign_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id inner join player_season_data on player_season_data.player_id = player_fixtures.player_id and fixture_year = ? group by player_id order by total desc limit ?';
+        let params = [season_year, limit];
+        if (position_id) {
+            sql = 'select player_fixtures.player_id,SUM(' + columnName + ') as total,players.first_name,players.last_name,player_season_data.foreign_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id inner join player_season_data on player_season_data.player_id = player_fixtures.player_id and fixture_year = ? and position_id = ? group by player_id order by total desc limit ?';
+            params = [season_year, position_id, limit];
+        }
         let connection = await this.createConnection();
         try {
-            let results = await connection.execute('select player_fixtures.player_id,SUM(' + columnName + ') as total,players.first_name,players.last_name from player_fixtures inner join players on players.player_id = player_fixtures.player_id and fixture_year = ? group by player_id order by total desc limit ?', [season_year, limit]);
+            let results = await connection.execute(sql, params);
             await connection.end();
             return results[0];
         } catch (err){
@@ -458,13 +464,24 @@ module.exports = {
         }
     },
 
+    getAllPlayers: async function() {
+        var params = {
+            resourceArn: process.env.RDS_CLUSTER_ARN,
+            secretArn: process.env.RDS_SECRET_ARN,
+            sql: 'SELECT * FROM players',
+            database: process.env.DATABASE_NAME
+        };
+        let results = await rdsdataservice.executeStatement(params).promise();
+        return results;
+    },
+
     createConnection: async function() {
         let connection = await mysql.createConnection({
             host           : process.env.AURORA_DB_ENDPOINT,
             user           : process.env.USERNAME,
             password       : process.env.PASSWORD,
             database       : process.env.DATABASE_NAME,
-            connectTimeout : 20000
+            connectTimeout : 30000
         });
         return connection;
     }

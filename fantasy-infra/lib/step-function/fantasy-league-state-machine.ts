@@ -12,6 +12,8 @@ import { HasGameweekCompletedLambda } from '../lambda/has-gameweek-completed-lam
 import { SeasonProcessingMachine } from './season-processing-machine';
 import { GameweekProcessingMachine } from './gameweek-processing-machine';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
+import { PremiereLeagueRDSDataLambda } from '../lambda/premier-league-rds-data-lambda';
+import { Result, JsonPath } from '@aws-cdk/aws-stepfunctions';
 
 export interface FantasyLeagueStateMachineProps {
     gameweekCompletedTopic: sns.Topic;
@@ -84,11 +86,29 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
         });
 
         hasGameweekCompletedTask.next(hasGameweekCompletedChoice);
+
+        // I need to warm the serverless RDS cluster because the mysql2 library is timing out regularly when the cluster is scaling up
+        // I do not want to use the RDS Data API for nodejs because it is slow and returns data in a completely unreadable way
+        const RDSWarmingLambda = new PremiereLeagueRDSDataLambda(this, "RDSWarmingLambda", {
+            functionName: "RDSWarmingLambda",
+            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
+            vpc: props.vpc,
+            description: "Lambda for warming the RDS Cluster to remove timeouts when connecting using mysql2",
+            handler: "controller/warming-controller.warmRDSCluster"
+        });
+        const rdsWarmingTask = new stepFunctions.Task(this, "RDSWarmingTask", {
+            task: new stepFunctionTasks.InvokeFunction(RDSWarmingLambda),
+            timeout: cdk.Duration.minutes(3),
+            comment: "Warms RDS in prep for data extraction",
+            resultPath: JsonPath.DISCARD
+        });
+
         const gameweekProcessingStateMachineExecution = new stepFunctionTasks.StepFunctionsStartExecution(this, "GameweekProcessingStateMachineTask", {
             stateMachine: gameweekCompletedStateMachine.gameweekProcessingStateMachine,
             resultPath: stepFunctions.JsonPath.DISCARD
         });
-        hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), gameweekProcessingStateMachineExecution);
+        hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), rdsWarmingTask);
+        rdsWarmingTask.next(gameweekProcessingStateMachineExecution);
         hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
         gameweekProcessingStateMachineExecution.next(hasSeasonCompletedChoice);
         const hasSeasonCompletedCondition = stepFunctions.Condition.or(

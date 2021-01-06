@@ -30,9 +30,9 @@ export class AssignSeasonBadgesLambda extends PremiereLeagueRDSDataLambda {
     });
 
     props.leagueDetailsTable.grantReadData(this);
-    props.gameweeksTable.grantReadWriteData(this);
+    props.gameweeksTable.grantReadData(this);
     props.badgeTable.grantReadWriteData(this);
-    props.gameweekPlayerHistoryTable.grantWriteData(this);
-    props.staticContentBucket.grantReadWrite(this);
+    props.gameweekPlayerHistoryTable.grantReadData(this);
+    props.staticContentBucket.grantRead(this);
   }
 }

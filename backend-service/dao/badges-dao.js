@@ -4,6 +4,10 @@ AWS.config.update({region: process.env.AWS_REGION});
 var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 module.exports = {
+    /**
+     * @deprecated use addNewBadgeWithParticipants instead, this relies on the leagueDetails object
+     * provided by the fpl draft api instead of the domain leagueDetails object
+     */
     addNewBadge: async function(id, participantId, badgeType, badgeMetadata, leagueDetails){
         let newBadgeParams = {
             Item: {
@@ -21,6 +25,31 @@ module.exports = {
                 },
                 "participantName": {
                     S: this._getParticipantFullName(leagueDetails.league_entries, participantId)
+                }
+            },
+            TableName: process.env.BADGE_TABLE_NAME
+        }
+        let newBadgeResponse = await ddb.putItem(newBadgeParams).promise();
+        console.log("Added new badge: " + JSON.stringify(newBadgeParams));
+    },
+
+    addNewBadgeWithParticipants: async function(id, participantId, badgeType, badgeMetadata, participants){
+        let newBadgeParams = {
+            Item: {
+                "id": {
+                    S: id
+                },
+                "participantId": {
+                    S: participantId
+                },
+                "badgeType": {
+                    S: badgeType
+                },
+                "badgeMetadata": {
+                    S: JSON.stringify(badgeMetadata)
+                },
+                "participantName": {
+                    S: this._getParticipantFullName(participants, participantId)
                 }
             },
             TableName: process.env.BADGE_TABLE_NAME
