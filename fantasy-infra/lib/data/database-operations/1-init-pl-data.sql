@@ -112,3 +112,4 @@ SHOW COLUMNS FROM team_season_data;
 SHOW COLUMNS FROM fixtures;
 SHOW COLUMNS FROM teams;
 SHOW COLUMNS FROM players;
+
