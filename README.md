@@ -8,9 +8,21 @@ This architecture, like many others I've made utilizes serverless tech as much a
 
 ![Architecture Image From DrawIO](fantasy-premier-league-v2.png)
 
+### Aurora Schema
+
+The premiere league data is stored in an Aurora serverless cluster because it is highly relational. A rough outline of the schema can be seen below and full schema is defined in the mysql init files in [fantasy-infra/data/database-operations](https://github.com/seththeeke/last-of-the-mohigans/blob/extract-season-data/fantasy-infra/lib/data/database-operations/1-init-pl-data.sql).
+
+![Aurora Schema](aurora-schema.png)
+
+### Step Function State Machine for Fantasy League Processing
+
+![Gameweek Processing State Machine](stepfunctions_graph.png)
+
 ### Step Function State Machine for Gameweek Processing
 
 ![Gameweek Processing State Machine](stepfunctions_graph.png)
+
+### Step Function State Machine for Season Processing
 
 ### Emails
 
