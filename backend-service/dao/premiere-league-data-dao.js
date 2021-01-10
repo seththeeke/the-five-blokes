@@ -342,10 +342,9 @@ module.exports = {
         return results;
     },
 
-    upsertPlayerFixture: async function(player_id, fixture_id, goals, assists, fixture_year, gameweek, clean_sheets, points, minutes_played, yellow_cards, red_cards) {
-        // fixture.bonus,fixture.goals_conceded, fixture.own_goals, fixtures.penalties_missed,fixtures.penalties_saved, saves
+    upsertPlayerFixture: async function(player_id, fixture_id, goals, assists, fixture_year, gameweek, clean_sheets, points, minutes_played, yellow_cards, red_cards, bonus, goals_conceded, own_goals, penalties_missed, penalties_saved, saves) {
         // need to properly handle upsert, currently ignoring update
-        let sql = 'INSERT INTO player_fixtures (player_fixture_id, player_id, fixture_id, goals, assists, fixture_year, gameweek, clean_sheets, points, minutes_played, yellow_cards, red_cards) VALUES (:playerFixtureId, :playerId, :fixtureId, :goals, :assists, :fixtureYear, :gameweek, :cleanSheets, :points, :minutesPlayed, :yellowCards, :redCards) ON DUPLICATE KEY UPDATE fixture_id= :fixtureId';
+        let sql = 'INSERT INTO player_fixtures (player_fixture_id, player_id, fixture_id, goals, assists, fixture_year, gameweek, clean_sheets, points, minutes_played, yellow_cards, red_cards, bonus, goals_conceded, own_goals, penalties_missed, penalties_saved, saves) VALUES (:playerFixtureId, :playerId, :fixtureId, :goals, :assists, :fixtureYear, :gameweek, :cleanSheets, :points, :minutesPlayed, :yellowCards, :redCards, :bonus, :goalsConceded, :ownGoals, :penaltiesMissed, :penaltiesSaved, :saves) ON DUPLICATE KEY UPDATE fixture_id= :fixtureId';
         let injectedParamaters = [
             {
                 name: 'playerFixtureId',
@@ -417,6 +416,42 @@ module.exports = {
                 name: 'redCards',
                 value: {
                     stringValue: red_cards.toString()
+                }
+            },
+            {
+                name: 'bonus',
+                value: {
+                    stringValue: bonus.toString()
+                }
+            },
+            {
+                name: 'goalsConceded',
+                value: {
+                    stringValue: goals_conceded.toString()
+                }
+            },
+            {
+                name: 'ownGoals',
+                value: {
+                    stringValue: own_goals.toString()
+                }
+            },
+            {
+                name: 'penaltiesMissed',
+                value: {
+                    stringValue: penalties_missed.toString()
+                }
+            },
+            {
+                name: 'penaltiesSaved',
+                value: {
+                    stringValue: penalties_saved.toString()
+                }
+            },
+            {
+                name: 'saves',
+                value: {
+                    stringValue: saves.toString()
                 }
             }
         ];

@@ -3,6 +3,7 @@ import * as ddb from '@aws-cdk/aws-dynamodb';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as rds from '@aws-cdk/aws-rds';
+import { RemovalPolicy } from '@aws-cdk/core';
 
 export interface DataSourcesProps {
     vpc: ec2.Vpc;
@@ -60,7 +61,9 @@ export class DataSources extends cdk.Construct {
 
         this.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER] = new rds.ServerlessCluster(this, "PremierLeagueRDSCluster", {
             engine: rds.DatabaseClusterEngine.auroraMysql({ version: rds.AuroraMysqlEngineVersion.VER_5_7_12 }),
-            vpc: props.vpc
+            vpc: props.vpc,
+            removalPolicy: RemovalPolicy.RETAIN,
+            deletionProtection: true
         });
 
         this.dataSourcesMap.ddbTables[DataSourceMapKeys.FANTASY_TRANSACTIONS_TABLE] = new ddb.Table(this, "FantasyTransactions", {

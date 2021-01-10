@@ -13,7 +13,7 @@ import { SeasonProcessingMachine } from './season-processing-machine';
 import { GameweekProcessingMachine } from './gameweek-processing-machine';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 import { PremiereLeagueRDSDataLambda } from '../lambda/premier-league-rds-data-lambda';
-import { Result, JsonPath } from '@aws-cdk/aws-stepfunctions';
+import { Result, JsonPath, IntegrationPattern } from '@aws-cdk/aws-stepfunctions';
 
 export interface FantasyLeagueStateMachineProps {
     gameweekCompletedTopic: sns.Topic;
@@ -105,7 +105,8 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
 
         const gameweekProcessingStateMachineExecution = new stepFunctionTasks.StepFunctionsStartExecution(this, "GameweekProcessingStateMachineTask", {
             stateMachine: gameweekCompletedStateMachine.gameweekProcessingStateMachine,
-            resultPath: stepFunctions.JsonPath.DISCARD
+            resultPath: stepFunctions.JsonPath.DISCARD,
+            integrationPattern: IntegrationPattern.RUN_JOB
         });
         hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), rdsWarmingTask);
         rdsWarmingTask.next(gameweekProcessingStateMachineExecution);
@@ -115,7 +116,8 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
             stepFunctions.Condition.stringEquals("$.gameweek", "38"),
             stepFunctions.Condition.booleanEquals("$.shouldOverrideSeasonCompletedChoice", true));
         const seasonProcessingStateMachineExecution = new stepFunctionTasks.StepFunctionsStartExecution(this, "SeasonProcessingStateMachineTask", {
-            stateMachine: seasonCompletedStateMachine.seasonProcessingStateMachine
+            stateMachine: seasonCompletedStateMachine.seasonProcessingStateMachine,
+            integrationPattern: IntegrationPattern.RUN_JOB
         });
         hasSeasonCompletedChoice.when(hasSeasonCompletedCondition, seasonProcessingStateMachineExecution);
         hasSeasonCompletedChoice.when(stepFunctions.Condition.not(hasSeasonCompletedCondition), new stepFunctions.Succeed(this, "SeasonDidNotCompleteSoSkipToEnd"));

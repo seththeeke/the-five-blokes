@@ -75,6 +75,12 @@ CREATE TABLE player_fixtures(
     minutes_played INT,
     yellow_cards INT,
     red_cards INT,
+    bonus INT,
+    goals_conceded INT,
+    own_goals INT,
+    penalties_missed INT,
+    penalties_saved INT,
+    saves INT,
     PRIMARY KEY ( player_fixture_id ),
     FOREIGN KEY (player_id) REFERENCES players(player_id),
     FOREIGN KEY (fixture_id) REFERENCES fixtures(fixture_id)
