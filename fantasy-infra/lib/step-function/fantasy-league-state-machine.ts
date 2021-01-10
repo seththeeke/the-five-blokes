@@ -125,7 +125,8 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
         const stateMachine = new stepFunctions.StateMachine(this, "FantasyLeagueProcessingStateMachine", {
             stateMachineName: "FantasyLeagueProcessingStateMachine",
             definition: hasGameweekCompletedTask,
-            stateMachineType: stepFunctions.StateMachineType.STANDARD
+            stateMachineType: stepFunctions.StateMachineType.STANDARD,
+            timeout: cdk.Duration.minutes(60)
         });
 
         const alarm = new cw.Alarm(this, 'FantasyLeagueStepFunctionFailureAlarm', {

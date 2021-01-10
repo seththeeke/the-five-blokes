@@ -18,7 +18,7 @@ export class ExtractSeasonDataLambda extends PremiereLeagueRDSDataLambda {
             "LEAGUE_DETAILS_TABLE_NAME": props.leagueDetailsTable.tableName,
             "GAMEWEEK_TABLE_NAME": props.gameweeksTable.tableName,
         },
-        functionName: "ExtractSeasonDataLambda",
+        functionName: "ExtractSeasonDataLambdaV2",
         description: "Extracts data for a Season",
         vpc: props.vpc,
         plRDSCluster: props.plRDSCluster

@@ -24,18 +24,10 @@ module.exports = {
         for (let i in players){
             let player = players[i];
             let playerObject = await this._persistPlayerIfNotExists(player);
-            console.log(JSON.stringify(playerObject));
             // for each player, insert a player_season row for the season
             let playerSeasonInsertResults = await premiereLeagueDataDao.upsertPlayerSeasonData(player.id, playerObject.player_id, this._getLeagueYear(activeLeague));
         }
         
-        // All transactions
-        // https://draft.premierleague.com/api/draft/league/11133/transactions
-        // fetch all transactions for the league
-        // iterate through the transactions and insert them into the transactions table
-
-        // Top Elements
-        // https://draft.premierleague.com/api/top-elements
         return extractSeasonDataRequest;
     },
 

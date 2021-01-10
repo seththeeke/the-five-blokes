@@ -9,7 +9,6 @@ import * as cw from '@aws-cdk/aws-cloudwatch';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
 import { AssignSeasonBadgesLambda } from '../lambda/assign-season-badges-lambda';
-import { ExtractSeasonDataLambda } from '../lambda/extract-season-data-lambda';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 
 export interface SeasonProcessingMachineProps {
@@ -25,7 +24,6 @@ export interface SeasonProcessingMachineProps {
 }
 export class SeasonProcessingMachine extends cdk.Construct{
 
-    extractSeasonDataLambda: lambda.Function;
     seasonBadgeLambdas: lambda.Function[];
     seasonProcessingStateMachine: stepFunctions.StateMachine;
 
@@ -58,13 +56,6 @@ export class SeasonProcessingMachine extends cdk.Construct{
             parallelSeasonBadgeProcessor.branch(stepFunctionTask);
         }
 
-        // The currently season data extraction lambda is used for instantiating the basic objects for the league, no additional data extraction at this point
-        // const extractSeasonDataTask = new stepFunctions.Task(this, "ExtractSeasonData", {
-        //     task: new stepFunctionTasks.InvokeFunction(this.extractSeasonDataLambda),
-        //     timeout: cdk.Duration.minutes(5),
-        //     comment: "Extracts and stores data from FPL for processing season data"
-        // });
-
         seasonCompletedPublishTask.next(parallelSeasonBadgeProcessor);
 
         this.seasonProcessingStateMachine = new stepFunctions.StateMachine(this, "SeasonProcessingStateMachine", {
@@ -84,12 +75,6 @@ export class SeasonProcessingMachine extends cdk.Construct{
     }
 
     createLambdas(props: SeasonProcessingMachineProps): void {
-        this.extractSeasonDataLambda = new ExtractSeasonDataLambda(this, "ExtractSeasonDataLambdaFunction", {
-            vpc: props.vpc,
-            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
-            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
-            gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE]
-        });
         const seasonBadgeMetadatas = [
             {
                 functionName: "AssignLeagueAwardsBadgesV2",

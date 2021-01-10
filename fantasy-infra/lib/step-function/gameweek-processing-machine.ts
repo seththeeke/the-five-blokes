@@ -15,6 +15,8 @@ import { PremiereLeagueRDSDataLambda } from '../lambda/premier-league-rds-data-l
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 import { ExtractGameweekFixturesLambda } from '../lambda/extract-gameweek-fixtures-lambda';
 import { ExtractFantasyTransactionsLambda } from '../lambda/extract-fantasy-transactions-lambda';
+import { ExtractSeasonDataLambda } from '../lambda/extract-season-data-lambda';
+import { Duration } from '@aws-cdk/core';
 
 export interface GameweekProcessingMachineProps {
     gameweekCompletedTopic: sns.Topic;
@@ -31,6 +33,7 @@ export interface GameweekProcessingMachineProps {
 }
 export class GameweekProcessingMachine extends cdk.Construct{
 
+    extractSeasonDataLambda: lambda.Function;
     extractGameweekFixturesLambda: lambda.Function;
     extractPlayerFixtureLambda: lambda.Function;
     extractGameweekDataLambda: lambda.Function;
@@ -55,6 +58,12 @@ export class GameweekProcessingMachine extends cdk.Construct{
         });
 
         const parallelGameweekDataExtraction = new stepFunctions.Parallel(this, "GameweekExtractionProcessors");
+        const extractSeasonDataTask = new stepFunctions.Task(this, "ExtractSeasonData", {
+            task: new stepFunctionTasks.InvokeFunction(this.extractSeasonDataLambda),
+            timeout: cdk.Duration.minutes(20),
+            comment: "Extracts and stores data from FPL for processing season data",
+            resultPath: stepFunctions.JsonPath.DISCARD
+        });
         const extractGameweekFixturesTask = new stepFunctions.Task(this, "ExtractGameweekFixturesTask", {
             task: new stepFunctionTasks.InvokeFunction(this.extractGameweekFixturesLambda),
             timeout: cdk.Duration.minutes(5),
@@ -70,8 +79,9 @@ export class GameweekProcessingMachine extends cdk.Construct{
             timeout: cdk.Duration.minutes(5),
             comment: "Extracts and stores transactions for the league"
         });
+        extractSeasonDataTask.next(extractGameweekFixturesTask);
         extractGameweekFixturesTask.next(extractGameweekPlayerFixtureTask);
-        parallelGameweekDataExtraction.branch(extractGameweekFixturesTask);
+        parallelGameweekDataExtraction.branch(extractSeasonDataTask);
         parallelGameweekDataExtraction.branch(extractTransactionsTask);
 
         const extractGameweekDataTask = new stepFunctions.Task(this, "ExtractGameweekData", {
@@ -109,7 +119,8 @@ export class GameweekProcessingMachine extends cdk.Construct{
         this.gameweekProcessingStateMachine = new stepFunctions.StateMachine(this, "GameweekProcessingStateMachine", {
             stateMachineName: "GameweekProcessingStateMachine",
             definition: gameweekCompletedPublishTask,
-            stateMachineType: stepFunctions.StateMachineType.STANDARD
+            stateMachineType: stepFunctions.StateMachineType.STANDARD,
+            timeout: Duration.minutes(30)
         });
 
         const alarm = new cw.Alarm(this, 'GameweekProcessingStepFunctionFailureAlarm', {
@@ -126,6 +137,13 @@ export class GameweekProcessingMachine extends cdk.Construct{
     }
 
     createLambdas(props: GameweekProcessingMachineProps): void {
+
+        this.extractSeasonDataLambda = new ExtractSeasonDataLambda(this, "ExtractSeasonDataLambdaFunction", {
+            vpc: props.vpc,
+            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
+            gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE]
+        });
 
         this.extractGameweekDataLambda = new ExtractGameweekDataLambda(this, "ExtractGameweekDataLambda", {
             gameweeksTable: props.gameweeksTable,
