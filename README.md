@@ -4,9 +4,9 @@ This [project](https://lastofthemohigans.com/) was created to track the history 
 
 ## Architecture
 
-This architecture, like many others I've made utilizes serverless tech as much as possible, primarily to save on cost to keep me in the free tier rather than optimize for performance. I also persist a large amount of raw data from the fantasy premier league system rather than normalizing for the sake of simplificity for the first season. That may change over time as needed. 
+This architecture, like many others I've made utilizes serverless tech as much as possible, primarily to save on cost to keep me in the free tier rather than optimize for performance. It follows a basic ETL process using AWS Step Functions, Lambda, Dynamo, and Aurora MySQL to collect data each week. The website is a basic 3-tier architecture made of a React website hosted in S3 behind a Cloudfront distribution.
 
-![Architecture Image From DrawIO](fantasy-premier-league-v2.png)
+![Architecture Image From DrawIO](fantasy-premier-league-v3.png)
 
 ### Step Functions
 
