@@ -15,11 +15,34 @@ exports.hasGameweekCompleted = async (event) => {
 exports.extractGameweekDataHandler = async (event) => {
     console.log(JSON.stringify(event));
     let extractGameweeDataRequest = {
+        "leagueId": event[0].league,
+        "gameweekNum": event[0].gameweek,
+        "shouldOverrideSeasonCompletedChoice": event.shouldOverrideSeasonCompletedChoice
+    }
+    let response = await gameweekProcessService.extractGameweekData(extractGameweeDataRequest);
+    return response;
+}
+
+exports.extractGameweekFixturesHandler = async (event) => {
+    console.log(JSON.stringify(event));
+    let extractGameweeDataRequest = {
         "leagueId": event.league,
         "gameweekNum": event.gameweek,
         "shouldOverrideSeasonCompletedChoice": event.shouldOverrideSeasonCompletedChoice
     }
-    let response = await gameweekProcessService.extractGameweekData(extractGameweeDataRequest);
+    let response = await gameweekProcessService.extractGameweekFixtures(extractGameweeDataRequest);
+    return response;
+}
+
+exports.extractGameweekPlayerFixturesHandler = async (event) => {
+    console.log(JSON.stringify(event));
+    let response = await gameweekProcessService.extractGameweekPlayerFixtures(event);
+    return response;
+}
+
+exports.extractTransactionsHandler = async (event) => {
+    console.log(JSON.stringify(event));
+    let response = await gameweekProcessService.extractTransactions(event);
     return response;
 }
 

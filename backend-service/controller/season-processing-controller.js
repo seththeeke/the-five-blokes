@@ -4,81 +4,53 @@ var playerPointsSBP = require('./../season-badge-processors/player-points-sbp');
 var teamPointsSBP = require('./../season-badge-processors/team-points-sbp');
 var teamStatisticsSBP = require('./../season-badge-processors/team-statistics-sbp');
 var transactionsSBP = require('./../season-badge-processors/transactions-sbp');
+var seasonProcessingService = require('./../services/season-processing-service');
+
+exports.extractSeasonDataHandler = async (event) => {
+    console.log(JSON.stringify(event));
+    let response = await seasonProcessingService.extractSeasonData(createBadgeProcessingRequest(event));
+    return response;
+}
 
 exports.assignLeagueAwardsHandler = async (event) => {
     console.log(JSON.stringify(event));
-    let assignSeasonBadgesRequest = {
-        "gameweek": event.gameweek,
-        "filteredPlayerDataKey": event.filteredPlayerDataKey,
-        "gameweekData": event.gameweekData,
-        "leagueGameweekData": event.leagueGameweekData,
-        "leaguePicks": event.leaguePicks
-    }
-    let response = await leagueAwardsSBP.assignBadges(assignSeasonBadgesRequest);
+    let response = await leagueAwardsSBP.assignBadges(createBadgeProcessingRequest(event));
     return response;
 }
 
 exports.assignPlayerAwardsHandler = async (event) => {
     console.log(JSON.stringify(event));
-    let assignSeasonBadgesRequest = {
-        "gameweek": event.gameweek,
-        "filteredPlayerDataKey": event.filteredPlayerDataKey,
-        "gameweekData": event.gameweekData,
-        "leagueGameweekData": event.leagueGameweekData,
-        "leaguePicks": event.leaguePicks
-    }
-    let response = await playerAwardsSBP.assignBadges(assignSeasonBadgesRequest);
+    let response = await playerAwardsSBP.assignBadges(createBadgeProcessingRequest(event));
     return response;
 }
 
 exports.assignPlayerPointsAwardsHandler = async (event) => {
     console.log(JSON.stringify(event));
-    let assignSeasonBadgesRequest = {
-        "gameweek": event.gameweek,
-        "filteredPlayerDataKey": event.filteredPlayerDataKey,
-        "gameweekData": event.gameweekData,
-        "leagueGameweekData": event.leagueGameweekData,
-        "leaguePicks": event.leaguePicks
-    }
-    let response = await playerPointsSBP.assignBadges(assignSeasonBadgesRequest);
+    let response = await playerPointsSBP.assignBadges(createBadgeProcessingRequest(event));
     return response;
 }
 
 exports.assignTeamPointsAwardsHandler = async (event) => {
     console.log(JSON.stringify(event));
-    let assignSeasonBadgesRequest = {
-        "gameweek": event.gameweek,
-        "filteredPlayerDataKey": event.filteredPlayerDataKey,
-        "gameweekData": event.gameweekData,
-        "leagueGameweekData": event.leagueGameweekData,
-        "leaguePicks": event.leaguePicks
-    }
-    let response = await teamPointsSBP.assignBadges(assignSeasonBadgesRequest);
+    let response = await teamPointsSBP.assignBadges(createBadgeProcessingRequest(event));
     return response;
 }
 
 exports.assignTeamStatisticsAwardsHandler = async (event) => {
     console.log(JSON.stringify(event));
-    let assignSeasonBadgesRequest = {
-        "gameweek": event.gameweek,
-        "filteredPlayerDataKey": event.filteredPlayerDataKey,
-        "gameweekData": event.gameweekData,
-        "leagueGameweekData": event.leagueGameweekData,
-        "leaguePicks": event.leaguePicks
-    }
-    let response = await teamStatisticsSBP.assignBadges(assignSeasonBadgesRequest);
+    let response = await teamStatisticsSBP.assignBadges(createBadgeProcessingRequest(event));
     return response;
 }
 
 exports.assignTransactionsAwardsHandler = async (event) => {
     console.log(JSON.stringify(event));
-    let assignSeasonBadgesRequest = {
-        "gameweek": event.gameweek,
-        "filteredPlayerDataKey": event.filteredPlayerDataKey,
-        "gameweekData": event.gameweekData,
-        "leagueGameweekData": event.leagueGameweekData,
-        "leaguePicks": event.leaguePicks
-    }
-    let response = await transactionsSBP.assignBadges(assignSeasonBadgesRequest);
+    let response = await transactionsSBP.assignBadges(createBadgeProcessingRequest(event));
     return response;
+}
+
+function createBadgeProcessingRequest(event){
+    return {
+        "gameweek": event.gameweek,
+        "leagueId": event.league,
+    };
 }

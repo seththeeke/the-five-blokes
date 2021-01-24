@@ -4,19 +4,43 @@ This [project](https://lastofthemohigans.com/) was created to track the history 
 
 ## Architecture
 
-This architecture, like many others I've made utilizes serverless tech as much as possible, primarily to save on cost to keep me in the free tier rather than optimize for performance. I also persist a large amount of raw data from the fantasy premier league system rather than normalizing for the sake of simplificity for the first season. That may change over time as needed. 
+This architecture, like many others I've made utilizes serverless tech as much as possible, primarily to save on cost to keep me in the free tier rather than optimize for performance. It follows a basic ETL process using AWS Step Functions, Lambda, Dynamo, and Aurora MySQL to collect data each week. The website is a basic 3-tier architecture made of a React website hosted in S3 behind a Cloudfront distribution.
 
-![Architecture Image From DrawIO](fantasy-premier-league-v2.png)
+![Architecture Image From DrawIO](fantasy-premier-league-v3.png)
 
-### Step Function State Machine for Gameweek Processing
+### Step Functions
 
-![Gameweek Processing State Machine](stepfunctions_graph.png)
+AWS Step Functions drive the majority of the processing to do basic ETL through a set of nested workflows defined below.
 
-### Emails
+#### Step Function State Machine for Fantasy League Processing
+
+Weekly processing starts at a parent workflow that orchestrates the nested workflows providing appropriate inputs and outputs and invoking them at appropriate times. 
+
+![Parent Workflow](parent_workflow.png)
+
+#### Step Function State Machine for Gameweek Processing
+
+Gameweek processing is where the bulk of the work happens in this system. When invoked, it queries a number of APIs to get premiere league specific data as well as specific data related to our fantasy league. After collecting gameweek data, it assigns badges based on that data and sends out a weekly summary email using SES.
+
+![Gameweek Processing State Machine](gameweek_processing_workflow.png)
+
+##### Emails
 
 Every week, an email is sent out to notify everyone of the week's results. A sample email from gameweek 9 can be seen below.
 
 ![Sample Email](sample-email.png)
+
+#### Step Function State Machine for Season Processing
+
+Once the season completes, a final round of data extraction occurs and then season related badges are assigned by querying the various data stores that have been aggregated over the course of the season.
+
+![Season Processing State Machine](season_processing_workflow.png)
+
+### Aurora Schema
+
+The premiere league data is stored in an Aurora serverless cluster because it is highly relational. A rough outline of the schema can be seen below and full schema is defined in the mysql init files in [fantasy-infra/data/database-operations](https://github.com/seththeeke/last-of-the-mohigans/blob/extract-season-data/fantasy-infra/lib/data/database-operations/1-init-pl-data.sql).
+
+![Aurora Schema](aurora-schema.png)
 
 ## Setup
 

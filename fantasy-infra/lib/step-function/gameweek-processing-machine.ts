@@ -7,9 +7,16 @@ import * as ddb from '@aws-cdk/aws-dynamodb';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as cw from '@aws-cdk/aws-cloudwatch';
 import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
+import * as ec2 from '@aws-cdk/aws-ec2';
 import { ExtractGameweekDataLambda } from '../lambda/extract-gameweek-data-lambda';
 import { AssignGameweekBadgesLambda } from '../lambda/assign-gameweek-badges-lambda';
 import { GameweekProcessingCompletedEmailLambda } from '../lambda/gameweek-processing-completed-email-lambda';
+import { PremiereLeagueRDSDataLambda } from '../lambda/premier-league-rds-data-lambda';
+import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
+import { ExtractGameweekFixturesLambda } from '../lambda/extract-gameweek-fixtures-lambda';
+import { ExtractFantasyTransactionsLambda } from '../lambda/extract-fantasy-transactions-lambda';
+import { ExtractSeasonDataLambda } from '../lambda/extract-season-data-lambda';
+import { Duration } from '@aws-cdk/core';
 
 export interface GameweekProcessingMachineProps {
     gameweekCompletedTopic: sns.Topic;
@@ -21,10 +28,16 @@ export interface GameweekProcessingMachineProps {
     errorTopic: sns.Topic;
     mediaAssetsBucket: s3.Bucket;
     emailSubscriptionTable: ddb.Table;
+    vpc: ec2.Vpc;
+    dataSourcesMap: DataSourcesMap;
 }
 export class GameweekProcessingMachine extends cdk.Construct{
 
+    extractSeasonDataLambda: lambda.Function;
+    extractGameweekFixturesLambda: lambda.Function;
+    extractPlayerFixtureLambda: lambda.Function;
     extractGameweekDataLambda: lambda.Function;
+    extractTransactionsLambda: lambda.Function;
     gameweekBadgeLambdas: lambda.Function[];
     gameweekProcessingCompletedEmailLambda: lambda.Function;
     gameweekProcessingStateMachine: stepFunctions.StateMachine;
@@ -43,6 +56,33 @@ export class GameweekProcessingMachine extends cdk.Construct{
             subject: "Gameweek Completed",
             resultPath: stepFunctions.JsonPath.DISCARD
         });
+
+        const parallelGameweekDataExtraction = new stepFunctions.Parallel(this, "GameweekExtractionProcessors");
+        const extractSeasonDataTask = new stepFunctions.Task(this, "ExtractSeasonData", {
+            task: new stepFunctionTasks.InvokeFunction(this.extractSeasonDataLambda),
+            timeout: cdk.Duration.minutes(20),
+            comment: "Extracts and stores data from FPL for processing season data",
+            resultPath: stepFunctions.JsonPath.DISCARD
+        });
+        const extractGameweekFixturesTask = new stepFunctions.Task(this, "ExtractGameweekFixturesTask", {
+            task: new stepFunctionTasks.InvokeFunction(this.extractGameweekFixturesLambda),
+            timeout: cdk.Duration.minutes(5),
+            comment: "Extracts and stores data from FPL for processing"
+        });
+        const extractGameweekPlayerFixtureTask = new stepFunctions.Task(this, "ExtractGameweekPlayerFixtureTask", {
+            task: new stepFunctionTasks.InvokeFunction(this.extractPlayerFixtureLambda),
+            timeout: cdk.Duration.minutes(5),
+            comment: "Extracts and stores gameweek player fixture data from FPL for processing"
+        });
+        const extractTransactionsTask = new stepFunctions.Task(this, "ExtractTransactionsTask", {
+            task: new stepFunctionTasks.InvokeFunction(this.extractTransactionsLambda),
+            timeout: cdk.Duration.minutes(5),
+            comment: "Extracts and stores transactions for the league"
+        });
+        extractSeasonDataTask.next(extractGameweekFixturesTask);
+        extractGameweekFixturesTask.next(extractGameweekPlayerFixtureTask);
+        parallelGameweekDataExtraction.branch(extractSeasonDataTask);
+        parallelGameweekDataExtraction.branch(extractTransactionsTask);
 
         const extractGameweekDataTask = new stepFunctions.Task(this, "ExtractGameweekData", {
             task: new stepFunctionTasks.InvokeFunction(this.extractGameweekDataLambda),
@@ -71,14 +111,16 @@ export class GameweekProcessingMachine extends cdk.Construct{
             resultPath: stepFunctions.JsonPath.DISCARD
         });
 
-        gameweekCompletedPublishTask.next(extractGameweekDataTask);
+        gameweekCompletedPublishTask.next(parallelGameweekDataExtraction);
+        parallelGameweekDataExtraction.next(extractGameweekDataTask);
         extractGameweekDataTask.next(parallelGameweekBadgeProcessor);
         parallelGameweekBadgeProcessor.next(sendGameweekProcessingCompleteEmailTask);
 
         this.gameweekProcessingStateMachine = new stepFunctions.StateMachine(this, "GameweekProcessingStateMachine", {
             stateMachineName: "GameweekProcessingStateMachine",
             definition: gameweekCompletedPublishTask,
-            stateMachineType: stepFunctions.StateMachineType.STANDARD
+            stateMachineType: stepFunctions.StateMachineType.STANDARD,
+            timeout: Duration.minutes(30)
         });
 
         const alarm = new cw.Alarm(this, 'GameweekProcessingStepFunctionFailureAlarm', {
@@ -89,9 +131,19 @@ export class GameweekProcessingMachine extends cdk.Construct{
             treatMissingData: cw.TreatMissingData.MISSING
         });
         alarm.addAlarmAction(new cwActions.SnsAction(props.errorTopic));
+
+        // Should be removed eventually
+        this.createDataMigrationMachine();
     }
 
     createLambdas(props: GameweekProcessingMachineProps): void {
+
+        this.extractSeasonDataLambda = new ExtractSeasonDataLambda(this, "ExtractSeasonDataLambdaFunction", {
+            vpc: props.vpc,
+            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
+            gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE]
+        });
 
         this.extractGameweekDataLambda = new ExtractGameweekDataLambda(this, "ExtractGameweekDataLambda", {
             gameweeksTable: props.gameweeksTable,
@@ -99,6 +151,24 @@ export class GameweekProcessingMachine extends cdk.Construct{
             badgeTable: props.badgeTable,
             gameweekPlayerHistoryTable: props.gameweekPlayerHistoryTable,
             staticContentBucket: props.staticContentBucket,
+        });
+
+        this.extractGameweekFixturesLambda = new ExtractGameweekFixturesLambda(this, "ExtractGameweekFixturesLambda", {
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
+            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
+            vpc: props.vpc
+        });
+
+        this.extractPlayerFixtureLambda = new PremiereLeagueRDSDataLambda(this, "ExtractGameweekPlayerFixtureLambda", {
+            vpc: props.vpc,
+            functionName: "ExtractGameweekPlayerFixtureLambda",
+            description: "Extracts all fixture data per player for the gameweek",
+            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
+            handler: "controller/gameweek-processing-controller.extractGameweekPlayerFixturesHandler"
+        });
+
+        this.extractTransactionsLambda = new ExtractFantasyTransactionsLambda(this, "ExtractFantasyTransactionsLambda", {
+            fantasyTransactionsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.FANTASY_TRANSACTIONS_TABLE]
         });
     
         const gameweekBadgeMetadatas = [
@@ -145,6 +215,26 @@ export class GameweekProcessingMachine extends cdk.Construct{
             handler: "controller/email-controller.sendGameweekProcessingCompletedEmailController",
             mediaAssetsBucket: props.mediaAssetsBucket,
             emailSubscriptionTable: props.emailSubscriptionTable
+        });
+    }
+
+    createDataMigrationMachine (): void {
+        const extractGameweekFixturesTaskMigration = new stepFunctions.Task(this, "ExtractGameweekFixturesTaskMigration", {
+            task: new stepFunctionTasks.InvokeFunction(this.extractGameweekFixturesLambda),
+            timeout: cdk.Duration.minutes(5),
+            comment: "Extracts and stores data from FPL for processing migration"
+        });
+        const extractGameweekPlayerFixtureTaskMigration = new stepFunctions.Task(this, "ExtractGameweekPlayerFixtureTaskMigration", {
+            task: new stepFunctionTasks.InvokeFunction(this.extractPlayerFixtureLambda),
+            timeout: cdk.Duration.minutes(5),
+            comment: "Extracts and stores gameweek player fixture data from FPL for processing migration"
+        });
+        extractGameweekFixturesTaskMigration.next(extractGameweekPlayerFixtureTaskMigration);
+
+        const dataMigrationStack = new stepFunctions.StateMachine(this, "DataMigrationMachine", {
+            stateMachineName: "GameweekDataMigrationMachineMachine",
+            definition: extractGameweekFixturesTaskMigration,
+            stateMachineType: stepFunctions.StateMachineType.STANDARD
         });
     }
 }

@@ -6,8 +6,10 @@ import * as sns from '@aws-cdk/aws-sns';
 import * as ddb from '@aws-cdk/aws-dynamodb';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as cw from '@aws-cdk/aws-cloudwatch';
+import * as ec2 from '@aws-cdk/aws-ec2';
 import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
 import { AssignSeasonBadgesLambda } from '../lambda/assign-season-badges-lambda';
+import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 
 export interface SeasonProcessingMachineProps {
     seasonCompletedTopic: sns.Topic;
@@ -17,6 +19,8 @@ export interface SeasonProcessingMachineProps {
     gameweekPlayerHistoryTable: ddb.Table;
     staticContentBucket: s3.Bucket;
     errorTopic: sns.Topic;
+    vpc: ec2.Vpc;
+    dataSourcesMap: DataSourcesMap;
 }
 export class SeasonProcessingMachine extends cdk.Construct{
 
@@ -116,7 +120,9 @@ export class SeasonProcessingMachine extends cdk.Construct{
                 staticContentBucket: props.staticContentBucket,
                 functionName: seasonBadgeMetadata.functionName,
                 description: seasonBadgeMetadata.description,
-                handler: seasonBadgeMetadata.handler
+                handler: seasonBadgeMetadata.handler,
+                vpc: props.vpc,
+                plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER]
             }));
         }
     }

@@ -5,25 +5,22 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as targets from '@aws-cdk/aws-events-targets';
 import * as events from '@aws-cdk/aws-events';
 import * as sns from '@aws-cdk/aws-sns';
-import * as ddb from '@aws-cdk/aws-dynamodb';
-import * as s3 from '@aws-cdk/aws-s3';
 import * as cw from '@aws-cdk/aws-cloudwatch';
 import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
+import * as ec2 from '@aws-cdk/aws-ec2';
 import { HasGameweekCompletedLambda } from '../lambda/has-gameweek-completed-lambda';
 import { SeasonProcessingMachine } from './season-processing-machine';
 import { GameweekProcessingMachine } from './gameweek-processing-machine';
+import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
+import { PremiereLeagueRDSDataLambda } from '../lambda/premier-league-rds-data-lambda';
+import { Result, JsonPath, IntegrationPattern } from '@aws-cdk/aws-stepfunctions';
 
 export interface FantasyLeagueStateMachineProps {
     gameweekCompletedTopic: sns.Topic;
     seasonCompletedTopic: sns.Topic;
-    leagueDetailsTable: ddb.Table;
-    gameweeksTable: ddb.Table;
-    badgeTable: ddb.Table;
-    gameweekPlayerHistoryTable: ddb.Table;
-    staticContentBucket: s3.Bucket;
     errorTopic: sns.Topic;
-    mediaAssetsBucket: s3.Bucket;
-    emailSubscriptionTable: ddb.Table;
+    dataSourcesMap: DataSourcesMap;
+    vpc: ec2.Vpc;
 }
 export class FantasyLeagueStateMachine extends cdk.Construct{
 
@@ -59,15 +56,17 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
         });
 
         const gameweekCompletedStateMachine = new GameweekProcessingMachine(this, "GameweekProcessingStateMachine", {
-            badgeTable: props.badgeTable,
-            emailSubscriptionTable: props.emailSubscriptionTable,
+            badgeTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.BADGE_TABLE],
+            emailSubscriptionTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.EMAIL_SUBSCRIPTIONS_TABLE],
             errorTopic: props.errorTopic,
             gameweekCompletedTopic: props.gameweekCompletedTopic,
-            gameweekPlayerHistoryTable: props.gameweekPlayerHistoryTable,
-            gameweeksTable: props.gameweeksTable,
-            leagueDetailsTable: props.leagueDetailsTable,
-            mediaAssetsBucket: props.mediaAssetsBucket,
-            staticContentBucket: props.staticContentBucket
+            gameweekPlayerHistoryTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEK_PLAYER_HISTORY_TABLE],
+            gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE],
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
+            mediaAssetsBucket: props.dataSourcesMap.s3Buckets[DataSourceMapKeys.MEDIA_ASSET_BUCKET],
+            staticContentBucket: props.dataSourcesMap.s3Buckets[DataSourceMapKeys.STATIC_CONTENT_BUCKET],
+            dataSourcesMap: props.dataSourcesMap,
+            vpc: props.vpc
         });
 
         const hasSeasonCompletedChoice = new stepFunctions.Choice(this, "HasSeasonCompletedChoice", {
@@ -75,28 +74,50 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
         });
 
         const seasonCompletedStateMachine = new SeasonProcessingMachine(this, "SeasonProcessingMachine", {
-            badgeTable: props.badgeTable,
+            badgeTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.BADGE_TABLE],
             errorTopic: props.errorTopic,
-            gameweekPlayerHistoryTable: props.gameweekPlayerHistoryTable,
-            gameweeksTable: props.gameweeksTable, 
-            leagueDetailsTable: props.leagueDetailsTable,
+            gameweekPlayerHistoryTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEK_PLAYER_HISTORY_TABLE],
+            gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE], 
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
             seasonCompletedTopic: props.seasonCompletedTopic,
-            staticContentBucket: props.staticContentBucket
+            staticContentBucket: props.dataSourcesMap.s3Buckets[DataSourceMapKeys.STATIC_CONTENT_BUCKET],
+            vpc: props.vpc,
+            dataSourcesMap: props.dataSourcesMap
         });
 
         hasGameweekCompletedTask.next(hasGameweekCompletedChoice);
+
+        // I need to warm the serverless RDS cluster because the mysql2 library is timing out regularly when the cluster is scaling up
+        // I do not want to use the RDS Data API for nodejs because it is slow and returns data in a completely unreadable way
+        const RDSWarmingLambda = new PremiereLeagueRDSDataLambda(this, "RDSWarmingLambda", {
+            functionName: "RDSWarmingLambda",
+            plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
+            vpc: props.vpc,
+            description: "Lambda for warming the RDS Cluster to remove timeouts when connecting using mysql2",
+            handler: "controller/warming-controller.warmRDSCluster"
+        });
+        const rdsWarmingTask = new stepFunctions.Task(this, "RDSWarmingTask", {
+            task: new stepFunctionTasks.InvokeFunction(RDSWarmingLambda),
+            timeout: cdk.Duration.minutes(3),
+            comment: "Warms RDS in prep for data extraction",
+            resultPath: JsonPath.DISCARD
+        });
+
         const gameweekProcessingStateMachineExecution = new stepFunctionTasks.StepFunctionsStartExecution(this, "GameweekProcessingStateMachineTask", {
             stateMachine: gameweekCompletedStateMachine.gameweekProcessingStateMachine,
-            resultPath: stepFunctions.JsonPath.DISCARD
+            resultPath: stepFunctions.JsonPath.DISCARD,
+            integrationPattern: IntegrationPattern.RUN_JOB
         });
-        hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), gameweekProcessingStateMachineExecution);
+        hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), rdsWarmingTask);
+        rdsWarmingTask.next(gameweekProcessingStateMachineExecution);
         hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
         gameweekProcessingStateMachineExecution.next(hasSeasonCompletedChoice);
         const hasSeasonCompletedCondition = stepFunctions.Condition.or(
             stepFunctions.Condition.stringEquals("$.gameweek", "38"),
             stepFunctions.Condition.booleanEquals("$.shouldOverrideSeasonCompletedChoice", true));
         const seasonProcessingStateMachineExecution = new stepFunctionTasks.StepFunctionsStartExecution(this, "SeasonProcessingStateMachineTask", {
-            stateMachine: seasonCompletedStateMachine.seasonProcessingStateMachine
+            stateMachine: seasonCompletedStateMachine.seasonProcessingStateMachine,
+            integrationPattern: IntegrationPattern.RUN_JOB
         });
         hasSeasonCompletedChoice.when(hasSeasonCompletedCondition, seasonProcessingStateMachineExecution);
         hasSeasonCompletedChoice.when(stepFunctions.Condition.not(hasSeasonCompletedCondition), new stepFunctions.Succeed(this, "SeasonDidNotCompleteSoSkipToEnd"));
@@ -104,7 +125,8 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
         const stateMachine = new stepFunctions.StateMachine(this, "FantasyLeagueProcessingStateMachine", {
             stateMachineName: "FantasyLeagueProcessingStateMachine",
             definition: hasGameweekCompletedTask,
-            stateMachineType: stepFunctions.StateMachineType.STANDARD
+            stateMachineType: stepFunctions.StateMachineType.STANDARD,
+            timeout: cdk.Duration.minutes(60)
         });
 
         const alarm = new cw.Alarm(this, 'FantasyLeagueStepFunctionFailureAlarm', {
@@ -132,8 +154,8 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
 
     createLambdas(props: FantasyLeagueStateMachineProps): void {
         this.hasGameweekCompletedLambda = new HasGameweekCompletedLambda(this, "HasGameweekCompletedLambda", {
-            leagueDetailsTable: props.leagueDetailsTable,
-            gameweeksTable: props.gameweeksTable,
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
+            gameweeksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.GAMEWEEKS_TABLE],
         });
     }
 }

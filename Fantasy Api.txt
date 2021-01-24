@@ -22,7 +22,7 @@ Fantasy Api
     "waivers_processed": false
 }
 5. https://draft.premierleague.com/api/event/2/live
- - Appears to return all information for all players in the gameweek
+ - Return all information for all players and fixtures in the gameweek and includes live results
 6. https://draft.premierleague.com/api/entry/<team-id>38762/public
  - public info about the team with the team id
 {

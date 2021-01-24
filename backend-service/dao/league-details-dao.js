@@ -63,6 +63,18 @@ module.exports = {
         return activeLeague;
     },
 
+    getLeagueDetailsById: async function(leagueId){
+        let leagueDetails = await this.getAllLeagueDetails()
+        let leagueWithLeagueId = undefined;
+        for (let i in leagueDetails.Items){
+            let league = leagueDetails.Items[i];
+            if (league.leagueId.S){
+                leagueWithLeagueId = league;
+            }
+        }
+        return leagueWithLeagueId;
+    },
+
     getAllLeagueDetails: async function(){
         let leagueDetailsScanParams = {
             TableName: process.env.LEAGUE_DETAILS_TABLE_NAME

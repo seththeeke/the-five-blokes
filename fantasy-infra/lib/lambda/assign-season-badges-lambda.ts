@@ -1,10 +1,9 @@
 import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
 import * as ddb from '@aws-cdk/aws-dynamodb';
 import * as s3 from '@aws-cdk/aws-s3';
-import path = require('path');
+import { PremiereLeagueRDSDataLambda, PremiereLeagueRDSDataLambdaProps } from './premier-league-rds-data-lambda';
 
-export interface AssignSeasonBadgesLambdaProps {
+export interface AssignSeasonBadgesLambdaProps extends PremiereLeagueRDSDataLambdaProps {
     leagueDetailsTable: ddb.Table;
     gameweeksTable: ddb.Table;
     badgeTable: ddb.Table;
@@ -14,29 +13,26 @@ export interface AssignSeasonBadgesLambdaProps {
     functionName: string;
     description: string;
 }
-export class AssignSeasonBadgesLambda extends lambda.Function {
+export class AssignSeasonBadgesLambda extends PremiereLeagueRDSDataLambda {
   constructor(scope: cdk.Construct, id: string, props: AssignSeasonBadgesLambdaProps) {
     super(scope, id, {
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../../backend-service')),
       handler: props.handler,
-      runtime: lambda.Runtime.NODEJS_12_X,
-      tracing: lambda.Tracing.ACTIVE,
-      environment: {
+      environmentVars: {
         "LEAGUE_DETAILS_TABLE_NAME": props.leagueDetailsTable.tableName,
         "GAMEWEEK_TABLE_NAME": props.gameweeksTable.tableName,
         "BADGE_TABLE_NAME": props.badgeTable.tableName,
         "GAMEWEEK_PLAYER_HISTORY_TABLE_NAME": props.gameweekPlayerHistoryTable.tableName,
         "STATIC_CONTENT_BUCKET_NAME": props.staticContentBucket.bucketName,
       },
-      timeout: cdk.Duration.seconds(300),
       functionName: props.functionName,
-      description: props.description
+      description: props.description,
+      ...props
     });
 
     props.leagueDetailsTable.grantReadData(this);
-    props.gameweeksTable.grantReadWriteData(this);
+    props.gameweeksTable.grantReadData(this);
     props.badgeTable.grantReadWriteData(this);
-    props.gameweekPlayerHistoryTable.grantWriteData(this);
-    props.staticContentBucket.grantReadWrite(this);
+    props.gameweekPlayerHistoryTable.grantReadData(this);
+    props.staticContentBucket.grantRead(this);
   }
 }
