@@ -5,11 +5,11 @@ select SUM(player_fixtures.goals),players.* from player_fixtures inner join play
 -- Get all players with their sum of goals grouped by playerId
 select player_id,SUM(goals) from player_fixtures group by player_id;
 -- Returns top ten goal scorers from 2020/2021 and their names
-select player_fixtures.player_id,SUM(goals) as total_goals,players.first_name,players.last_name,player_season_data.foreign_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id inner join player_season_data on player_season_data.player_id = player_fixtures.player_id and fixture_year = "2020/2021" group by player_id order by total_goals desc limit 10;
+select player_fixtures.player_id,SUM(player_fixtures.goals) as total_goals,players.first_name,players.last_name,player_season_data.foreign_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id inner join player_season_data on player_season_data.player_id = player_fixtures.player_id and fixture_year = "2020/2021" group by player_id order by total_goals desc limit 10;
 -- Returns top ten assisters from 2020/2021 and their names
-select player_fixtures.player_id,SUM(assists) as total_assists,players.first_name,players.last_name from player_fixtures inner join players on players.player_id = player_fixtures.player_id and fixture_year = "2020/2021" group by player_id order by total_assists desc limit 10;
+select player_fixtures.player_id,SUM(player_fixtures.assists) as total_assists,players.first_name,players.last_name from player_fixtures inner join players on players.player_id = player_fixtures.player_id and fixture_year = "2020/2021" group by player_id order by total_assists desc limit 10;
 -- Returns top 10 clean sheet goalkeepers from 2020/2021 and their names
-select player_fixtures.player_id,SUM(clean_sheets) as total_clean_sheets,players.first_name,players.last_name,players.position_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id and fixture_year = "2020/2021" and players.position_id = 1 group by player_id order by total_clean_sheets desc limit 10;
+select player_fixtures.player_id,SUM(player_fixtures.clean_sheets) as total_clean_sheets,players.first_name,players.last_name,players.position_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id and fixture_year = "2020/2021" and players.position_id = 1 group by player_id order by total_clean_sheets desc limit 10;
 -- Returns all wins for arsenal in 2020/2021
 select gameweek,home_team_goals,away_team_goals,date_played from fixtures where (home_team_id = "acc64fc9-2077-4669-a2a4-2ec345b30a98" and home_team_goals > away_team_goals) or (away_team_id = "acc64fc9-2077-4669-a2a4-2ec345b30a98" and away_team_goals > home_team_goals) and fixture_year = "2020/2021" order by gameweek;
 -- Select many column statistics across all fixtures for a single team_id and fixture_year
