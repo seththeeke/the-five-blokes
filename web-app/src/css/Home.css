@@ -71,3 +71,7 @@
     display: inline-flex;
     box-shadow: 2px 5px 10px #888888;
 }
+
+.five-blokes-banner {
+    margin: 10px 45px;
+}
