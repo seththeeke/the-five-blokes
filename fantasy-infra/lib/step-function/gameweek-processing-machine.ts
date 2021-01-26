@@ -131,9 +131,6 @@ export class GameweekProcessingMachine extends cdk.Construct{
             treatMissingData: cw.TreatMissingData.MISSING
         });
         alarm.addAlarmAction(new cwActions.SnsAction(props.errorTopic));
-
-        // Should be removed eventually
-        this.createDataMigrationMachine();
     }
 
     createLambdas(props: GameweekProcessingMachineProps): void {
@@ -218,23 +215,4 @@ export class GameweekProcessingMachine extends cdk.Construct{
         });
     }
 
-    createDataMigrationMachine (): void {
-        const extractGameweekFixturesTaskMigration = new stepFunctions.Task(this, "ExtractGameweekFixturesTaskMigration", {
-            task: new stepFunctionTasks.InvokeFunction(this.extractGameweekFixturesLambda),
-            timeout: cdk.Duration.minutes(5),
-            comment: "Extracts and stores data from FPL for processing migration"
-        });
-        const extractGameweekPlayerFixtureTaskMigration = new stepFunctions.Task(this, "ExtractGameweekPlayerFixtureTaskMigration", {
-            task: new stepFunctionTasks.InvokeFunction(this.extractPlayerFixtureLambda),
-            timeout: cdk.Duration.minutes(5),
-            comment: "Extracts and stores gameweek player fixture data from FPL for processing migration"
-        });
-        extractGameweekFixturesTaskMigration.next(extractGameweekPlayerFixtureTaskMigration);
-
-        const dataMigrationStack = new stepFunctions.StateMachine(this, "DataMigrationMachine", {
-            stateMachineName: "GameweekDataMigrationMachineMachine",
-            definition: extractGameweekFixturesTaskMigration,
-            stateMachineType: stepFunctions.StateMachineType.STANDARD
-        });
-    }
 }
