@@ -8,6 +8,7 @@ module.exports = {
 
     assignBadges: async function(assignSeasonBadgesRequest) {
         // Need to extract this information from elsewhere, unsure where, may need to do manual data input here
+        // this will almost certainly need to be added manually
         // PFA Player of the Year
         // PFA Young Player of the Year
 

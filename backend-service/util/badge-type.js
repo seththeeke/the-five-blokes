@@ -27,5 +27,9 @@ module.exports = {
     GOLDEN_BOOT: "Golden Boot Winner",
     GOLDEN_GLOVE: "Golden Glove Winner",
     PLAYMAKER_OF_THE_SEASON_WINNER: "Playmaker of the Season Winner",
-    DREAM_TEAM_PLAYER: "Dreamteam Player"
+    DREAM_TEAM_PLAYER: "Dreamteam Player",
+    SEASON_MVP: "Season MVP",
+    _200_POINT_SEASON_PLAYER: "200+ Point Season Player",
+    _250_POINT_SEASON_PLAYER: "250+ Point Season Player",
+    _300_POINT_SEASON_PLAYER: "300+ Point Season Player"
 };

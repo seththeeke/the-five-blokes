@@ -484,7 +484,9 @@ module.exports = {
         limit = limit ? limit : 10;
         let sql = 'select player_fixtures.player_id,SUM(player_fixtures.' + columnName + ') as total,players.first_name,players.last_name,player_season_data.foreign_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id inner join player_season_data on player_season_data.player_id = player_fixtures.player_id and fixture_year = ? group by player_id order by total desc limit ?';
         let params = [season_year, limit];
-        if (position_id) {
+        // use -1 to bypass the position_id filter if you want to use limit
+        // should probably just make the input an object...
+        if (position_id && position_id !== -1) {
             sql = 'select player_fixtures.player_id,SUM(player_fixtures.' + columnName + ') as total,players.first_name,players.last_name,player_season_data.foreign_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id inner join player_season_data on player_season_data.player_id = player_fixtures.player_id and fixture_year = ? and position_id = ? group by player_id order by total desc limit ?';
             params = [season_year, position_id, limit];
         }
