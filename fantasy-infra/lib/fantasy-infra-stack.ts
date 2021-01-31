@@ -7,13 +7,13 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import { AddNewLeagueLambda } from './lambda/add-new-league-lambda';
 import { InitiateLeagueLambda } from './lambda/initiate-league-lambda';
 import { StartingPosition } from '@aws-cdk/aws-lambda';
-import { LastOfTheMohigansRestService } from './rest-service/last-of-the-mohigans-rest-service';
 import { FantasyLeagueStateMachine } from './step-function/fantasy-league-state-machine';
 import { DataSources, DataSourceMapKeys } from './data/data-stores';
 
 export class FantasyInfraStack extends cdk.Stack {
 
   vpc: ec2.Vpc;
+  dataSources: DataSources;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -95,7 +95,7 @@ export class FantasyInfraStack extends cdk.Stack {
     const mediaAssetsBucket = new s3.Bucket(this, "MediaAssetsBucket");
 
     // Global data sources so I don't have to pass individual databases and tables into sub-constructs
-    const dataSources = new DataSources(this, "FantasyInfraDataSources", {
+    this.dataSources = new DataSources(this, "FantasyInfraDataSources", {
       vpc: this.vpc,
       leagueDetailsTable,
       gameweeksTable,
@@ -117,14 +117,14 @@ export class FantasyInfraStack extends cdk.Stack {
     });
 
     const addNewLeagueLambda = new AddNewLeagueLambda(this, "AddNewLeagueLambda", {
-      leagueDetailsTable: dataSources.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE]
+      leagueDetailsTable: this.dataSources.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE]
     });
 
     const initiateLeagueLambda = new InitiateLeagueLambda(this, "InitiateLeagueLambda", {
-      leagueDetailsTable: dataSources.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
-      badgeTable: dataSources.dataSourcesMap.ddbTables[DataSourceMapKeys.BADGE_TABLE]
+      leagueDetailsTable: this.dataSources.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
+      badgeTable: this.dataSources.dataSourcesMap.ddbTables[DataSourceMapKeys.BADGE_TABLE]
     });
-    const leagueDetailsStreamEventSource = new eventSource.DynamoEventSource(dataSources.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE], {
+    const leagueDetailsStreamEventSource = new eventSource.DynamoEventSource(this.dataSources.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE], {
       startingPosition: StartingPosition.TRIM_HORIZON,
       batchSize: 1,
       retryAttempts: 5
@@ -135,17 +135,8 @@ export class FantasyInfraStack extends cdk.Stack {
       gameweekCompletedTopic,
       seasonCompletedTopic,
       errorTopic,
-      dataSourcesMap: dataSources.dataSourcesMap,
+      dataSourcesMap: this.dataSources.dataSourcesMap,
       vpc: this.vpc
     });
-
-    const shouldUseDomainName = this.node.tryGetContext('shouldUseDomainName');
-    new LastOfTheMohigansRestService(this, "LastOfTheMohigansRestService", {
-      shouldUseDomainName,
-      dataSourcesMap: dataSources.dataSourcesMap
-    });
-
-    // Statistics API should be broken into its own stack with the Last Of The Mohigans Service
-    // new StatisticsApi(this, "StatisticsApi");
   }
 }
