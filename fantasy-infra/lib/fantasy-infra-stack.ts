@@ -32,7 +32,8 @@ export class FantasyInfraStack extends cdk.Stack {
       sortKey: {
         name: "year",
         type: ddb.AttributeType.STRING
-      }
+      },
+      pointInTimeRecovery: true
     });
 
     const badgeTable = new ddb.Table(this, "FantasyBadges", {
@@ -47,7 +48,8 @@ export class FantasyInfraStack extends cdk.Stack {
       sortKey: {
         name: "participantId",
         type: ddb.AttributeType.STRING
-      }
+      },
+      pointInTimeRecovery: true
     });
 
     const gameweeksTable = new ddb.Table(this, "Gameweeks", {
@@ -62,7 +64,8 @@ export class FantasyInfraStack extends cdk.Stack {
       sortKey: {
         name: "gameweek",
         type: ddb.AttributeType.NUMBER
-      }
+      },
+      pointInTimeRecovery: true
     });
 
     const gameweekPlayerHistoryTable = new ddb.Table(this, "GameweekPlayerHistory", {
@@ -77,7 +80,8 @@ export class FantasyInfraStack extends cdk.Stack {
       sortKey: {
         name: "gameweek",
         type: ddb.AttributeType.NUMBER
-      }
+      },
+      pointInTimeRecovery: true
     });
 
     const emailSubscriptionTable = new ddb.Table(this, "EmailSubscriptionTable", {
