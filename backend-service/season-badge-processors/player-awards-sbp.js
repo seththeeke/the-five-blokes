@@ -1,7 +1,5 @@
 var badgesDao = require('./../dao/badges-dao');
-var staticContentDao = require('./../dao/static-content-dao');
 var BADGE_TYPE = require('./../util/badge-type');
-var statisticsCalculator = require('./../util/statistics-calculator');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweekPlayerHistoryDao = require('./../dao/gameweek-player-history-dao');
 var premiereLeagueDataDao = require('./../dao/premiere-league-data-dao');
@@ -16,8 +14,6 @@ module.exports = {
         let topTenScorers = await premiereLeagueDataDao.getTopPlayersByStatistic("goals", "2020/2021");
         let topTenAssisters = await premiereLeagueDataDao.getTopPlayersByStatistic("assists", "2020/2021");
         let topTenCleanSheets = await premiereLeagueDataDao.getTopPlayersByStatistic("clean_sheets", "2020/2021", 1);
-        // // get all players with dreamteam set to true from rds
-        // let dreamTeam = statisticsCalculator.getDreamTeamPlayers(filteredPlayers);
         let goldenBootWinner = topTenScorers[0];
         let playmakerOfTheSeasonWinner = topTenAssisters[0];
         let goldenGloveWinner = topTenCleanSheets[0];
@@ -51,26 +47,14 @@ module.exports = {
             "badgeType": BADGE_TYPE.GOLDEN_GLOVE,
             "value": goldenBootWinner.total
         });
-        // for (let i in dreamTeam) {
-        //     let dreamTeamPlayer = dreamTeam[i];
-        //     let teamId = badgeProcessorUtil.getTeamIdForPlayer(leaguePicks, dreamTeamPlayer, playerMap);
-        //     if (teamId){
-        //         badges.push({
-        //             teamId,
-        //             "player": dreamTeamPlayer,
-        //             "badgeType": BADGE_TYPE.DREAM_TEAM_PLAYER,
-        //             "value": dreamTeamPlayer.total_points
-        //         });
-        //     } else {
-        //         console.log("No player owns dreamteam player with id: " + dreamTeamPlayer.id);
-        //     }
-        // }
 
         // Iterate through badge array and award badges
         for (let j in badges) {
             let badge = badges[j];
             if (badge.teamId && badge.player){
                 let playerBadge = await this._badgePlayerWithValue(badge.value, badge.player, leagueDetails, badge.teamId, badge.badgeType);
+            } else {
+                console.log("No one owned the player with the badgeType: " + badge.badgeType);
             }
         }
 
@@ -82,14 +66,13 @@ module.exports = {
 
     _badgePlayerWithValue: async function(value, player, leagueDetails, teamId, badgeType){
         let participants = JSON.parse(leagueDetails.participants.S);
-        // leagueEntry is currently coming back null/empty, need to figure out mapping participant and teamId
-        let leagueEntry = participants.filter(participant => participant.entry_id.toString() === teamId.toString());
+        let leagueEntry = participants.filter(participant => participant.entry_id.toString() === teamId.toString())[0];
         let playerBadge = await badgesDao.addNewBadgeWithParticipants(
-            leagueDetails.league.id.toString() + "-" + leagueEntry.id.toString() + "-" + badgeType + "-" + player.id.toString(),
+            leagueDetails.leagueId.S.toString() + "-" + leagueEntry.id.toString() + "-" + badgeType + "-" + player.foreign_id.toString(),
             leagueEntry.id.toString(),
             badgeType, 
             {
-                "year": leagueDetails.league.draft_dt.substring(0, 4),
+                "year": leagueDetails.year.S,
                 "value": value,
                 "player": player
             },
