@@ -58,7 +58,7 @@ class Home extends React.Component {
                   </div>
                </div>
                <div className="grid-container">
-                  <div class="five-blokes-banner">
+                  <div className="five-blokes-banner">
                      <iframe src="https://open.spotify.com/embed-podcast/show/7Hw0EJXJE2Zmi4pZ13aehl" width="100%" height="232" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
                   </div>
                   <div className="grid-item">

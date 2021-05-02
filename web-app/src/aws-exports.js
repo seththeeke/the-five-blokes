@@ -8,7 +8,7 @@ const awsmobile = {
             },
             {
                 name: "FPLServiceProdRaw",
-                endpoint: "https://hzjqhnruqh.execute-api.us-east-1.amazonaws.com/prod"
+                endpoint: "https://yag7p08kzb.execute-api.us-east-1.amazonaws.com/prod/"
             },
             {
                 name: "FPLServiceProd",
