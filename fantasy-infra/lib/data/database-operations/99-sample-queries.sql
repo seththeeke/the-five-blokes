@@ -4,6 +4,8 @@ SELECT team_season_data.*,teams.name FROM teams INNER JOIN team_season_data ON t
 select SUM(player_fixtures.goals),players.* from player_fixtures inner join players on players.player_id = player_fixtures.player_id and player_fixtures.player_id = 249;
 -- Get all players with their sum of goals grouped by playerId
 select player_id,SUM(goals) from player_fixtures group by player_id;
+-- Returns top ten point scorers from 2020/2021 and their names
+select player_fixtures.player_id,SUM(player_fixtures.points) as total_points,players.first_name,players.last_name,player_season_data.foreign_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id inner join player_season_data on player_season_data.player_id = player_fixtures.player_id and fixture_year = "2020/2021" group by player_id order by total_points desc limit 10;
 -- Returns top ten goal scorers from 2020/2021 and their names
 select player_fixtures.player_id,SUM(player_fixtures.goals) as total_goals,players.first_name,players.last_name,player_season_data.foreign_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id inner join player_season_data on player_season_data.player_id = player_fixtures.player_id and fixture_year = "2020/2021" group by player_id order by total_goals desc limit 10;
 -- Returns top ten assisters from 2020/2021 and their names

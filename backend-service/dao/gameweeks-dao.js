@@ -18,7 +18,6 @@ module.exports = {
                 lastCompletedGameweek = gameweek;
             }
         }
-        console.log("Found latest gameweek: " + JSON.stringify(lastCompletedGameweek));
         return lastCompletedGameweek;
     },
 

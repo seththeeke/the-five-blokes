@@ -66,6 +66,19 @@ module.exports = {
         return allBadgesResponse;
     },
 
+    getBadgesByType: async function(leagueId, badgeType){
+        let params = {
+            FilterExpression: "badgeType = :badgeType AND contains (id, :leagueId)",
+            ExpressionAttributeValues: {
+              ":badgeType": { S: badgeType },
+              ":leagueId": { S: leagueId }
+            },
+            TableName: process.env.BADGE_TABLE_NAME,
+        };
+        let badgeResponse = await ddb.scan(params).promise();
+        return badgeResponse;
+    },
+
     _getParticipantFullName: function(participants, participantId) {
         for (let i in participants) {
             let participant = participants[i];

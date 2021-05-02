@@ -82,7 +82,9 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
             seasonCompletedTopic: props.seasonCompletedTopic,
             staticContentBucket: props.dataSourcesMap.s3Buckets[DataSourceMapKeys.STATIC_CONTENT_BUCKET],
             vpc: props.vpc,
-            dataSourcesMap: props.dataSourcesMap
+            dataSourcesMap: props.dataSourcesMap,
+            mediaAssetsBucket: props.dataSourcesMap.s3Buckets[DataSourceMapKeys.MEDIA_ASSET_BUCKET],
+            emailSubscriptionTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.EMAIL_SUBSCRIPTIONS_TABLE]
         });
 
         hasGameweekCompletedTask.next(hasGameweekCompletedChoice);
