@@ -68,7 +68,7 @@ module.exports = {
         let leagueWithLeagueId = undefined;
         for (let i in leagueDetails.Items){
             let league = leagueDetails.Items[i];
-            if (league.leagueId.S){
+            if (league.leagueId.S === leagueId){
                 leagueWithLeagueId = league;
             }
         }

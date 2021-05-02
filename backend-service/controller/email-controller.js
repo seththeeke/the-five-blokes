@@ -6,6 +6,14 @@ exports.sendGameweekProcessingCompletedEmailController = async (event) => {
     return response;
 }
 
+exports.sendSeasonCompletedEmailController = async (event) => {
+    console.log(JSON.stringify(event));
+    let response = await emailService.sendSeasonCompletedEmail({
+        "leagueId": event.league
+    });
+    return response;
+}
+
 exports.subscribe = async (event) => {
     console.log(JSON.stringify(event));
     try {

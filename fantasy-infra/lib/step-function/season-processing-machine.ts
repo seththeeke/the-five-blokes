@@ -10,6 +10,7 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
 import { AssignSeasonBadgesLambda } from '../lambda/assign-season-badges-lambda';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
+import { SeasonCompletedEmailLambda } from '../lambda/season-completed-email-lambda';
 
 export interface SeasonProcessingMachineProps {
     seasonCompletedTopic: sns.Topic;
@@ -21,11 +22,14 @@ export interface SeasonProcessingMachineProps {
     errorTopic: sns.Topic;
     vpc: ec2.Vpc;
     dataSourcesMap: DataSourcesMap;
+    mediaAssetsBucket: s3.Bucket;
+    emailSubscriptionTable: ddb.Table;
 }
 export class SeasonProcessingMachine extends cdk.Construct{
 
     seasonBadgeLambdas: lambda.Function[];
     seasonProcessingStateMachine: stepFunctions.StateMachine;
+    seasonCompletedEmailLambda: lambda.Function;
 
     constructor(scope: cdk.Construct, id: string, props: SeasonProcessingMachineProps) {
         super(scope, id);
@@ -57,6 +61,13 @@ export class SeasonProcessingMachine extends cdk.Construct{
         }
 
         seasonCompletedPublishTask.next(parallelSeasonBadgeProcessor);
+
+        let seasonCompletedEmailTask = new stepFunctions.Task(this, "SeasonCompletedEmailTask", {
+            task: new stepFunctionTasks.InvokeFunction(this.seasonCompletedEmailLambda),
+            timeout: cdk.Duration.minutes(10)
+        });
+
+        parallelSeasonBadgeProcessor.next(seasonCompletedEmailTask);
 
         this.seasonProcessingStateMachine = new stepFunctions.StateMachine(this, "SeasonProcessingStateMachine", {
             stateMachineName: "SeasonProcessingStateMachine",
@@ -125,5 +136,18 @@ export class SeasonProcessingMachine extends cdk.Construct{
                 plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER]
             }));
         }
+
+        this.seasonCompletedEmailLambda = new SeasonCompletedEmailLambda(this, "SeasonCompletedEmailLambda", {
+            gameweeksTable: props.gameweeksTable,
+            leagueDetailsTable: props.leagueDetailsTable,
+            badgeTable: props.badgeTable,
+            gameweekPlayerHistoryTable: props.gameweekPlayerHistoryTable,
+            staticContentBucket: props.staticContentBucket,
+            functionName: "SeasonCompletedEmailLambdaV2",
+            description: "Controller for email sent after the season has completed",
+            handler: "controller/email-controller.sendSeasonCompletedEmailController",
+            mediaAssetsBucket: props.mediaAssetsBucket,
+            emailSubscriptionTable: props.emailSubscriptionTable
+        });
     }
 }

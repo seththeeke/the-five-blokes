@@ -2,11 +2,14 @@ var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');
 var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
 var emailSubscriptionsDao = require('./../dao/email-subscriptions-dao');
+var badgesDao = require('./../dao/badges-dao');
 
 var AWSXRay = require('aws-xray-sdk');
 var AWS = AWSXRay.captureAWS(require('aws-sdk'));
 AWS.config.update({region: process.env.AWS_REGION});
 var ses = new AWS.SES({apiVersion: '2010-12-01'});
+
+var BADGE_TYPE = require('./../util/badge-type');
 
 var MEDIA_ASSETS_BASE_URL = process.env.MEDIA_ASSETS_BUCKET_URL;
 var headerIcon = MEDIA_ASSETS_BASE_URL + "/circular-prem-lion.png";
@@ -16,6 +19,11 @@ var pointsIcon = MEDIA_ASSETS_BASE_URL + "/gameweek-winner.png";
 var goalsIcon = MEDIA_ASSETS_BASE_URL + "/football-ball.png";
 var assistsIcon = MEDIA_ASSETS_BASE_URL + "/kick-ball.png";
 var podiumImg = MEDIA_ASSETS_BASE_URL + "/podium.png";
+var leagueTrophyIcon = MEDIA_ASSETS_BASE_URL + "/league-champion.png";
+var goldenBootIcon = MEDIA_ASSETS_BASE_URL + "/golden-boot-season-winner.png";
+var playmakerIcon = MEDIA_ASSETS_BASE_URL + "/playmaker-of-the-season.png";
+var seasonLoserIcon = MEDIA_ASSETS_BASE_URL + "/season-loser.png";
+var seasonMVPIcon = MEDIA_ASSETS_BASE_URL + "/season-mvp-player.png";
 
 module.exports = {
     sendGameweekProcessingCompletedEmail: async function(){
@@ -146,6 +154,134 @@ module.exports = {
             } catch (error) {
                 console.log("Failed to send email to email address " + emailAddress);
             }
+        }
+    },
+
+    sendSeasonCompletedEmail: async function(sendSeasonCompletedRequest){
+        let leagueId = sendSeasonCompletedRequest.leagueId;
+        let leagueDetails = await leagueDetailsDao.getLeagueDetailsById(leagueId);
+        let participants = JSON.parse(leagueDetails.participants.S);
+        let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(leagueDetails);
+        let standings = JSON.parse(lastCompletedGameweek.standings.S);
+
+        console.log("Fetching league winner and league loser");
+        // get league winner
+        let leagueWinner = this._getParticipantFirstName(participants, standings[0].league_entry);
+        let leagueWinnerPoints = standings[0].total;
+        let leagueWinnerPointsDifference = parseInt(standings[0].total) - parseInt(standings[1].total);
+        // get last place
+        let lastPlace = this._getParticipantFirstName(participants, standings[standings.length - 1].league_entry);
+        let lastPlacePoints = standings[standings.length - 1].total;
+        let lastPlacePointsDifference = parseInt(standings[standings.length - 2].total) - parseInt(standings[standings.length - 1].total);
+
+        let leagueMVPParticipantName = "default";
+        let leagueMVPBadgeMetadata = "default";
+        let leagueMVPPlayerName = "default";
+        let leagueMVPValue = "default";
+        let leagueTopGoalScorerBadgeParticipantName = "default";
+        let leagueTopGoalScorerBadgeMetadata = "default";
+        let leagueTopGoalScorerPlayerName = "default";
+        let leagueTopGoalScorerValue = "default";
+        let leagueTopAssisterBadgeParticipantName = "default";
+        let leagueTopAssisterBadgeMetadata = "default";
+        let leagueTopAssisterPlayerName = "default";
+        let leagueTopAssisterScorerValue = "default";
+
+        console.log("Fetching league mvp information");
+        let leagueMVPBadgeScan = await badgesDao.getBadgesByType(leagueId, BADGE_TYPE.SEASON_MVP);
+        let leagueMVPBadge = leagueMVPBadgeScan.Items[0];
+        if (leagueMVPBadge){
+            leagueMVPParticipantName = leagueMVPBadge.participantName.S;
+            leagueMVPBadgeMetadata = JSON.parse(leagueMVPBadge.badgeMetadata.S);
+            leagueMVPPlayerName = leagueMVPBadgeMetadata.player.first_name + " " + leagueMVPBadgeMetadata.player.last_name;
+            leagueMVPValue = leagueMVPBadgeMetadata.player.value ? leagueMVPBadgeMetadata.player.value : "default";
+        }
+
+        console.log("Fetching golden boot info");
+        let leagueTopGoalScorerBadgeScan = await badgesDao.getBadgesByType(leagueId, BADGE_TYPE.GOLDEN_BOOT);
+        let leagueTopGoalScorerBadge = leagueTopGoalScorerBadgeScan.Items[0];
+        if (leagueTopGoalScorerBadge) {
+            leagueTopGoalScorerBadgeParticipantName = leagueTopGoalScorerBadge.participantName.S;
+            leagueTopGoalScorerBadgeMetadata = JSON.parse(leagueTopGoalScorerBadge.badgeMetadata.S);
+            leagueTopGoalScorerPlayerName = leagueTopGoalScorerBadgeMetadata.player.first_name + " " + leagueTopGoalScorerBadgeMetadata.player.last_name;
+            leagueTopGoalScorerValue = leagueTopGoalScorerBadgeMetadata.player.value ? leagueTopGoalScorerBadgeMetadata.player.value : "default";
+        }
+        
+        console.log("Fetching playmaker info");
+        let leagueTopAssisterBadgeScan = await badgesDao.getBadgesByType(leagueId, BADGE_TYPE.PLAYMAKER_OF_THE_SEASON_WINNER);
+        let leagueTopAssisterBadge = leagueTopAssisterBadgeScan.Items[0];
+        if (leagueTopAssisterBadge) {
+            leagueTopAssisterBadgeParticipantName = leagueTopAssisterBadge.participantName.S;
+            leagueTopAssisterBadgeMetadata = JSON.parse(leagueTopGoalScorerBadge.badgeMetadata.S);
+            leagueTopAssisterPlayerName = leagueTopAssisterBadgeMetadata.player.first_name + " " + leagueTopAssisterBadgeMetadata.player.last_name;
+            leagueTopAssisterScorerValue = leagueTopAssisterBadgeMetadata.player.value ? leagueTopAssisterBadgeMetadata.player.value : "default";;
+        }
+
+        console.log("Building and sending email...");
+        let emailAddresses = await emailSubscriptionsDao.getAllSubscriptions();
+        for (let i in emailAddresses.Items) {
+            let emailAddress = emailAddresses.Items[i].emailAddress.S;
+            let sendEmailParams = {
+                Destination: {
+                  ToAddresses: [
+                    emailAddress,
+                  ]
+                },
+                Template: 'SeasonCompleted', // should be env var
+                TemplateData: JSON.stringify(
+                    {
+                        leagueWinner,
+                        leagueWinnerPoints,
+                        leagueWinnerPointsDifference,
+                        lastPlace,
+                        lastPlacePoints,
+                        lastPlacePointsDifference,
+                        leagueMVPParticipantName,
+                        leagueMVPPlayerName,
+                        leagueMVPValue,
+                        leagueTopGoalScorerBadgeParticipantName,
+                        leagueTopGoalScorerPlayerName,
+                        leagueTopGoalScorerValue,
+                        leagueTopAssisterBadgeParticipantName,
+                        leagueTopAssisterPlayerName,
+                        leagueTopAssisterScorerValue,
+                        headerIcon,
+                        leagueTrophyIcon,
+                        goldenBootIcon,
+                        playmakerIcon,
+                        seasonLoserIcon,
+                        seasonMVPIcon,
+                        "customUnsubscribeUrl": "https://lastofthemohigans.com/email-subscription-management?emailAddress=" + emailAddress
+                    }
+                ),
+                Source: 'seththeekelastofthemohigans@gmail.com', // should be env var
+            };
+    
+            try {
+                let response = await ses.sendTemplatedEmail(sendEmailParams).promise();
+                console.log(response);
+                console.log("Successfully sent email to email address " + emailAddress);
+            } catch (error) {
+                console.log("Failed to send email to email address " + emailAddress);
+            }
+        }
+
+        return {
+            leagueWinner,
+            leagueWinnerPoints,
+            leagueWinnerPointsDifference,
+            lastPlace,
+            lastPlacePoints,
+            lastPlacePointsDifference,
+            leagueMVPParticipantName,
+            leagueMVPPlayerName,
+            leagueMVPValue,
+            leagueTopGoalScorerBadgeParticipantName,
+            leagueTopGoalScorerPlayerName,
+            leagueTopGoalScorerValue,
+            leagueTopAssisterBadgeParticipantName,
+            leagueTopAssisterPlayerName,
+            leagueTopAssisterScorerValue
         }
     },
 
