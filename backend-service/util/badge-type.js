@@ -31,5 +31,11 @@ module.exports = {
     SEASON_MVP: "Season MVP",
     _200_POINT_SEASON_PLAYER: "200+ Point Season Player",
     _250_POINT_SEASON_PLAYER: "250+ Point Season Player",
-    _300_POINT_SEASON_PLAYER: "300+ Point Season Player"
+    _300_POINT_SEASON_PLAYER: "300+ Point Season Player",
+    _1250_POINT_SEASON: "1250+ Point Season",
+    _1500_POINT_SEASON: "1500+ Point Season",
+    _1750_POINT_SEASON: "1750+ Point Season",
+    _2000_POINT_SEASON: "2000+ Point Season",
+    SEASON_CHAMPION: "League Champion",
+    SEASON_LOSER: "Season Loser"
 };
