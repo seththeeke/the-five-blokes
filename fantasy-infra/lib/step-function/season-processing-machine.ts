@@ -133,7 +133,8 @@ export class SeasonProcessingMachine extends cdk.Construct{
                 description: seasonBadgeMetadata.description,
                 handler: seasonBadgeMetadata.handler,
                 vpc: props.vpc,
-                plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER]
+                plRDSCluster: props.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER],
+                transactionsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.FANTASY_TRANSACTIONS_TABLE]
             }));
         }
 

@@ -37,5 +37,7 @@ module.exports = {
     _1750_POINT_SEASON: "1750+ Point Season",
     _2000_POINT_SEASON: "2000+ Point Season",
     SEASON_CHAMPION: "League Champion",
-    SEASON_LOSER: "Season Loser"
+    SEASON_LOSER: "Season Loser",
+    MOST_TRANSACTIONS_ACCEPTED: "Most Transactions",
+    MOST_TRANSACTIONS_DENIED: "Most Transactions Denied"
 };

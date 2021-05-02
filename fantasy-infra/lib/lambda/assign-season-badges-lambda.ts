@@ -12,6 +12,7 @@ export interface AssignSeasonBadgesLambdaProps extends PremiereLeagueRDSDataLamb
     handler: string;
     functionName: string;
     description: string;
+    transactionsTable: ddb.Table;
 }
 export class AssignSeasonBadgesLambda extends PremiereLeagueRDSDataLambda {
   constructor(scope: cdk.Construct, id: string, props: AssignSeasonBadgesLambdaProps) {
@@ -23,6 +24,7 @@ export class AssignSeasonBadgesLambda extends PremiereLeagueRDSDataLambda {
         "BADGE_TABLE_NAME": props.badgeTable.tableName,
         "GAMEWEEK_PLAYER_HISTORY_TABLE_NAME": props.gameweekPlayerHistoryTable.tableName,
         "STATIC_CONTENT_BUCKET_NAME": props.staticContentBucket.bucketName,
+        "TRANSACTIONS_TABLE_NAME": props.transactionsTable.tableName
       },
       functionName: props.functionName,
       description: props.description,
@@ -34,5 +36,6 @@ export class AssignSeasonBadgesLambda extends PremiereLeagueRDSDataLambda {
     props.badgeTable.grantReadWriteData(this);
     props.gameweekPlayerHistoryTable.grantReadData(this);
     props.staticContentBucket.grantRead(this);
+    props.transactionsTable.grantReadData(this);
   }
 }

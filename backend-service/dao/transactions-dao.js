@@ -47,10 +47,14 @@ module.exports = {
     },
 
     getAllTransactionsForLeagueId: async function(leagueId){
-        let allTransactionsResponse = await ddb.scan(badgeScanParams).promise();
-        let filteredTransactionsResponse = allTransactionsResponse.records.filter(function(transaction) {
-            return transaction.leagueId.S == leagueId;
-        });
+        let params = {
+            FilterExpression: "leagueId = :leagueId",
+            ExpressionAttributeValues: {
+              ":leagueId": { S: leagueId }
+            },
+            TableName: process.env.TRANSACTIONS_TABLE_NAME,
+        };
+        let filteredTransactionsResponse = await ddb.scan(params).promise();
         return filteredTransactionsResponse;
     }
 }
