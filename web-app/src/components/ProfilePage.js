@@ -30,6 +30,9 @@ class ProfilePage extends React.Component {
         for (let badgeType in badgeCounter){
             counter++;
             let badge = this.iconService.getIconByBadgeType(badgeType);
+            if (!badge) {
+                console.log(badgeType);
+            }
             badgeRows.push(
                 <div className="badge-container" key={badgeType}>
                     <Badge badge={badge}></Badge>

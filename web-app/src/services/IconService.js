@@ -33,7 +33,14 @@ import mostYellowCards from "../img/most-yellow-cards-season.png";
 import playmakerOfTheSeason from "../img/playmaker-of-the-season.png";
 import seasonLVP from "../img/season-lvp-player.png";
 import seasonMVP from "../img/season-mvp-player.png";
-
+import twoHundredPointPlayer from "../img/200-point-player.png";
+import twoHundredFiftyPointPlayer from "../img/250-point-player.png";
+import threeHundredPointPlayer from "../img/300-point-player.png";
+import twelveFiftyPointSeason from "../img/1250-point-season.png";
+import fifteenHundredPointSeason from "../img/1500-point-season.png";
+import seventeenFiftyPointSeason from "../img/1750-point-season.png";
+import twoThousandPointSeason from "../img/2000-point-season.png";
+import dreamteamPlayer from "../img/dreamteam-player.png";
 
 class IconService {
     constructor() {
@@ -204,6 +211,46 @@ class IconService {
           icon: mostTransactionsDenied,
           badgeType: "Most Transactions Denied",
           description: "Given to the player who has the most transactions denied in a season"
+        },
+        {
+          icon: twoHundredPointPlayer,
+          badgeType: "200+ Point Season Player",
+          description: "Given to the player who picks a player who earns at least 200 points in a season"
+        },
+        {
+          icon: twoHundredFiftyPointPlayer,
+          badgeType: "250+ Point Season Player",
+          description: "Given to the player who picks a player who earns at least 250 points in a season"
+        },
+        {
+          icon: threeHundredPointPlayer,
+          badgeType: "300+ Point Season Player",
+          description: "Given to the player who picks a player who earns at least 300 points in a season"
+        },
+        {
+          icon: twelveFiftyPointSeason,
+          badgeType: "1250+ Point Season",
+          description: "Given to the player who earns at least 1250 points in a season"
+        },
+        {
+          icon: fifteenHundredPointSeason,
+          badgeType: "1500+ Point Season",
+          description: "Given to the player who earns at least 1500 points in a season"
+        },
+        {
+          icon: seventeenFiftyPointSeason,
+          badgeType: "1750+ Point Season",
+          description: "Given to the player who earns at least 1750 points in a season"
+        },
+        {
+          icon: twoThousandPointSeason,
+          badgeType: "2000+ Point Season",
+          description: "Given to the player who earns at least 2000 points in a season"
+        },
+        {
+          icon: dreamteamPlayer,
+          badgeType: "Dreamteam Player",
+          description: "Given to the player who picks a player who earns at spot on the dreamteam of the year"
         }
       ]
       this.allIcons = [];
