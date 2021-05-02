@@ -194,7 +194,7 @@ module.exports = {
             leagueMVPParticipantName = leagueMVPBadge.participantName.S;
             leagueMVPBadgeMetadata = JSON.parse(leagueMVPBadge.badgeMetadata.S);
             leagueMVPPlayerName = leagueMVPBadgeMetadata.player.first_name + " " + leagueMVPBadgeMetadata.player.last_name;
-            leagueMVPValue = leagueMVPBadgeMetadata.player.value ? leagueMVPBadgeMetadata.player.value : "default";
+            leagueMVPValue = leagueMVPBadgeMetadata.value ? leagueMVPBadgeMetadata.value : "default";
         }
 
         console.log("Fetching golden boot info");
@@ -204,7 +204,7 @@ module.exports = {
             leagueTopGoalScorerBadgeParticipantName = leagueTopGoalScorerBadge.participantName.S;
             leagueTopGoalScorerBadgeMetadata = JSON.parse(leagueTopGoalScorerBadge.badgeMetadata.S);
             leagueTopGoalScorerPlayerName = leagueTopGoalScorerBadgeMetadata.player.first_name + " " + leagueTopGoalScorerBadgeMetadata.player.last_name;
-            leagueTopGoalScorerValue = leagueTopGoalScorerBadgeMetadata.player.value ? leagueTopGoalScorerBadgeMetadata.player.value : "default";
+            leagueTopGoalScorerValue = leagueTopGoalScorerBadgeMetadata.value ? leagueTopGoalScorerBadgeMetadata.value : "default";
         }
         
         console.log("Fetching playmaker info");
@@ -214,7 +214,7 @@ module.exports = {
             leagueTopAssisterBadgeParticipantName = leagueTopAssisterBadge.participantName.S;
             leagueTopAssisterBadgeMetadata = JSON.parse(leagueTopGoalScorerBadge.badgeMetadata.S);
             leagueTopAssisterPlayerName = leagueTopAssisterBadgeMetadata.player.first_name + " " + leagueTopAssisterBadgeMetadata.player.last_name;
-            leagueTopAssisterScorerValue = leagueTopAssisterBadgeMetadata.player.value ? leagueTopAssisterBadgeMetadata.player.value : "default";;
+            leagueTopAssisterScorerValue = leagueTopAssisterBadgeMetadata.value ? leagueTopAssisterBadgeMetadata.value : "default";;
         }
 
         console.log("Building and sending email...");

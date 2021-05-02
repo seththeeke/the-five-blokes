@@ -21,3 +21,5 @@ Due to cost, the NAT gateways in my gamma environment are deleted. If you want t
 
 1. Create a NAT gateway in each public subnet, make sure to allocate an elastic ip for each rather than using an existing ENI
 2. Update the route tables on the private subnets to have a route for 0.0.0.0/0 to the NAT Gateways you create
+
+Seeing some weird behavior after creating them manually, getting numerous Lambda ResourceNotReadyExceptions. After waiting a day, one of the functions came back online, but then the problem continues to persist for other functions.
