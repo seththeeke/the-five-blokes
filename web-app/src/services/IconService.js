@@ -41,6 +41,10 @@ import fifteenHundredPointSeason from "../img/1500-point-season.png";
 import seventeenFiftyPointSeason from "../img/1750-point-season.png";
 import twoThousandPointSeason from "../img/2000-point-season.png";
 import dreamteamPlayer from "../img/dreamteam-player.png";
+import mostGoals from "../img/most-goals.png";
+import mostAssists from "../img/most-assists.png";
+import mostCleanSheets from "../img/most-clean-sheets.png";
+import mostBonusPoints from "../img/most-bonus.png";
 
 class IconService {
     constructor() {
@@ -193,22 +197,22 @@ class IconService {
           description: "Given to the player who owns the player who earned the least points in a season"
         },
         {
-          icon: mostYellowCards,
+          icon: mostGoals,
           badgeType: "Most Goals",
           description: "Given to the player who owns the players who scored the most goals in a season"
         },
         {
-          icon: mostRedCards,
+          icon: mostAssists,
           badgeType: "Most Assists",
           description: "Given to the player who owns the players who created the most assists in a season"
         },
         {
-          icon: mostYellowCards,
+          icon: mostCleanSheets,
           badgeType: "Most Clean Sheets",
           description: "Given to the player who owns the players who had the most clean sheets in a season"
         },
         {
-          icon: mostRedCards,
+          icon: mostBonusPoints,
           badgeType: "Most Bonus Points",
           description: "Given to the player who owns the players who earned the most bonus points in a season"
         },
