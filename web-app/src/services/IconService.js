@@ -194,13 +194,33 @@ class IconService {
         },
         {
           icon: mostYellowCards,
+          badgeType: "Most Goals",
+          description: "Given to the player who owns the players who scored the most goals in a season"
+        },
+        {
+          icon: mostRedCards,
+          badgeType: "Most Assists",
+          description: "Given to the player who owns the players who created the most assists in a season"
+        },
+        {
+          icon: mostYellowCards,
+          badgeType: "Most Clean Sheets",
+          description: "Given to the player who owns the players who had the most clean sheets in a season"
+        },
+        {
+          icon: mostRedCards,
+          badgeType: "Most Bonus Points",
+          description: "Given to the player who owns the players who earned the most bonus points in a season"
+        },
+        {
+          icon: mostYellowCards,
           badgeType: "Most Yellow Cards",
-          description: "Given to the player who owns the player who earned the most yellow cards in a season"
+          description: "Given to the player who owns the players who earned the most yellow cards in a season"
         },
         {
           icon: mostRedCards,
           badgeType: "Most Red Cards",
-          description: "Given to the player who owns the player who earned the most red cards in a season"
+          description: "Given to the player who owns the players who earned the most red cards in a season"
         },
         {
           icon: mostTransactions,

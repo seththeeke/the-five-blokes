@@ -512,6 +512,18 @@ module.exports = {
         return results;
     },
 
+    getPlayerSeasonSummary: async function(fixture_year, foreign_player_id) {
+        let connection = await this.createConnection();
+        try {
+            let results = await connection.execute('SELECT player_fixtures.player_id, SUM(player_fixtures.points) as total_points, SUM(player_fixtures.goals) as total_goals, SUM(player_fixtures.assists) as total_assists, SUM(player_fixtures.clean_sheets) as total_clean_sheets, SUM(player_fixtures.bonus) as total_bonus, SUM(player_fixtures.yellow_cards) as total_yellow_cards, SUM(player_fixtures.red_cards) as total_red_cards, SUM(player_fixtures.penalties_missed) as total_penalties_missed, SUM(player_fixtures.own_goals) as total_own_goals, players.first_name,players.last_name,player_season_data.foreign_id from player_fixtures inner join players on players.player_id = player_fixtures.player_id inner join player_season_data on player_season_data.player_id = player_fixtures.player_id and fixture_year = ? and player_season_data.foreign_id = ?', [fixture_year, foreign_player_id]);
+            await connection.end();
+            return results[0][0];
+        } catch (err){
+            await connection.end();
+            throw err;
+        }
+    },
+
     createConnection: async function() {
         let connection = await mysql.createConnection({
             host           : process.env.AURORA_DB_ENDPOINT,

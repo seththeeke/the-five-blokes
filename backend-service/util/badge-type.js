@@ -39,5 +39,11 @@ module.exports = {
     SEASON_CHAMPION: "League Champion",
     SEASON_LOSER: "Season Loser",
     MOST_TRANSACTIONS_ACCEPTED: "Most Transactions",
-    MOST_TRANSACTIONS_DENIED: "Most Transactions Denied"
+    MOST_TRANSACTIONS_DENIED: "Most Transactions Denied",
+    MOST_GOALS: "Most Goals",
+    MOST_ASSISTS: "Most Assists",
+    MOST_CLEAN_SHEETS: "Most Clean Sheets",
+    MOST_YELLOW_CARDS: "Most Yellow Cards",
+    MOST_RED_CARDS: "Most Red Cards",
+    MOST_BONUS_POINTS: "Most Bonus Points"
 };
