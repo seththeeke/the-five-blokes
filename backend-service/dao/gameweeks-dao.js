@@ -5,20 +5,17 @@ var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 module.exports = {
     getLatestGameweek: async function(activeLeague){
-        let gameweekScanParams = {
-            TableName: process.env.GAMEWEEK_TABLE_NAME
-        }
-        let gameweekDetails = await ddb.scan(gameweekScanParams).promise();
+        let gameweekQueryForLeagueParams = {
+            FilterExpression: "leagueId = :leagueId",
+            ExpressionAttributeValues: {
+              ":leagueId": { S: activeLeague.leagueId.S }
+            },
+            TableName: process.env.GAMEWEEK_TABLE_NAME,
+            ScanIndexForward: false
+        };
+        let gameweekDetails = await ddb.query(gameweekQueryForLeagueParams).promise();
         let gameweekItems = gameweekDetails.Items;
-        let lastCompletedGameweek = undefined;
-        for (let i in gameweekItems){
-            let gameweek = gameweekItems[i];
-            if (gameweek.leagueId.S === activeLeague.leagueId.S && 
-                (!lastCompletedGameweek || parseInt(gameweek.gameweek.N) > parseInt(lastCompletedGameweek.gameweek.N))){
-                lastCompletedGameweek = gameweek;
-            }
-        }
-        return lastCompletedGameweek;
+        return gameweekItems[0];
     },
 
     getAllGameweeksForLeague: async function(activeLeague){

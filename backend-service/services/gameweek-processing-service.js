@@ -26,7 +26,7 @@ module.exports = {
             return response;
         }
         if (gameweekData.current_event_finished && (!lastCompletedGameweek || parseInt(gameweekData.current_event) > parseInt(lastCompletedGameweek.gameweek.N))) {
-            console.log("New gameweek completed " + gameweekData);
+            console.log("New gameweek completed " + JSON.stringify(gameweekData));
             response.hasCompleted = true;
             return response;
         }
