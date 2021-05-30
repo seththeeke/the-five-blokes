@@ -1,0 +1,10 @@
+.header-wrapper {
+    text-align: left;
+}
+
+.header {
+    display: inline-block;
+    font-size: 2.5em;
+    padding: 0.1em;
+    color: white;
+}

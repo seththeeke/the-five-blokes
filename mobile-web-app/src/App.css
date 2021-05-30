@@ -1,0 +1,60 @@
+.App {
+  text-align: center;
+  background-color: #054a3e;
+}
+
+button {
+  font-size: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+button:focus {
+  outline: none;
+}
+
+input:focus {
+  outline: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.icon-button {
+  border: none;
+  cursor: pointer;
+}
+
+.icon{
+  padding: 15px;
+  height: 40px;
+  width: 40px;
+}
+
+table {
+  display: inline-table;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+th {
+  padding: 2px;
+}
+
+td {
+  padding: 2px;
+}
+
+.header-row {
+  background-color: #2fab95;
+  color: white;
+}
+
+.body-row {
+  background-color: white;
+  color: #505050;
+}

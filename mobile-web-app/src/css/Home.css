@@ -1,0 +1,13 @@
+.page-spinner-container {
+    padding: 100px;
+}
+
+.grid-container {
+    justify-content: start;
+    text-align: center;
+}
+
+.grid-item {
+    margin: 5px;
+    display: inline-flex;
+}

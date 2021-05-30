@@ -1,0 +1,27 @@
+.subscription-management-header {
+    font-weight: bold;
+    font-size: 24px;
+    padding-top: 50px;
+}
+
+.email-input {
+    font-size: 18px;
+    padding: 10px;
+    margin: 10px;
+    width: 300px;
+}
+
+.subscription-button {
+    padding: 5px;
+    font-size: 14px;
+}
+
+.email-sub-logo-wrapper {
+    margin-top: 15px;
+}
+
+.success-text {
+    padding: 10px;
+    font-weight: bolder;
+    font-size: 16px;
+}
