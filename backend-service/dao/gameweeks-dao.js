@@ -5,8 +5,9 @@ var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 module.exports = {
     getLatestGameweek: async function(activeLeague){
+        console.log("Fetching latest gameweek for league " + activeLeague.leagueId.S);
         let gameweekQueryForLeagueParams = {
-            FilterExpression: "leagueId = :leagueId",
+            KeyConditionExpression: "leagueId = :leagueId",
             ExpressionAttributeValues: {
               ":leagueId": { S: activeLeague.leagueId.S }
             },

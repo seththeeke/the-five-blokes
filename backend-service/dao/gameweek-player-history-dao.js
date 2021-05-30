@@ -25,6 +25,7 @@ module.exports = {
     },
 
     getGameweekPlayerDataForGameweek: async function(leagueId, gameweek) {
+        console.log("Fetching gameweek player data " + leagueId + " for gameweek " + gameweek);
         let gameweekPlayerScanParams = {
             TableName: process.env.GAMEWEEK_PLAYER_HISTORY_TABLE_NAME
         }
@@ -39,5 +40,17 @@ module.exports = {
         }
         console.log("Found gameweek data: " + JSON.stringify(playerHistoryForGameweek));
         return playerHistoryForGameweek;
+
+        // Should be query eventually
+        // let params = {
+        //     KeyConditionExpression: "gameweek = :gameweek AND contains (id, :leagueId)",
+        //     ExpressionAttributeValues: {
+        //       ":gameweek": { N: parseInt(gameweek) },
+        //       ":leagueId": { S: leagueId }
+        //     },
+        //     TableName: process.env.BADGE_TABLE_NAME,
+        // };
+        // let badgeResponse = await ddb.scan(params).promise();
+        // return badgeResponse;
     }
 }

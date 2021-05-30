@@ -263,6 +263,7 @@ module.exports = {
                 console.log("Successfully sent email to email address " + emailAddress);
             } catch (error) {
                 console.log("Failed to send email to email address " + emailAddress);
+                console.log(JSON.stringify(error));
             }
         }
 
