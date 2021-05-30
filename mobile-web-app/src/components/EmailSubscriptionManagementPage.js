@@ -1,7 +1,6 @@
 import React from 'react';
 import './../css/EmailSubscriptionManagement.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import circularLogo from "../img/circular-prem-lion.png";
 
 class EmailSubscriptionManagementPage extends React.Component {
     constructor(props){
@@ -55,10 +54,7 @@ class EmailSubscriptionManagementPage extends React.Component {
                 <CircularProgress></CircularProgress>
                 </div>
                 <div hidden={this.state.isLoadingWebsite}>
-                    <div className="logo-wrapper email-sub-logo-wrapper">
-                        <img className="logo" alt="logo" src={circularLogo}></img>
-                    </div>
-                    <div className="subscription-management-header">Subscription Management</div>
+                    <div className="subscription-management-header">Follow the Five Blokes Fantasy League by subscribing below</div>
                     <div>
                         <input id="emailInput" className="email-input" type="text" placeholder="email" defaultValue={this.state.email}></input>
                         <div>

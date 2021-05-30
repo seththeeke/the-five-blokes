@@ -1,7 +1,7 @@
 import React from 'react';
-import './../css/Home.css';
+import './../css/Podcast.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import GameweekResults from './GameweekResults';
+import { TwitterTimelineEmbed } from 'react-twitter-embed';
 
 class Podcast extends React.Component {
    constructor(props){
@@ -36,13 +36,15 @@ class Podcast extends React.Component {
             <div hidden={this.state.isLoadingWebsite}>
                <div className="grid-container">
                   <div className="grid-item">
-                     <iframe title="spotify" src="https://open.spotify.com/embed-podcast/show/7Hw0EJXJE2Zmi4pZ13aehl" width="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                     <iframe title="spotify" src="https://open.spotify.com/embed-podcast/show/7Hw0EJXJE2Zmi4pZ13aehl" width="100%" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe>
                   </div>
                   <div className="grid-item">
-                     <GameweekResults
-                        fplService={this.props.fplService}
-                     >
-                     </GameweekResults>
+                     <div className="twitter-embed-wrapper">
+                        <TwitterTimelineEmbed
+                           sourceType="profile"
+                           screenName="blokesfive"
+                        />
+                     </div>
                   </div>
                </div>
             </div>

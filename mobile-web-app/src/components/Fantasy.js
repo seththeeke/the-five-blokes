@@ -4,7 +4,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import GameweekResults from './GameweekResults';
 import TheBoys from './TheBoys';
 import Standings from "./Standings";
-import LeagueHistory from './LeagueHistory';
 import GameweekBadges from './GameweekBadges';
 
 class Fantasy extends React.Component {

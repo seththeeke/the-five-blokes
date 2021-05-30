@@ -6,7 +6,6 @@ import './../css/AppNavigation.css';
 import HomeIcon from '@material-ui/icons/Home';
 import MicIcon from '@material-ui/icons/Mic';
 import SportsSoccerIcon from '@material-ui/icons/SportsSoccer';
-import AccessibilityIcon from '@material-ui/icons/Accessibility';
 import EmailIcon from '@material-ui/icons/Email';
 
 class AppNavigation extends React.Component {

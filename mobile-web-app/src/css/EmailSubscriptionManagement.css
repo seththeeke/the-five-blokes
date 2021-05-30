@@ -1,7 +1,6 @@
 .subscription-management-header {
     font-weight: bold;
     font-size: 24px;
-    padding-top: 50px;
 }
 
 .email-input {
@@ -14,6 +13,9 @@
 .subscription-button {
     padding: 5px;
     font-size: 14px;
+    background-color: #2fab95;
+    color: white;
+    border: none;
 }
 
 .email-sub-logo-wrapper {

@@ -39,7 +39,7 @@ class ProfilePage extends React.Component {
                     <span className="badge-counter-container"> x {badgeCounter[badgeType]}</span>
                 </div>
             );
-            if (badgeRows.length === 4){
+            if (badgeRows.length === 3){
                 badgeContent.push(
                     <div className="badge-row" key={badgeType}>
                         {badgeRows}
@@ -75,10 +75,6 @@ class ProfilePage extends React.Component {
                 <div hidden={this.state.isLoadingWebsite}>
                     <div className="profile-wrapper">
                         <div className="main-profile-container">
-                                <div className="short-info-container">
-                                    <div className="short-name-container">{this.props.participant.participant.short_name}</div>
-                                    <div>{stars}</div>
-                                </div>
                                 <div className="player-info-container">
                                     <div className="player-name-container">{this.props.participant.participant.player_first_name} {this.props.participant.participant.player_last_name}</div>
                                     <div className="subtitle-container">Founded: {firstYear}</div>

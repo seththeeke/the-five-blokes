@@ -1,7 +1,7 @@
 .profile-wrapper {
     border: 1px solid black;
     display: inline-block;
-    background-color: #4D0078;
+    background-color: #054a3e;
     color: white;
     text-align: left;
 }
@@ -49,16 +49,16 @@
     color: black;
     display: inline-flex;
     align-items: center;
-    padding: 10px
+    padding: 5px
 }
 
 .badge {
-    height: 40px;
+    height: 25px;
     width: auto;
 }
 
 .badge-counter-container {
     color: darkgray;
-    padding: 10px;
-    font-size: 15px;
+    padding: 5px;
+    font-size: 10px;
 }
