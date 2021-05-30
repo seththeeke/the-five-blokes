@@ -23,7 +23,7 @@ class GameweekResults extends React.Component {
                     tableData.push(
                         <tr className="body-row" key={i}>
                             <td>{standing.rank}</td>
-                            <td className="gameweek-results-player-container">{participant.player_first_name} {participant.player_last_name}</td>
+                            <td className="gameweek-results-player-container">{participant.player_first_name}</td>
                             <td>{standing.event_total}</td>
                             <td>{standing.last_rank}</td>
                             <td>{standing.total}</td>
