@@ -45,22 +45,18 @@ class Standings extends React.Component {
                 let participantData = participantsEvent.data;
                 let seriesData = [];
                 let rankMap = {};
-                let count = 0;
                 for (let i in standingsHistory) {
                     // limit chart width on mobile
-                    if (count < 4){
-                      let standingsForGameweek = JSON.parse(standingsHistory[i].standings);
-                      for (let j in standingsForGameweek) {
-                          let standing = standingsForGameweek[j];
-                          let participant = participantData[standing.league_entry].participant;
-                          let participantName = participant.player_first_name  + " " + participant.player_last_name;
-                          if (!rankMap[participantName]) {
-                              rankMap[participantName] = []
-                          }
-                          let data = rankMap[participantName];
-                          data.unshift(standing.rank);
-                      }
-                      count++;
+                    let standingsForGameweek = JSON.parse(standingsHistory[i].standings);
+                    for (let j in standingsForGameweek) {
+                        let standing = standingsForGameweek[j];
+                        let participant = participantData[standing.league_entry].participant;
+                        let participantName = participant.player_first_name  + " " + participant.player_last_name;
+                        if (!rankMap[participantName]) {
+                            rankMap[participantName] = []
+                        }
+                        let data = rankMap[participantName];
+                        data.unshift(standing.rank);
                     }
                 }
                 for (let participantName in rankMap) {

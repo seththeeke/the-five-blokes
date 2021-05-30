@@ -19,7 +19,7 @@
 }
 
 .gameweek-badge-list {
-    max-height: 387px;
+    max-height: 300px;
     overflow-y: scroll;
 }
 
