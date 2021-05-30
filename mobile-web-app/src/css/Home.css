@@ -9,5 +9,6 @@
 
 .grid-item {
     margin: 5px;
+    width: 95%;
     display: inline-flex;
 }

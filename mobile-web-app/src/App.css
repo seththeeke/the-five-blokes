@@ -39,6 +39,8 @@ table {
   display: inline-table;
   border-collapse: collapse;
   text-align: center;
+  font-size: 0.1em;
+  width:100%;
 }
 
 th {

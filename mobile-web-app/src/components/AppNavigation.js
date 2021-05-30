@@ -13,26 +13,26 @@ class AppNavigation extends React.Component {
     render() {
         return (
             <div className="nav-wrapper">
-                <div className="nav-button">
-                    <Link to="/home">
-                        <HomeIcon></HomeIcon>
-                    </Link>
-                </div>
-                <div className="nav-button">
-                    <Link to="/podcast">
-                        <MicIcon></MicIcon>
-                    </Link>
-                </div>
-                <div className="nav-button">
-                    <Link to="/fantasy">
-                        <SportsSoccerIcon></SportsSoccerIcon>
-                    </Link>
-                </div>
-                <div className="nav-button">
-                    <Link to="/email-subscription-management">
-                        <EmailIcon></EmailIcon>
-                    </Link>
-                </div>
+                <Link to="/home">
+                    <div className="nav-button">
+                        <HomeIcon fontSize="large" color="primary"></HomeIcon>
+                    </div>
+                </Link>
+                <Link to="/podcast">
+                    <div className="nav-button">
+                        <MicIcon fontSize="large" color="primary"></MicIcon>
+                    </div>
+                </Link>
+                <Link to="/fantasy">
+                    <div className="nav-button">
+                        <SportsSoccerIcon fontSize="large" color="primary"></SportsSoccerIcon>
+                    </div>
+                </Link>
+                <Link to="/email-subscription-management">
+                    <div className="nav-button">
+                        <EmailIcon fontSize="large" color="primary"></EmailIcon>
+                    </div>
+                </Link>
             </div>
         );
     }

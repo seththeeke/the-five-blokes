@@ -2,14 +2,14 @@
     position:fixed;
     left:0px;
     bottom:0px;
-    height:5em;
     width:100%;
     background: #00332a;
 }
 
 .nav-button {
     display: inline-block;
-    width: 25%;
+    width: 20%;
+    margin: 0.4em;
 }
 
 .nav-button-icon {

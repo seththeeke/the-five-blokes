@@ -57,7 +57,7 @@ class TheBoys extends React.Component {
                 let i = 0;
                 let stars = [];
                 while (i < numChampion) {
-                    stars.push(<StarRateIcon></StarRateIcon>)
+                    stars.push(<StarRateIcon fontSize="small"></StarRateIcon>)
                     i++;
                 }
                 let divKey = 'TheBoys-Row-' + k;

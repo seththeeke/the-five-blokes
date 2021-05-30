@@ -1,5 +1,5 @@
 .standings-title-container {
-    background-color: #02894E;
+    background-color: #2fab95;
     color: white;
     font-weight: bold;
     text-align: left;
@@ -7,8 +7,7 @@
 }
 
 .standings-chart {
-    width: 750px;
-    height: 320px;
+    width: 100%;
     background-color: white;
     border: 1px solid black;
 }
@@ -16,6 +15,6 @@
 @media only screen and (min-device-width : 320px) 
 and (max-device-width : 667px) {
     .standings-chart {
-       width: 185vw;
+       width: 95vw;
     }
 }

@@ -1,6 +1,9 @@
+.the-boys-container {
+    width: 100%;
+}
+
 .participant-table-name-container {
     font-weight: bold;
-    padding-right: 100px;
     display: inline-flex;
     align-items: center;
     float: left;
