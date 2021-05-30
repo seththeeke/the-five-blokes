@@ -64,7 +64,7 @@ class TheBoys extends React.Component {
                 tableData.push(
                     <tr className="body-row" key={divKey} onClick={() => this.openProfile(participant)}>
                         <td className="participant-table-name-container">
-                            {participant.participant.player_first_name} {participant.participant.player_last_name} {stars}
+                            {participant.participant.player_first_name} {stars}
                         </td>
                         <td>{numParticipations}</td>
                         <td>{numBadges}</td>

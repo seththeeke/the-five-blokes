@@ -1,6 +1,4 @@
 .gameweek-badges-container {
-    border: 1px solid black;
-    background-color: white;
     width: 100%;
 }
 
@@ -21,6 +19,10 @@
 .gameweek-badge-list {
     max-height: 300px;
     overflow-y: scroll;
+}
+
+.gameweek-badges-wrapper {
+    background-color: white;
 }
 
 .awarded-to-container {

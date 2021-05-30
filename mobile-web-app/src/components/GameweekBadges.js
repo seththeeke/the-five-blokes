@@ -89,13 +89,15 @@ class GameweekBadges extends React.Component {
         return (
             <div className='gameweek-badges-container'>
                 <div className="page-spinner-container" hidden={!this.state.isLoadingWebsite}>
-                <CircularProgress></CircularProgress>
+                    <CircularProgress></CircularProgress>
                 </div>
-                <div className="gameweek-badges-title-container">Badges</div>
-                <div className="gameweek-badge-list" hidden={this.state.isLoadingWebsite}>
-                    <List subheader={<li />}>
-                        {this.state.listObjects}
-                    </List>
+                <div className="gameweek-badges-wrapper" hidden={this.state.isLoadingWebsite}>
+                    <div className="gameweek-badges-title-container">Badges</div>
+                    <div className="gameweek-badge-list" hidden={this.state.isLoadingWebsite}>
+                        <List subheader={<li />}>
+                            {this.state.listObjects}
+                        </List>
+                    </div>
                 </div>
             </div>
         );
