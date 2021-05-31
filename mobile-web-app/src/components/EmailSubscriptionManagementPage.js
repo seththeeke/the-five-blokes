@@ -54,7 +54,7 @@ class EmailSubscriptionManagementPage extends React.Component {
                 <CircularProgress></CircularProgress>
                 </div>
                 <div hidden={this.state.isLoadingWebsite}>
-                    <div className="subscription-management-header">Follow the Five Blokes Fantasy League by subscribing below</div>
+                    <div className="subscription-management-header">Follow the Five Blokes Fantasy League</div>
                     <div>
                         <input id="emailInput" className="email-input" type="text" placeholder="email" defaultValue={this.state.email}></input>
                         <div>

@@ -1,6 +1,8 @@
 .subscription-management-header {
     font-weight: bold;
-    font-size: 24px;
+    font-size: 18px;
+    color: white;
+    text-shadow: -1px -1px 0 #2fab95, 1px -1px 0 #2fab95, -1px 1px 0 #2fab95, 1px 1px 0 #2fab95;
 }
 
 .email-input {

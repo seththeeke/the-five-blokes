@@ -2,6 +2,8 @@ import React from 'react';
 import './../css/Home.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import GameweekResults from './GameweekResults';
+import EmailSubscriptionManagementPage from './EmailSubscriptionManagementPage';
+import fiveBlokes from "../img/morgantown-view.jpg";
 
 class Home extends React.Component {
    constructor(props){
@@ -36,6 +38,9 @@ class Home extends React.Component {
             <div hidden={this.state.isLoadingWebsite}>
                <div className="grid-container">
                   <div className="grid-item">
+                     <img className="five-blokes" alt="logo" src={fiveBlokes}></img>
+                  </div>
+                  <div className="grid-item">
                      <iframe title="spotify" src="https://open.spotify.com/embed-podcast/show/7Hw0EJXJE2Zmi4pZ13aehl" width="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
                   </div>
                   <div className="grid-item">
@@ -43,6 +48,12 @@ class Home extends React.Component {
                         fplService={this.props.fplService}
                      >
                      </GameweekResults>
+                  </div>
+                  <div className="grid-item">
+                     <EmailSubscriptionManagementPage
+                        emailSubscriptionService={this.props.emailSubscriptionService}
+                     >
+                     </EmailSubscriptionManagementPage>
                   </div>
                </div>
             </div>
