@@ -2,7 +2,8 @@
     font-weight: bold;
     font-size: 18px;
     color: white;
-    text-shadow: -1px -1px 0 #2fab95, 1px -1px 0 #2fab95, -1px 1px 0 #2fab95, 1px 1px 0 #2fab95;
+    /* text-shadow: -1px -1px 0 #2fab95, 1px -1px 0 #2fab95, -1px 1px 0 #2fab95, 1px 1px 0 #2fab95; */
+    text-shadow: -1px -1px 0 #8CACFD, 1px -1px 0 #8CACFD, -1px 1px 0 #8CACFD, 1px 1px 0 #8CACFD;
 }
 
 .email-input {
@@ -15,7 +16,7 @@
 .subscription-button {
     padding: 5px;
     font-size: 14px;
-    background-color: #2fab95;
+    background-color: #8CACFD;
     color: white;
     border: none;
 }

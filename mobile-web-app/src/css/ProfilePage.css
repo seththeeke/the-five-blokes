@@ -1,7 +1,8 @@
 .profile-wrapper {
     border: 1px solid black;
     display: inline-block;
-    background-color: #054a3e;
+    /* background-color: #054a3e; */
+    background-color: #8CACFD;
     color: white;
     text-align: left;
 }

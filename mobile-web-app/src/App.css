@@ -1,6 +1,7 @@
 .App {
   text-align: center;
-  background-color: #054a3e;
+  /* background-color: #054a3e; */
+  background-color: #1E253F;
 }
 
 button {
@@ -54,7 +55,8 @@ td {
 }
 
 .header-row {
-  background-color: #2fab95;
+  /* background-color: #2fab95; */
+  background-color: #8CACFD;
   color: white;
 }
 
