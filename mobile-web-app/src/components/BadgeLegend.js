@@ -9,7 +9,6 @@ class BadgeLegend extends React.Component {
         this.iconService = new IconService();
 
         this.buildBadgeRows = this.buildBadgeRows.bind(this);
-        this.showBadgeDetail = this.showBadgeDetail.bind(this);
     }
 
     render() {
@@ -46,10 +45,7 @@ class BadgeLegend extends React.Component {
         let badgeContent = [];
         let counter = 0;
         let badgeRows = [];
-        let rowLength = 8;
-        if (window.innerWidth < 850) {
-            rowLength = 4;
-        }
+        let rowLength = 5;
         for (let i in badges){
             counter++;
             let badge = badges[i];
@@ -75,10 +71,6 @@ class BadgeLegend extends React.Component {
             );
         }
         return badgeContent;
-   }
-
-   showBadgeDetail(badge){
-       console.log(badge);
    }
 
 }

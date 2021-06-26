@@ -11,8 +11,9 @@ import EmailIcon from '@material-ui/icons/Email';
 class AppNavigation extends React.Component {
     constructor(props) {
         super(props);
+        let currentPage = window.location.pathname.substring(1);
         this.state = {
-            "selected": window.location.pathname.substring(1)
+            "selected": currentPage || "home"
         }
         this.onLinkClick = this.onLinkClick.bind(this);
     }

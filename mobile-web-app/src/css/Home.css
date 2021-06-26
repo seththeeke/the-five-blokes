@@ -21,3 +21,12 @@
     height: 200px;
     width: 100%;
 }
+
+.info-icon-container {
+    color: white;
+    float: right;
+}
+
+.info-icon-container:hover {
+    cursor: pointer
+}

@@ -6,15 +6,22 @@ import IconService from '../services/IconService';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListSubheader from '@material-ui/core/ListSubheader';
+import BadgeLegend from "./BadgeLegend";
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import InfoIcon from '@material-ui/icons/Info';
 
 class GameweekBadges extends React.Component {
    constructor(props){
       super(props);
       this.state = {
         isLoadingWebsite: true,
-        listObjects: []
+        listObjects: [],
+        legendOpen: false
       }
       this.iconService = new IconService();
+      this.toggleLegend = this.toggleLegend.bind(this);
    }
 
    componentDidMount(){
@@ -85,6 +92,12 @@ class GameweekBadges extends React.Component {
         }.bind(this));
    }
 
+    toggleLegend(){
+        this.setState({
+            legendOpen: !this.state.legendOpen
+        });
+    }
+
    render() {
         return (
             <div className='gameweek-badges-container'>
@@ -92,13 +105,35 @@ class GameweekBadges extends React.Component {
                     <CircularProgress></CircularProgress>
                 </div>
                 <div className="gameweek-badges-wrapper" hidden={this.state.isLoadingWebsite}>
-                    <div className="gameweek-badges-title-container">Badges</div>
+                    <div className="gameweek-badges-title-container">
+                        Badges 
+                        <div className="info-icon-container" onClick={this.toggleLegend}>
+                            <InfoIcon/>
+                        </div>
+                    </div>
                     <div className="gameweek-badge-list" hidden={this.state.isLoadingWebsite}>
                         <List subheader={<li />}>
                             {this.state.listObjects}
                         </List>
                     </div>
                 </div>
+                <Modal
+                  aria-labelledby="transition-modal-title"
+                  aria-describedby="transition-modal-description"
+                  open={this.state.legendOpen}
+                  onClose={this.toggleLegend}
+                  closeAfterTransition
+                  BackdropComponent={Backdrop}
+                  BackdropProps={{
+                     timeout: 500,
+                  }}
+               >
+                  <Fade in={this.state.legendOpen}>
+                     <div className="badge-legend-container" style={this.state.legendOpen ? {} : { display: 'none' }}>
+                        <BadgeLegend></BadgeLegend>
+                     </div>
+                  </Fade>
+               </Modal>
             </div>
         );
    }

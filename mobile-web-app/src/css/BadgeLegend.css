@@ -14,10 +14,24 @@
     color: gray;
 }
 
+.badge-legend-container {
+    display: inline-block;
+    background-color: white;
+    border: 1px solid black;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    outline: none;
+    border: 1px solid black;
+    display: inline-block;
+    text-align: left;
+}
+
 .badge-legend-title {
     padding: 5px;
     font-size: 20px;
     font-weight: bold;
-    background-color: #4D0078;
+    background-color: #8CACFD;
     color: white;
 }
