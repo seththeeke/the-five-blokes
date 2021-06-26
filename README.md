@@ -1,4 +1,8 @@
-# FPL Badges and Stats
+![The Five Blokes](five-blokes-sample.png)
+
+# The Five Blokes
+
+## FPL Badges and Stats
 
 This [project](https://lastofthemohigans.com/) was created to track the history of our fantasy premiere league players, stats, scores, losers, winner, etc. The premiere league fantasy system has an api exposed to fetch league data, player data, transactions, fixtures, and more and this project utilizes them to create a league history, aware preseason, gameweek, season, and other types of badges to track the highs and lows of your season and increase banter.
 
