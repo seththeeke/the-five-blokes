@@ -12,7 +12,7 @@ class Badge extends React.Component {
         if (this.props.showBadgeType){
             return (
                 <div className="badge-center-container">
-                    <Tooltip disableFocusListener enterTouchDelay="0" title={this.props.badge.description}>
+                    <Tooltip disableFocusListener enterTouchDelay={0} title={this.props.badge.description}>
                         <img className="badge" alt={this.props.badge.badgeType} src={this.props.badge.icon} onClick={this.showBadgeDetail.bind(this.props.badge)}></img>
                     </Tooltip>
                     <span className="badge-type-container">{this.props.badge.badgeType}</span>
@@ -21,7 +21,7 @@ class Badge extends React.Component {
         }
         return (
             <div>
-                <Tooltip enterTouchDelay="0" disableFocusListener title={this.props.badge.description}>
+                <Tooltip enterTouchDelay={0} disableFocusListener title={this.props.badge.description}>
                     <img className="badge" alt={this.props.badge.badgeType} src={this.props.badge.icon} onClick={this.showBadgeDetail.bind(this.props.badge)}></img>
                 </Tooltip>
             </div>

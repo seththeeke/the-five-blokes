@@ -41,7 +41,7 @@ class Home extends React.Component {
                      <img className="five-blokes" alt="logo" src={fiveBlokes}></img>
                   </div>
                   <div className="grid-item">
-                     <iframe title="spotify" src="https://open.spotify.com/embed-podcast/show/7Hw0EJXJE2Zmi4pZ13aehl" width="100%" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                     <iframe title="spotify" src="https://open.spotify.com/embed-podcast/show/7Hw0EJXJE2Zmi4pZ13aehl" width="100%" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe>
                   </div>
                   <div className="grid-item">
                      <GameweekResults

@@ -40,7 +40,6 @@ class Standings extends React.Component {
         this.props.fplService.getStandingsHistoryForActiveLeague().then(function(historyEvent){
             let standingsHistory = historyEvent.data;
             standingsHistory.sort(function(a, b){return parseInt(b.gameweek) - parseInt(a.gameweek)});
-            console.log(standingsHistory.length);
             this.props.fplService.getAllParticipants().then(function(participantsEvent){
                 let participantData = participantsEvent.data;
                 let seriesData = [];

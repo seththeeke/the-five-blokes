@@ -56,8 +56,9 @@ class TheBoys extends React.Component {
                 let numBadges = participant.badges.length;
                 let i = 0;
                 let stars = [];
+                let starKey = "StarIcon-" + k;
                 while (i < numChampion) {
-                    stars.push(<StarRateIcon fontSize="small"></StarRateIcon>)
+                    stars.push(<StarRateIcon key={starKey} fontSize="small"></StarRateIcon>)
                     i++;
                 }
                 let divKey = 'TheBoys-Row-' + k;

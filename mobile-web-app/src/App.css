@@ -4,6 +4,11 @@
   background-color: #1E253F;
 }
 
+body {
+  min-height: 100vh;
+  background-color: #1E253F;
+}
+
 button {
   font-size: 15px;
   margin-left: 10px;
