@@ -34,24 +34,19 @@ exports.getAllParticipants = async (event, context) => {
     }
 }
 
-exports.getGameweekBadgeHistoryForLeague = async (event, context) => {
-    try {
-        console.log(JSON.stringify(event));
-        let getGameweekBadgeHistoryForLeagueRequest = {
-            "leagueId": event.body.leagueId
-        }
-        let response = await lastOfTheMohigansService.getGameweekBadgeHistoryForLeague(getGameweekBadgeHistoryForLeagueRequest);
-        return respond(response);
-    } catch (err) {
-        console.log(err);
-        return error(err);
-    }
-}
-
 exports.getLatestGameweek = async (event, context) => {
     try {
         console.log(JSON.stringify(event));
-        let response = await lastOfTheMohigansService.getLatestGameweek();
+        let leagueId;
+        if (event.multiValueQueryStringParameters && event.multiValueQueryStringParameters.leagueId) {
+            leagueId = event.multiValueQueryStringParameters.leagueId[0];
+        }
+        let response;
+        if (leagueId) {
+            response = await lastOfTheMohigansService.getLatestGameweek(leagueId);
+        } else {
+            response = await lastOfTheMohigansService.getLatestGameweek();
+        }
         return respond(response);
     } catch (err) {
         console.log(err);

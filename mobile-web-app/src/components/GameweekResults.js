@@ -9,41 +9,79 @@ class GameweekResults extends React.Component {
         isLoadingWebsite: true,
         tableData: [],
       }
+
+      this.updateData = this.updateData.bind(this);
    }
 
-   componentDidMount(){
-        this.props.fplService.getLatestGameweek().then(function(gameweekEvent){
-            if (gameweekEvent.data) {
-                let standings = JSON.parse(gameweekEvent.data.standings.S);
-                this.props.fplService.getAllParticipants().then(function(participantsEvent){
-                    let participantData = participantsEvent.data;
-                    let tableData = [];
-                    for (let i in standings) {
-                        let standing = standings[i];
-                        let participant = participantData[standing.league_entry].participant;
-                        tableData.push(
-                            <tr className="body-row" key={i}>
-                                <td>{standing.rank}</td>
-                                <td className="gameweek-results-player-container">{participant.player_first_name}</td>
-                                <td>{standing.event_total}</td>
-                                <td>{standing.last_rank}</td>
-                                <td>{standing.total}</td>
-                            </tr>
-                        )
-                    }
-                    this.setState({
-                        isLoadingWebsite: false,
-                        tableData: tableData
-                    });
-                }.bind(this))
-            } else {
-                // Will display empty table
-                this.setState({
-                    isLoadingWebsite: false
-                });
-            }
-        }.bind(this))
-   }
+    componentDidMount(){
+        this.updateData();
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.leagueId !== prevProps.leagueId){
+            this.updateData();
+        }
+    } 
+
+    updateData(){
+        if (this.props.leagueId) {
+            this.props.fplService.getLatestGameweek(this.props.leagueId).then(function(gameweekEvent){
+                if (gameweekEvent.data) {
+                    let standings = JSON.parse(gameweekEvent.data.standings.S);
+                    this.props.fplService.getAllParticipants(this.props.leagueId).then(function(participantsEvent){
+                        let participantData = participantsEvent.data;
+                        let tableData = [];
+                        for (let i in standings) {
+                            let standing = standings[i];
+                            let participant = participantData[standing.league_entry].participant;
+                            tableData.push(
+                                <tr className="body-row" key={i}>
+                                    <td>{standing.rank}</td>
+                                    <td className="gameweek-results-player-container">{participant.player_first_name}</td>
+                                    <td>{standing.event_total}</td>
+                                    <td>{standing.last_rank}</td>
+                                    <td>{standing.total}</td>
+                                </tr>
+                            )
+                        }
+                        this.setState({
+                            isLoadingWebsite: false,
+                            tableData: tableData
+                        });
+                    }.bind(this))
+                } else {
+                    // No gameweek data, display an empty table with participant's names
+                    this.props.fplService.getAllParticipants(this.props.leagueId).then(function(participantsEvent){
+                        let participantData = participantsEvent.data;
+                        let tableData = [];
+                        for (let key in participantData) {
+                            if (participantData.hasOwnProperty(key)) {
+                                let participant = participantData[key].participant;
+                                tableData.push(
+                                    <tr className="body-row" key={key}>
+                                        <td>-</td>
+                                        <td className="gameweek-results-player-container">{participant.player_first_name}</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                    </tr>
+                                )
+                            }
+                        }
+                        this.setState({
+                            isLoadingWebsite: false,
+                            tableData: tableData
+                        });
+                    }.bind(this))
+                }
+            }.bind(this))
+        } else {
+            // Will display empty table
+            this.setState({
+                isLoadingWebsite: false
+            });
+        }
+    }
 
    render() {
       return (

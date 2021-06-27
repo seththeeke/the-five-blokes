@@ -47,10 +47,8 @@ class GameweekBadges extends React.Component {
             fontWeight: "bold",
             fontSize: "18px"
         }
-        console.log(this.props.leagueId);
         if (this.props.leagueId){
             this.props.fplService.getAllParticipants(this.props.leagueId).then(function(participantsEvent){
-                console.log(participantsEvent);
                 let participantData = participantsEvent.data;
                 let badgeToGameweekMap = {};
                 let gameweeks = [];
@@ -118,8 +116,6 @@ class GameweekBadges extends React.Component {
     }
 
     render() {
-        // console.log(this.props.leagueId);
-        // console.log(JSON.stringify(this.props.leagueId));
         return (
             <div className='gameweek-badges-container'>
                 <div className="page-spinner-container" hidden={!this.state.isLoadingWebsite}>

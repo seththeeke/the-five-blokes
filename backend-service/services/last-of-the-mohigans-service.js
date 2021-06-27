@@ -88,9 +88,14 @@ module.exports = {
         return participantsResponse;
     },
 
-    getLatestGameweek: async function() {
-        let activeLeague = await leagueDetailsDao.getActiveLeague();
-        let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
+    getLatestGameweek: async function(leagueId) {
+        let leagueForGameweek;
+        if (leagueId){
+            leagueForGameweek = await leagueDetailsDao.getLeagueDetailsById(leagueId);
+        } else {
+            leagueForGameweek = await leagueDetailsDao.getActiveLeague();
+        }
+        let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(leagueForGameweek);
         return lastCompletedGameweek;
     },
 

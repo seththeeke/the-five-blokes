@@ -6,6 +6,7 @@ class FPLService {
     this.participantCache = undefined;
     this.participantIdCache = {};
     this.latestGameweekCache = undefined;
+    this.latestGameweekIdCache = {};
     this.gameweekHistoryCache = undefined;
     this.leagueDetailsCache = undefined;
   }
@@ -17,10 +18,8 @@ class FPLService {
    */
   getAllParticipants(leagueId) {
     if (leagueId){
-      console.log("Fetching for leagueId: " + leagueId);
       return this.getAllParticipantsForLeagueId(leagueId);
     }
-    console.log("Fetching for all participants");
     if (this.participantCache){
       return this.participantCache;
     }
@@ -40,12 +39,27 @@ class FPLService {
     return this.participantIdCache[leagueId];
   }
 
-  getLatestGameweek() {
+  getLatestGameweek(leagueId) {
+    if (leagueId){
+      return this.getLatestGameweekForLeagueId(leagueId);
+    }
     if (this.latestGameweekCache){
       return this.latestGameweekCache;
     }
     this.latestGameweekCache = this.amplifyRequestService.request(this.apiName, '/gameweeks', "GET");
     return this.latestGameweekCache;
+  }
+
+  getLatestGameweekForLeagueId(leagueId) {
+    if (this.latestGameweekIdCache && this.latestGameweekIdCache[leagueId]){
+      return this.latestGameweekIdCache[leagueId];
+    }
+    this.latestGameweekIdCache[leagueId] = this.amplifyRequestService.request(this.apiName, '/gameweeks', "GET", {
+      queryStringParameters: {
+        leagueId: leagueId
+      }
+    });
+    return this.latestGameweekIdCache[leagueId];
   }
 
   getStandingsHistoryForActiveLeague() {

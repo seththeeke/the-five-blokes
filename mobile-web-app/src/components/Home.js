@@ -4,6 +4,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import GameweekResults from './GameweekResults';
 import EmailSubscriptionManagementPage from './EmailSubscriptionManagementPage';
 import fiveBlokes from "../img/morgantown-view.jpg";
+import TheBoys from './TheBoys';
 
 class Home extends React.Component {
    constructor(props){
@@ -44,10 +45,10 @@ class Home extends React.Component {
                      <iframe title="spotify" src="https://open.spotify.com/embed-podcast/show/7Hw0EJXJE2Zmi4pZ13aehl" width="100%" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe>
                   </div>
                   <div className="grid-item">
-                     <GameweekResults
+                     <TheBoys
                         fplService={this.props.fplService}
                      >
-                     </GameweekResults>
+                     </TheBoys>
                   </div>
                   <div className="grid-item">
                      <EmailSubscriptionManagementPage
