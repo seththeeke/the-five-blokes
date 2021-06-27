@@ -9,6 +9,7 @@ import { GetStandingsHistoryForLeagueLambda } from '../lambda/get-standings-hist
 import { SubscribeEmailLambda } from '../lambda/subscribe-email-lambda';
 import { UnSubscribeEmailLambda } from '../lambda/unsubscribe-email-lambda';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
+import { GetAllLeagueDetailsLambda } from '../lambda/get-all-league-details-lambda';
 
 export interface LastOfTheMohigansRestServiceProps {
     shouldUseDomainName?: boolean;
@@ -45,6 +46,7 @@ export class LastOfTheMohigansRestService extends cdk.Construct {
     const gameweeksResource = fantasyApiGateway.root.addResource('gameweeks');
     const standingsResource = fantasyApiGateway.root.addResource('standings');
     const emailsResource = fantasyApiGateway.root.addResource('emails');
+    const leagueDetailsResource = fantasyApiGateway.root.addResource('league-details');
 
     const getAllParticipantsLambda = new GetAllParticipantsLambda(this, "GetAllParticipantsLambda", {
         leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
@@ -78,5 +80,11 @@ export class LastOfTheMohigansRestService extends cdk.Construct {
     });
     const unSubscribeEmailIntegration = new apigateway.LambdaIntegration(unSubscribeEmailLambda);
     emailsResource.addMethod('DELETE', unSubscribeEmailIntegration);    
+
+    const getAllLeagueDetailsLambda = new GetAllLeagueDetailsLambda(this, "GetAllLeagueDetailsLambda", {
+      leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
+    });
+    const getAllLeagueDetailsIntegration = new apigateway.LambdaIntegration(getAllLeagueDetailsLambda);
+    leagueDetailsResource.addMethod('GET', getAllLeagueDetailsIntegration);
   }
 }

@@ -8,7 +8,7 @@ This [project](https://lastofthemohigans.com/) was created to track the history 
 
 ## Architecture
 
-This architecture, like many others I've made utilizes serverless tech as much as possible, primarily to save on cost to keep me in the free tier rather than optimize for performance. It follows a basic ETL process using AWS Step Functions, Lambda, Dynamo, and Aurora MySQL to collect data each week. The website is a basic 3-tier architecture made of a React website hosted in S3 behind a Cloudfront distribution.
+This architecture, like many others I've made utilizes serverless tech as much as possible, primarily to save on cost to keep me in the free tier rather than optimize for performance. It follows a basic ETL process using AWS Step Functions, Lambda, Dynamo, and Aurora MySQL to collect data each week. The website is a basic 3-tier architecture made of a React website hosted in S3 behind a Cloudfront distribution. Adding a new league is currently a manual process by scraping the leagueId from the console on draft.fantasy.com and then adding it through an addLeagueLambda.
 
 ![Architecture Image From DrawIO](fantasy-premier-league-v3.png)
 

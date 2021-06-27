@@ -66,6 +66,22 @@ module.exports = {
         return allBadgesResponse;
     },
 
+    getAllBadgesForLeagueId: async function(leagueId){
+        console.log(leagueId);
+        let badgeScanParams = {
+            TableName: process.env.BADGE_TABLE_NAME
+        }
+        let allBadgesResponse = await ddb.scan(badgeScanParams).promise();
+        let badgeResponse = [];
+        for (let i in allBadgesResponse.Items){
+            let badge = allBadgesResponse.Items[i];
+            if (badge.id.S.includes(leagueId)){
+                badgeResponse.push(badge);
+            }
+        }
+        return badgeResponse;
+    },
+
     getBadgesByType: async function(leagueId, badgeType){
         let params = {
             FilterExpression: "badgeType = :badgeType AND contains (id, :leagueId)",

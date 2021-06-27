@@ -13,84 +13,27 @@ import Fade from '@material-ui/core/Fade';
 import InfoIcon from '@material-ui/icons/Info';
 
 class GameweekBadges extends React.Component {
-   constructor(props){
-      super(props);
-      this.state = {
-        isLoadingWebsite: true,
-        listObjects: [],
-        legendOpen: false
-      }
-      this.iconService = new IconService();
-      this.toggleLegend = this.toggleLegend.bind(this);
-   }
-
-   componentDidMount(){
-        let listSubHeaderStyle = {
-            backgroundColor: "white",
-            fontWeight: "bold",
-            fontSize: "18px"
+    constructor(props){
+        super(props);
+        this.state = {
+            isLoadingWebsite: true,
+            listObjects: [],
+            legendOpen: false
         }
-        this.props.fplService.getAllParticipants().then(function(participantsEvent){
-            let participantData = participantsEvent.data;
-            let badgeToGameweekMap = {};
-            let gameweeks = [];
-            // sort all the badges into their gameweek
-            for (let participantId in participantData) {
-                let participant = participantData[participantId];
-                let badges = participant.badges;
-                for (let i in badges) {
-                    let badge = badges[i];
-                    let badgeMetadata = JSON.parse(badge.badgeMetadata.S);
-                    if (badgeMetadata.gameweek){
-                        let gameweekKey = badgeMetadata.gameweek.toString();
-                        if (!badgeToGameweekMap[gameweekKey]){
-                            badgeToGameweekMap[gameweekKey] = [];
-                            gameweeks.push(gameweekKey);
-                        }
-                        let badgeArrayForGameweek = badgeToGameweekMap[gameweekKey];
-                        badgeArrayForGameweek.push(badge);
-                        badgeToGameweekMap[gameweekKey] = badgeArrayForGameweek;
-                    }
-                }
-            }
-            let listObjects = [];
-            gameweeks.sort(function(a, b){return parseInt(b) - parseInt(a)});
-            // iterate through the badges for each gameweek and generate a list item for the badge for the gameweek subheader
-            for (let j in gameweeks) {
-                let gameweek = gameweeks[j];
-                let badgesForGameweek = badgeToGameweekMap[gameweek];
-                let listItems = [];
-                for (let i in badgesForGameweek) {
-                    let badge = badgesForGameweek[i];
-                    let badgeIcon = this.iconService.getIconByBadgeType(badge.badgeType.S);
-                    if (badgeIcon){
-                        listItems.push(
-                            <ListItem key={`item-${gameweek}-${badge.badgeType.S}-${badge.participantName.S}`}>
-                                <div className="gameweek-badge-container">
-                                    <Badge badge={badgeIcon} showBadgeType></Badge>
-                                    <div className="awarded-to-container">Awarded To: {badge.participantName.S}</div>
-                                </div>
-                            </ListItem>
-                        );
-                    } else {
-                        console.log(badge);
-                    }
-                }
-                listObjects.push(
-                    <li key={`section-${gameweek}`}>
-                        <ul>
-                            <ListSubheader style={listSubHeaderStyle}>{`Gameweek ${gameweek}`}</ListSubheader>
-                            {listItems}
-                        </ul>
-                    </li>
-                );
-            }
-            this.setState({
-                isLoadingWebsite: false,
-                listObjects: listObjects
-            });
-        }.bind(this));
-   }
+        this.iconService = new IconService();
+        this.toggleLegend = this.toggleLegend.bind(this);
+        this.updateData = this.updateData.bind(this);
+    }
+
+    componentDidMount(){
+        this.updateData();
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.leagueId !== prevProps.leagueId){
+            this.updateData();
+        }
+    } 
 
     toggleLegend(){
         this.setState({
@@ -98,7 +41,85 @@ class GameweekBadges extends React.Component {
         });
     }
 
-   render() {
+    updateData(){
+        let listSubHeaderStyle = {
+            backgroundColor: "white",
+            fontWeight: "bold",
+            fontSize: "18px"
+        }
+        console.log(this.props.leagueId);
+        if (this.props.leagueId){
+            this.props.fplService.getAllParticipants(this.props.leagueId).then(function(participantsEvent){
+                console.log(participantsEvent);
+                let participantData = participantsEvent.data;
+                let badgeToGameweekMap = {};
+                let gameweeks = [];
+                // sort all the badges into their gameweek
+                for (let participantId in participantData) {
+                    let participant = participantData[participantId];
+                    let badges = participant.badges;
+                    for (let i in badges) {
+                        let badge = badges[i];
+                        let badgeMetadata = JSON.parse(badge.badgeMetadata.S);
+                        if (badgeMetadata.gameweek){
+                            let gameweekKey = badgeMetadata.gameweek.toString();
+                            if (!badgeToGameweekMap[gameweekKey]){
+                                badgeToGameweekMap[gameweekKey] = [];
+                                gameweeks.push(gameweekKey);
+                            }
+                            let badgeArrayForGameweek = badgeToGameweekMap[gameweekKey];
+                            badgeArrayForGameweek.push(badge);
+                            badgeToGameweekMap[gameweekKey] = badgeArrayForGameweek;
+                        }
+                    }
+                }
+                let listObjects = [];
+                gameweeks.sort(function(a, b){return parseInt(b) - parseInt(a)});
+                // iterate through the badges for each gameweek and generate a list item for the badge for the gameweek subheader
+                for (let j in gameweeks) {
+                    let gameweek = gameweeks[j];
+                    let badgesForGameweek = badgeToGameweekMap[gameweek];
+                    let listItems = [];
+                    for (let i in badgesForGameweek) {
+                        let badge = badgesForGameweek[i];
+                        let badgeIcon = this.iconService.getIconByBadgeType(badge.badgeType.S);
+                        if (badgeIcon){
+                            listItems.push(
+                                <ListItem key={`item-${gameweek}-${badge.badgeType.S}-${badge.participantName.S}`}>
+                                    <div className="gameweek-badge-container">
+                                        <Badge badge={badgeIcon} showBadgeType></Badge>
+                                        <div className="awarded-to-container">Awarded To: {badge.participantName.S}</div>
+                                    </div>
+                                </ListItem>
+                            );
+                        } else {
+                            console.log(badge);
+                        }
+                    }
+                    listObjects.push(
+                        <li key={`section-${gameweek}`}>
+                            <ul>
+                                <ListSubheader style={listSubHeaderStyle}>{`Gameweek ${gameweek}`}</ListSubheader>
+                                {listItems}
+                            </ul>
+                        </li>
+                    );
+                }
+                this.setState({
+                    isLoadingWebsite: false,
+                    listObjects: listObjects
+                });
+            }.bind(this));
+        } else {
+            this.setState({
+                isLoadingWebsite: false
+            });
+        }
+    }
+
+    render() {
+        // console.log(this.props.leagueId);
+        // console.log(JSON.stringify(this.props.leagueId));
         return (
             <div className='gameweek-badges-container'>
                 <div className="page-spinner-container" hidden={!this.state.isLoadingWebsite}>
@@ -118,25 +139,25 @@ class GameweekBadges extends React.Component {
                     </div>
                 </div>
                 <Modal
-                  aria-labelledby="transition-modal-title"
-                  aria-describedby="transition-modal-description"
-                  open={this.state.legendOpen}
-                  onClose={this.toggleLegend}
-                  closeAfterTransition
-                  BackdropComponent={Backdrop}
-                  BackdropProps={{
-                     timeout: 500,
-                  }}
-               >
-                  <Fade in={this.state.legendOpen}>
-                     <div className="badge-legend-container" style={this.state.legendOpen ? {} : { display: 'none' }}>
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                open={this.state.legendOpen}
+                onClose={this.toggleLegend}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500,
+                }}
+            >
+                <Fade in={this.state.legendOpen}>
+                    <div className="badge-legend-container" style={this.state.legendOpen ? {} : { display: 'none' }}>
                         <BadgeLegend></BadgeLegend>
-                     </div>
-                  </Fade>
-               </Modal>
+                    </div>
+                </Fade>
+            </Modal>
             </div>
         );
-   }
+    }
 }
 
 export default GameweekBadges;
