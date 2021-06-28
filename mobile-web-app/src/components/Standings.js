@@ -34,45 +34,62 @@ class Standings extends React.Component {
         },
         series: []
       }
+      this.updateData = this.updateData.bind(this);
    }
 
-   componentDidMount(){
-        this.props.fplService.getStandingsHistoryForActiveLeague().then(function(historyEvent){
-            let standingsHistory = historyEvent.data;
-            standingsHistory.sort(function(a, b){return parseInt(b.gameweek) - parseInt(a.gameweek)});
-            this.props.fplService.getAllParticipants().then(function(participantsEvent){
-                let participantData = participantsEvent.data;
-                let seriesData = [];
-                let rankMap = {};
-                for (let i in standingsHistory) {
-                    // limit chart width on mobile
-                    let standingsForGameweek = JSON.parse(standingsHistory[i].standings);
-                    for (let j in standingsForGameweek) {
-                        let standing = standingsForGameweek[j];
-                        let participant = participantData[standing.league_entry].participant;
-                        let participantName = participant.player_first_name  + " " + participant.player_last_name;
-                        if (!rankMap[participantName]) {
-                            rankMap[participantName] = []
-                        }
-                        let data = rankMap[participantName];
-                        data.unshift(standing.rank);
-                    }
-                }
-                for (let participantName in rankMap) {
-                    seriesData.push(
-                        {
-                            name: participantName,
-                            data: rankMap[participantName]
-                        }
-                    )
-                }
-                this.setState({
-                    isLoadingWebsite: false,
-                    series: seriesData
-                });
-            }.bind(this))
+    componentDidMount(){
+      this.updateData();
+    }
+
+    componentDidUpdate(prevProps) {
+      if(this.props.leagueId !== prevProps.leagueId){
+          this.updateData();
+      }
+    } 
+
+    updateData(){
+      if (this.props.leagueId){
+        this.props.fplService.getStandingsHistory(this.props.leagueId).then(function(historyEvent){
+          let standingsHistory = historyEvent.data;
+          standingsHistory.sort(function(a, b){return parseInt(b.gameweek) - parseInt(a.gameweek)});
+          this.props.fplService.getAllParticipants(this.props.leagueId).then(function(participantsEvent){
+              let participantData = participantsEvent.data;
+              let seriesData = [];
+              let rankMap = {};
+              for (let i in standingsHistory) {
+                  // limit chart width on mobile
+                  let standingsForGameweek = JSON.parse(standingsHistory[i].standings);
+                  for (let j in standingsForGameweek) {
+                      let standing = standingsForGameweek[j];
+                      let participant = participantData[standing.league_entry].participant;
+                      let participantName = participant.player_first_name  + " " + participant.player_last_name;
+                      if (!rankMap[participantName]) {
+                          rankMap[participantName] = []
+                      }
+                      let data = rankMap[participantName];
+                      data.unshift(standing.rank);
+                  }
+              }
+              for (let participantName in rankMap) {
+                  seriesData.push(
+                      {
+                          name: participantName,
+                          data: rankMap[participantName]
+                      }
+                  )
+              }
+              this.setState({
+                  isLoadingWebsite: false,
+                  series: seriesData
+              });
+          }.bind(this))
         }.bind(this))
-   }
+      } else {
+        this.setState({
+          isLoadingWebsite: false,
+        });
+      }
+    }
 
    render() {
       return (

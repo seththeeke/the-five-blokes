@@ -57,7 +57,15 @@ exports.getLatestGameweek = async (event, context) => {
 exports.getStandingsHistoryForActiveLeague = async (event, context) => {
     try {
         console.log(JSON.stringify(event));
-        let response = await lastOfTheMohigansService.getStandingsHistoryForActiveLeague();
+        let leagueId;
+        if (event.multiValueQueryStringParameters && event.multiValueQueryStringParameters.leagueId) {
+            leagueId = event.multiValueQueryStringParameters.leagueId[0];
+        }
+        if (leagueId) {
+            response = await lastOfTheMohigansService.getStandingsHistoryForActiveLeague(leagueId);
+        } else {
+            response = await lastOfTheMohigansService.getStandingsHistoryForActiveLeague();
+        }
         return respond(response);
     } catch (err) {
         console.log(err);

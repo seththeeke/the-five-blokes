@@ -8,6 +8,7 @@ class FPLService {
     this.latestGameweekCache = undefined;
     this.latestGameweekIdCache = {};
     this.gameweekHistoryCache = undefined;
+    this.gameweekHistoryLeagueIdCache = {};
     this.leagueDetailsCache = undefined;
   }
 
@@ -62,12 +63,27 @@ class FPLService {
     return this.latestGameweekIdCache[leagueId];
   }
 
-  getStandingsHistoryForActiveLeague() {
+  getStandingsHistory(leagueId) {
+    if (leagueId){
+      return this.getStandingsHistoryForLeagueId(leagueId);
+    }
     if (this.gameweekHistoryCache){
       return this.gameweekHistoryCache;
     }
     this.gameweekHistoryCache = this.amplifyRequestService.request(this.apiName, '/standings', "GET");
     return this.gameweekHistoryCache;
+  }
+
+  getStandingsHistoryForLeagueId(leagueId) {
+    if (this.gameweekHistoryLeagueIdCache && this.gameweekHistoryLeagueIdCache[leagueId]){
+      return this.gameweekHistoryLeagueIdCache[leagueId];
+    }
+    this.gameweekHistoryLeagueIdCache[leagueId] = this.amplifyRequestService.request(this.apiName, '/standings', "GET", {
+      queryStringParameters: {
+        leagueId: leagueId
+      }
+    });
+    return this.gameweekHistoryLeagueIdCache[leagueId];
   }
 
   getAllLeagueDetails() {

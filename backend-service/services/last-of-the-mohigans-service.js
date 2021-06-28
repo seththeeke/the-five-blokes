@@ -99,10 +99,15 @@ module.exports = {
         return lastCompletedGameweek;
     },
 
-    getStandingsHistoryForActiveLeague: async function(){
-        let activeLeague = await leagueDetailsDao.getActiveLeague();
-        let allGameweeksForLeagueId = await gameweeksDao.getAllGameweeksForLeague(activeLeague);
-        return allGameweeksForLeagueId;
+    getStandingsHistoryForActiveLeague: async function(leagueId){
+        let league;
+        if (leagueId){
+            league = await leagueDetailsDao.getLeagueDetailsById(leagueId);
+        } else {
+            league = await leagueDetailsDao.getActiveLeague();
+        }
+        let standingsHistoryForLeague = await gameweeksDao.getAllGameweeksForLeague(league);
+        return standingsHistoryForLeague;
     },
 
     getAllLeagueDetails: async function() {
