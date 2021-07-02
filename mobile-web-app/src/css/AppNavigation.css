@@ -3,7 +3,6 @@
     left:0px;
     bottom:0px;
     width:100%;
-    height: 7%;
     /* background: #00332a; */
     background-color: #8CACFD;
 }
@@ -11,7 +10,7 @@
 .nav-button {
     display: inline-block;
     width: 20%;
-    margin: 0.4em;
+    padding: 0.4em;
 }
 
 .nav-button-icon {

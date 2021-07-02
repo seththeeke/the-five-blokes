@@ -7,7 +7,7 @@ class Standings extends React.Component {
    constructor(props){
       super(props);
       this.state = {
-        isLoadingWebsite: true,
+        isLoadingWidget: true,
         options: {
             legend: {
               show: false
@@ -43,6 +43,9 @@ class Standings extends React.Component {
 
     componentDidUpdate(prevProps) {
       if(this.props.leagueId !== prevProps.leagueId){
+          this.setState({
+            isLoadingWidget: true
+          });
           this.updateData();
       }
     } 
@@ -79,14 +82,14 @@ class Standings extends React.Component {
                   )
               }
               this.setState({
-                  isLoadingWebsite: false,
+                  isLoadingWidget: false,
                   series: seriesData
               });
           }.bind(this))
         }.bind(this))
       } else {
         this.setState({
-          isLoadingWebsite: false,
+          isLoadingWidget: false,
         });
       }
     }
@@ -94,12 +97,12 @@ class Standings extends React.Component {
    render() {
       return (
          <div className='results-container'>
-            <div className="page-spinner-container" hidden={!this.state.isLoadingWebsite}>
-               <CircularProgress></CircularProgress>
+            <div className="page-spinner-container" hidden={!this.state.isLoadingWidget}>
+              <CircularProgress></CircularProgress>
             </div>
-                <div hidden={this.state.isLoadingWebsite}>
-                <div className="standings-title-container">Season Standings</div>
-                <Chart className="standings-chart" options={this.state.options} series={this.state.series} type="line" />
+            <div hidden={this.state.isLoadingWidget}>
+              <div className="standings-title-container">Season Standings</div>
+              <Chart className="standings-chart" options={this.state.options} series={this.state.series} type="line" />
             </div>
          </div>
       );

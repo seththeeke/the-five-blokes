@@ -6,7 +6,7 @@ class GameweekResults extends React.Component {
    constructor(props){
       super(props);
       this.state = {
-        isLoadingWebsite: true,
+        isLoadingWidget: true,
         tableData: [],
       }
 
@@ -19,6 +19,9 @@ class GameweekResults extends React.Component {
 
     componentDidUpdate(prevProps) {
         if(this.props.leagueId !== prevProps.leagueId){
+            this.setState({
+                isLoadingWidget: true
+            });
             this.updateData();
         }
     } 
@@ -45,7 +48,7 @@ class GameweekResults extends React.Component {
                             )
                         }
                         this.setState({
-                            isLoadingWebsite: false,
+                            isLoadingWidget: false,
                             tableData: tableData
                         });
                     }.bind(this))
@@ -69,7 +72,7 @@ class GameweekResults extends React.Component {
                             }
                         }
                         this.setState({
-                            isLoadingWebsite: false,
+                            isLoadingWidget: false,
                             tableData: tableData
                         });
                     }.bind(this))
@@ -78,7 +81,7 @@ class GameweekResults extends React.Component {
         } else {
             // Will display empty table
             this.setState({
-                isLoadingWebsite: false
+                isLoadingWidget: false
             });
         }
     }
@@ -86,10 +89,10 @@ class GameweekResults extends React.Component {
    render() {
       return (
          <div className='results-container'>
-            <div className="page-spinner-container" hidden={!this.state.isLoadingWebsite}>
+            <div className="page-spinner-container" hidden={!this.state.isLoadingWidget}>
                <CircularProgress></CircularProgress>
             </div>
-            <div className="gameweek-results-wrapper" hidden={this.state.isLoadingWebsite}>
+            <div className="gameweek-results-wrapper" hidden={this.state.isLoadingWidget}>
                 <table>
                     <thead>
                         <tr className="header-row">

@@ -15,16 +15,26 @@ Amplify.configure(config);
 class App extends React.Component {
   constructor(props){
     super(props);
+    this.state = {
+      isMobileView: true
+    }
     this.fplServiceApiName = "FPLService";
     this.amplifyRequestService = new AmplifyRequestService();
     this.fplService = new FPLService(this.amplifyRequestService, this.fplServiceApiName);
     this.emailSubscriptionService = new EmailSubscriptionService(this.amplifyRequestService, this.fplServiceApiName);
   }
 
+  componentDidMount(){
+    this.setState({
+      isMobileView: (window.screen.width < 667)
+    });
+  }
+
   render(){
     return (
       <div className="App">
         <Router>
+          <div className="window-size-warning" hidden={this.state.isMobileView}>Wow, that's a big window, this website is optimized for mobile user experience but it will work just fine on Desktop</div>
           <AppHeader></AppHeader>
           <AppRouter
             fplService={this.fplService}

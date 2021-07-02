@@ -16,7 +16,7 @@ class GameweekBadges extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            isLoadingWebsite: true,
+            isLoadingWidget: true,
             listObjects: [],
             legendOpen: false
         }
@@ -31,6 +31,9 @@ class GameweekBadges extends React.Component {
 
     componentDidUpdate(prevProps) {
         if(this.props.leagueId !== prevProps.leagueId){
+            this.setState({
+                isLoadingWidget: true
+            });
             this.updateData();
         }
     } 
@@ -104,13 +107,13 @@ class GameweekBadges extends React.Component {
                     );
                 }
                 this.setState({
-                    isLoadingWebsite: false,
+                    isLoadingWidget: false,
                     listObjects: listObjects
                 });
             }.bind(this));
         } else {
             this.setState({
-                isLoadingWebsite: false
+                isLoadingWidget: false
             });
         }
     }
@@ -118,17 +121,17 @@ class GameweekBadges extends React.Component {
     render() {
         return (
             <div className='gameweek-badges-container'>
-                <div className="page-spinner-container" hidden={!this.state.isLoadingWebsite}>
+                <div className="page-spinner-container" hidden={!this.state.isLoadingWidget}>
                     <CircularProgress></CircularProgress>
                 </div>
-                <div className="gameweek-badges-wrapper" hidden={this.state.isLoadingWebsite}>
+                <div className="gameweek-badges-wrapper" hidden={this.state.isLoadingWidget}>
                     <div className="gameweek-badges-title-container">
                         Badges 
                         <div className="info-icon-container" onClick={this.toggleLegend}>
                             <InfoIcon/>
                         </div>
                     </div>
-                    <div className="gameweek-badge-list" hidden={this.state.isLoadingWebsite}>
+                    <div className="gameweek-badge-list" hidden={this.state.isLoadingWidget}>
                         <List subheader={<li />}>
                             {this.state.listObjects}
                         </List>
