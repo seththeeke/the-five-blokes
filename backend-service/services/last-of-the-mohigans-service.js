@@ -17,17 +17,18 @@ module.exports = {
      * Used for The Boys widget to display all participants and their badges and history
      */
     getAllParticipants: async function() {
-        // Get and Sort all the Badges by participantId
+        // Get and Sort all the Badges by participantName, there is no unique id between seasons
+        // so banking on nobody having the same first and last name in the same league
         let allBadges = await badgesDao.getAllBadges();
         let badgeMap = {};
         for (let i in allBadges.Items) {
             let badge = allBadges.Items[i];
-            if (badgeMap[badge.participantId.S]){
-                let badges = badgeMap[badge.participantId.S];
+            if (badgeMap[badge.participantName.S]){
+                let badges = badgeMap[badge.participantName.S];
                 badges.push(badge);
-                badgeMap[badge.participantId.S] = badges;
+                badgeMap[badge.participantName.S] = badges;
             } else {
-                badgeMap[badge.participantId.S] = [badge];
+                badgeMap[badge.participantName.S] = [badge];
             }   
         }
 
@@ -38,11 +39,11 @@ module.exports = {
             let participants = JSON.parse(leagueDetails.participants.S);
             for (let j in participants) {
                 let participant = participants[j];
-                let participantId = participant.id.toString();
-                if (!participantsResponse[participantId]){
-                    participantsResponse[participantId] = {
+                let participantName = participant.player_first_name + " " + participant.player_last_name;
+                if (!participantsResponse[participantName]){
+                    participantsResponse[participantName] = {
                         "participant": participant,
-                        "badges": badgeMap[participantId]
+                        "badges": badgeMap[participantName]
                     };
                 }
             }
