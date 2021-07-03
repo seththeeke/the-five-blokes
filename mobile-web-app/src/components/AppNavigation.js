@@ -19,27 +19,70 @@ class AppNavigation extends React.Component {
     }
 
     render() {
+        // This block of logic is for ensuring the right button is highlighted when loading the page
+        // Its a lot of code, there's probably a better way of doing this, all I need to do is add a className
+        // To the div corresponding to this.state.selected
+        let home = (
+            <div id="home" className="nav-button">
+                <HomeIcon fontSize="large" color="primary"></HomeIcon>
+            </div>
+        )
+        if (this.state.selected === "home") {
+            home = (
+                <div id="home" className="nav-button selected">
+                    <HomeIcon fontSize="large" color="primary"></HomeIcon>
+                </div>
+            ) 
+        }
+        let podcast = (
+            <div id="podcast" className="nav-button">
+                <MicIcon fontSize="large" color="primary"></MicIcon>
+            </div>
+        )
+        if (this.state.selected === "podcast") {
+            podcast = (
+                <div id="podcast" className="nav-button selected">
+                    <MicIcon fontSize="large" color="primary"></MicIcon>
+                </div>
+            ) 
+        }
+        let fantasy = (
+            <div id="fantasy" className="nav-button">
+                <SportsSoccerIcon fontSize="large" color="primary"></SportsSoccerIcon>
+            </div>
+        )
+        if (this.state.selected === "fantasy") {
+            fantasy = (
+                <div id="fantasy" className="nav-button selected">
+                    <SportsSoccerIcon fontSize="large" color="primary"></SportsSoccerIcon>
+                </div>
+            ) 
+        }
+        let email = (
+            <div id="email-subscription-management" className="nav-button">
+                <EmailIcon fontSize="large" color="primary"></EmailIcon>
+            </div>
+        )
+        if (this.state.selected === "email-subscription-management") {
+            email = (
+                <div id="email-subscription-management" className="nav-button selected">
+                    <EmailIcon fontSize="large" color="primary"></EmailIcon>
+                </div>
+            ) 
+        }
         return (
             <div className="nav-wrapper">
                 <Link to="/home" onClick={this.onLinkClick.bind(this, "home")}>
-                    <div id="home" className="nav-button">
-                        <HomeIcon fontSize="large" color="primary"></HomeIcon>
-                    </div>
+                    {home}
                 </Link>
                 <Link  to="/podcast" onClick={this.onLinkClick.bind(this, "podcast")}>
-                    <div id="podcast" className="nav-button">
-                        <MicIcon fontSize="large" color="primary"></MicIcon>
-                    </div>
+                    {podcast}
                 </Link>
                 <Link to="/fantasy" onClick={this.onLinkClick.bind(this, "fantasy")}>
-                    <div id="fantasy" className="nav-button">
-                        <SportsSoccerIcon fontSize="large" color="primary"></SportsSoccerIcon>
-                    </div>
+                    {fantasy}
                 </Link>
                 <Link to="/email-subscription-management" onClick={this.onLinkClick.bind(this, "email-subscription-management")}>
-                    <div id="email-subscription-management" className="nav-button">
-                        <EmailIcon fontSize="large" color="primary"></EmailIcon>
-                    </div>
+                    {email}
                 </Link>
             </div>
         );
