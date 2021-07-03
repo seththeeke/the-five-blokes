@@ -16,6 +16,7 @@ class AppRouter extends React.Component {
                     <Route path="/home">
                         <Home
                             fplService={this.props.fplService}
+                            emailSubscriptionService={this.props.emailSubscriptionService}
                         >
                         </Home>
                     </Route>

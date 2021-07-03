@@ -10,7 +10,6 @@ class AppHeader extends React.Component {
         return (
             <div className="header-wrapper">
                 <Link to="/home">
-                    {/* <div className="header">The Five Blokes</div> */}
                     <img className="header-logo" src={fiveBlokesLogo} alt="five-blokes-logo"></img>
                 </Link>
             </div>

@@ -1,18 +1,14 @@
 import React from 'react';
 import './../css/EmailSubscriptionManagement.css';
+import EmailManagementWidget from './EmailManagementWidget';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 class EmailSubscriptionManagementPage extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            isLoadingWebsite: true,
-            email: window.location.search.substring(window.location.search.indexOf("=") + 1),
-            responseSuccessful: false
+            isLoadingWebsite: true
         }
-
-        this.subscribe = this.subscribe.bind(this);
-        this.unsubscribe = this.unsubscribe.bind(this);
     }
 
     componentDidMount(){
@@ -21,48 +17,20 @@ class EmailSubscriptionManagementPage extends React.Component {
         });
     }
 
-    subscribe(){
-        this.setState({
-            isLoadingWebsite: true,
-            responseSuccessful: false
-        });
-        this.props.emailSubscriptionService.subscribe(document.getElementById("emailInput").value).then(function(event){
-            this.setState({
-                isLoadingWebsite: false,
-                responseSuccessful: true
-            });
-        }.bind(this));
-    }
-
-    unsubscribe(){
-        this.setState({
-            isLoadingWebsite: true,
-            responseSuccessful: false
-        });
-        this.props.emailSubscriptionService.unsubscribe(document.getElementById("emailInput").value).then(function(event){
-            this.setState({
-                isLoadingWebsite: false,
-                responseSuccessful: true
-            });
-        }.bind(this));
-    }
-
     render() {
         return (
             <div className='email-subscription-container'>
                 <div className="page-spinner-container" hidden={!this.state.isLoadingWebsite}>
                 <CircularProgress></CircularProgress>
                 </div>
-                <div hidden={this.state.isLoadingWebsite}>
-                    <div className="subscription-management-header">Follow the Five Blokes Fantasy League</div>
-                    <div>
-                        <input id="emailInput" className="email-input" type="text" placeholder="email" defaultValue={this.state.email}></input>
-                        <div>
-                            <button className="subscription-button" onClick={this.subscribe}>Subscribe</button>
-                            <button className="subscription-button" onClick={this.unsubscribe}>Unsubscribe</button>
-                        </div>
+                <div>
+                    <EmailManagementWidget
+                        emailSubscriptionService={this.props.emailSubscriptionService}
+                    >
+                    </EmailManagementWidget>
+                    <div className="email-subscription-info">
+                        By subscribing, you will get one <a href="https://github.com/seththeeke/last-of-the-mohigans#emails">email</a> each week and one at the end of the season. You can unsubscribe at any time.
                     </div>
-                    <div className="success-text" hidden={!this.state.responseSuccessful}>Success!</div>
                 </div>
             </div>
         );

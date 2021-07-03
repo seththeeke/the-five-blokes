@@ -26,7 +26,19 @@
 }
 
 .success-text {
-    padding: 10px;
+    padding: 5px;
+    margin: 5px;
     font-weight: bolder;
     font-size: 16px;
+    background-color: #d9ffcc;
+    border: 1px solid #40ff00;
+    border-radius: 28px;
+}
+
+.email-subscription-info {
+    display: inline-block;
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid grey;
+    background-color: #d1e0e0;
 }

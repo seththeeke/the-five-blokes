@@ -1,7 +1,7 @@
 import React from 'react';
 import './../css/Home.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import EmailSubscriptionManagementPage from './EmailSubscriptionManagementPage';
+import EmailManagementWidget from './EmailManagementWidget';
 import fiveBlokes from "../img/morgantown-view.jpg";
 import TheBoys from './TheBoys';
 
@@ -50,10 +50,10 @@ class Home extends React.Component {
                      </TheBoys>
                   </div>
                   <div className="grid-item">
-                     <EmailSubscriptionManagementPage
+                     <EmailManagementWidget
                         emailSubscriptionService={this.props.emailSubscriptionService}
                      >
-                     </EmailSubscriptionManagementPage>
+                     </EmailManagementWidget>
                   </div>
                </div>
             </div>
