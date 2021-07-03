@@ -2,8 +2,8 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "FPLWebsite"
-s3_prefix = "FPLWebsite"
+stack_name = "FPLWebsiteMobile"
+s3_prefix = "FPLWebsiteMobile"
 region = "us-east-1"
 profile = "lotm"
 confirm_changeset = true

@@ -92,6 +92,7 @@ sam build
 sam deploy
 npm run-script build
 aws s3 sync build/ s3://lastofthemohigans.com --acl public-read --profile lotm
+aws s3 sync build/ s3://thefiveblokes.com --acl public-read --profile lotm
 ```
 
 Note: You must have appropriate access and secret keys setup on your machine for the AWS account
