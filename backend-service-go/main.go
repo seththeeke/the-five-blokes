@@ -12,4 +12,4 @@ func hello() (string, error) {
 func main() {
 	// Make the handler available for Remote Procedure Call by AWS Lambda
 	lambda.Start(hello)
-}
+} 

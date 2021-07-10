@@ -14,6 +14,12 @@ exports.sendSeasonCompletedEmailController = async (event) => {
     return response;
 }
 
+exports.sendTestEmails = async (event) => {
+    console.log(JSON.stringify(event));
+    let response = await emailService.sendTestEmails();
+    return response;
+}
+
 exports.subscribe = async (event) => {
     console.log(JSON.stringify(event));
     try {

@@ -4,7 +4,7 @@
 
 ## FPL Badges and Stats
 
-This [project](https://lastofthemohigans.com/) was created to track the history of our fantasy premiere league players, stats, scores, losers, winner, etc. The premiere league fantasy system has an api exposed to fetch league data, player data, transactions, fixtures, and more and this project utilizes them to create a league history, aware preseason, gameweek, season, and other types of badges to track the highs and lows of your season and increase banter.
+This [project](https://thefiveblokes.com/) was created to track the history of our fantasy premiere league players, stats, scores, losers, winner, etc. The premiere league fantasy system has an api exposed to fetch league data, player data, transactions, fixtures, and more and this project utilizes them to create a league history, aware preseason, gameweek, season, and other types of badges to track the highs and lows of your season and increase banter.
 
 ## Architecture
 
@@ -91,7 +91,6 @@ cd $BASE_DIR/web-app
 sam build
 sam deploy
 npm run-script build
-aws s3 sync build/ s3://lastofthemohigans.com --acl public-read --profile lotm
 aws s3 sync build/ s3://thefiveblokes.com --acl public-read --profile lotm
 ```
 

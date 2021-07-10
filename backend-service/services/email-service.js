@@ -12,7 +12,7 @@ var ses = new AWS.SES({apiVersion: '2010-12-01'});
 var BADGE_TYPE = require('./../util/badge-type');
 
 var MEDIA_ASSETS_BASE_URL = process.env.MEDIA_ASSETS_BUCKET_URL;
-var headerIcon = MEDIA_ASSETS_BASE_URL + "/circular-prem-lion.png";
+var headerIcon = MEDIA_ASSETS_BASE_URL + "/favicon-sample.png";
 var thumbsUpIcon = MEDIA_ASSETS_BASE_URL + "/thumbs-up.png";
 var thumbsDownIcon = MEDIA_ASSETS_BASE_URL + "/thumbs-down.png";
 var pointsIcon = MEDIA_ASSETS_BASE_URL + "/gameweek-winner.png";
@@ -142,10 +142,10 @@ module.exports = {
                         "pointsIcon": pointsIcon,
                         "goalsIcon": goalsIcon,
                         "assistsIcon": assistsIcon,
-                        "customUnsubscribeUrl": "https://lastofthemohigans.com/email-subscription-management?emailAddress=" + emailAddress
+                        "customUnsubscribeUrl": "https://thefiveblokes.com/email-subscription-management?emailAddress=" + emailAddress
                     }
                 ),
-                Source: 'seththeekelastofthemohigans@gmail.com', // should be env var
+                Source: 'fivesoccerblokes@gmail.com', // should be env var
             };
     
             try {
@@ -251,10 +251,10 @@ module.exports = {
                         playmakerIcon,
                         seasonLoserIcon,
                         seasonMVPIcon,
-                        "customUnsubscribeUrl": "https://lastofthemohigans.com/email-subscription-management?emailAddress=" + emailAddress
+                        "customUnsubscribeUrl": "https://thefiveblokes.com/email-subscription-management?emailAddress=" + emailAddress
                     }
                 ),
-                Source: 'seththeekelastofthemohigans@gmail.com', // should be env var
+                Source: 'fivesoccerblokes@gmail.com', // should be env var
             };
     
             try {
@@ -299,6 +299,104 @@ module.exports = {
         console.log("Beginning to unsubscribe email address " + emailAddress);
         let response = await emailSubscriptionsDao.removeEmailAddress(emailAddress)
         return response;
+    },
+
+    sendTestEmails: async function(){
+        console.log("Beginning to form and send test emails");
+        let emailAddress = "seththeeke@gmail.com";
+        let sendEmailParams = {
+            Destination: {
+                ToAddresses: [
+                emailAddress,
+                ]
+            },
+            Template: 'GameweekCompleted',
+            TemplateData: JSON.stringify(
+                {
+                    "gameweek": "0",
+                    "podiumImg": podiumImg,
+                    "firstPlace": "Seth",
+                    "secondPlace": "Evan",
+                    "thirdPlace": "Nima",
+                    "firstPlacePoints": "300",
+                    "secondPlacePoints": "200",
+                    "thirdPlacePoints": "100",
+                    "mostGameweekPoints": "Nate",
+                    "mostGameweekPointsValue": "500",
+                    "leastGameweekPoints": "Liam",
+                    "leastGameweekPointsValue": "0",
+                    "mostGameweekGoals": "Amine",
+                    "mostGameweekGoalsValue": "5",
+                    "leastGameweekGoals": "Yaccine",
+                    "leastGameweekGoalsValue": "4",
+                    "mostGameweekAssists": "Matt",
+                    "mostGameweekAssistsValue": "3",
+                    "leastGameweekAssists": "Antonio",
+                    "leastGameweekAssistsValue": "2",
+                    "headerIcon": headerIcon,
+                    "thumbsUpIcon": thumbsUpIcon,
+                    "thumbsDownIcon": thumbsDownIcon,
+                    "pointsIcon": pointsIcon,
+                    "goalsIcon": goalsIcon,
+                    "assistsIcon": assistsIcon,
+                    "customUnsubscribeUrl": "https://thefiveblokes.com/email-subscription-management?emailAddress=" + emailAddress
+                }
+            ),
+            Source: 'fivesoccerblokes@gmail.com', // should be env var
+        };
+    
+        let response;
+        try {
+            response = await ses.sendTemplatedEmail(sendEmailParams).promise();
+            console.log("Successfully sent gameweek test email to email address " + emailAddress);
+        } catch (error) {
+            console.log("Failed to send email to email address " + emailAddress);
+        }
+
+        // season email
+        let sendSeasonEmailParams = {
+            Destination: {
+                ToAddresses: [
+                emailAddress,
+                ]
+            },
+            Template: 'SeasonCompleted', // should be env var
+            TemplateData: JSON.stringify(
+                {
+                    leagueWinner: "Seth",
+                    leagueWinnerPoints: "1000",
+                    leagueWinnerPointsDifference: "20",
+                    lastPlace: "Nima",
+                    lastPlacePoints: "10",
+                    lastPlacePointsDifference: "100",
+                    leagueMVPParticipantName: "Evan",
+                    leagueMVPPlayerName: "Auba",
+                    leagueMVPValue: "50",
+                    leagueTopGoalScorerBadgeParticipantName: "Evan",
+                    leagueTopGoalScorerPlayerName: "Harry",
+                    leagueTopGoalScorerValue: "25",
+                    leagueTopAssisterBadgeParticipantName: "Liam",
+                    leagueTopAssisterPlayerName: "Ozil",
+                    leagueTopAssisterScorerValue: "20",
+                    headerIcon,
+                    leagueTrophyIcon,
+                    goldenBootIcon,
+                    playmakerIcon,
+                    seasonLoserIcon,
+                    seasonMVPIcon,
+                    "customUnsubscribeUrl": "https://thefiveblokes.com/email-subscription-management?emailAddress=" + emailAddress
+                }
+            ),
+            Source: 'fivesoccerblokes@gmail.com', // should be env var
+        };
+    
+        try {
+            response = await ses.sendTemplatedEmail(sendSeasonEmailParams).promise();
+            console.log("Successfully sent season test email to email address " + emailAddress);
+        } catch (error) {
+            console.log("Failed to send email to email address " + emailAddress);
+            console.log(JSON.stringify(error));
+        }
     },
 
     _validateEmail: function(email) {
