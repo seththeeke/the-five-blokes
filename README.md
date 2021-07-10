@@ -2,13 +2,15 @@
 
 # The Five Blokes
 
+The Five Blokes are a group of my closest friends who have been fans, players, officials, and coaches in soccer since high school.
+
 ## The Website
 
 ![The Website GIF](the-five-blokes-mobile-demo.gif)
 
-## FPL Badges and Stats
+### Fantasy PL Data Collection
 
-This [project](https://thefiveblokes.com/) was created to track the history of our fantasy premiere league players, stats, scores, losers, winner, etc. The premiere league fantasy system has an api exposed to fetch league data, player data, transactions, fixtures, and more and this project utilizes them to create a league history, aware preseason, gameweek, season, and other types of badges to track the highs and lows of your season and increase banter.
+Originally, this [project](https://thefiveblokes.com/) was created to track the history of our fantasy premiere league players, stats, scores, losers, winner, etc. The premiere league fantasy system has an api exposed to fetch league data, player data, transactions, fixtures, and more and this project utilizes them to create a league history, aware preseason, gameweek, season, and other types of badges to track the highs and lows of your season and increase banter. You can see the history of our fantasy league from the Fantasy tab on the website.
 
 ## Architecture
 
