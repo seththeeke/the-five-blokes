@@ -25,48 +25,56 @@ class AppNavigation extends React.Component {
         let home = (
             <div id="home" className="nav-button">
                 <HomeIcon fontSize="large" color="primary"></HomeIcon>
+                <div className="nav-item-text">Home</div>
             </div>
         )
         if (this.state.selected === "home") {
             home = (
                 <div id="home" className="nav-button selected">
                     <HomeIcon fontSize="large" color="primary"></HomeIcon>
+                    <div className="nav-item-text">Home</div>
                 </div>
             ) 
         }
         let podcast = (
             <div id="podcast" className="nav-button">
                 <MicIcon fontSize="large" color="primary"></MicIcon>
+                <div className="nav-item-text">Listen</div>
             </div>
         )
         if (this.state.selected === "podcast") {
             podcast = (
                 <div id="podcast" className="nav-button selected">
                     <MicIcon fontSize="large" color="primary"></MicIcon>
+                    <div className="nav-item-text">Listen</div>
                 </div>
             ) 
         }
         let fantasy = (
             <div id="fantasy" className="nav-button">
                 <SportsSoccerIcon fontSize="large" color="primary"></SportsSoccerIcon>
+                <div className="nav-item-text">Fantasy</div>
             </div>
         )
         if (this.state.selected === "fantasy") {
             fantasy = (
                 <div id="fantasy" className="nav-button selected">
                     <SportsSoccerIcon fontSize="large" color="primary"></SportsSoccerIcon>
+                    <div className="nav-item-text">Fantasy PL</div>
                 </div>
             ) 
         }
         let email = (
             <div id="email-subscription-management" className="nav-button">
                 <EmailIcon fontSize="large" color="primary"></EmailIcon>
+                <div className="nav-item-text">Follow</div>
             </div>
         )
         if (this.state.selected === "email-subscription-management") {
             email = (
                 <div id="email-subscription-management" className="nav-button selected">
                     <EmailIcon fontSize="large" color="primary"></EmailIcon>
+                    <div className="nav-item-text">Follow</div>
                 </div>
             ) 
         }

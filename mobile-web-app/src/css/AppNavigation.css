@@ -17,6 +17,11 @@
     height: 10px;
 }
 
+.nav-item-text {
+    text-decoration: none;
+    color: #4051B6;
+}
+
 .selected {
     background-color: white;
 }
