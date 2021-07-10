@@ -42,3 +42,30 @@
     border: 1px solid grey;
     background-color: #d1e0e0;
 }
+
+.follow-the-blokes-text {
+    color: white;
+    font-weight: bolder;
+    font-size: 40px;
+    padding: 10px;
+}
+
+.follow-bloke-container {
+
+}
+
+.head {
+    width: 150px;
+    height: auto;
+}
+
+.bloke-name {
+    font-size: 35px;
+    color: white;
+}
+
+.social-media-logo{
+    width: 30px;
+    height: auto;
+    margin: 5px;
+}

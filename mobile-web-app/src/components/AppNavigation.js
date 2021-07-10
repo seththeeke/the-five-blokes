@@ -60,7 +60,7 @@ class AppNavigation extends React.Component {
             fantasy = (
                 <div id="fantasy" className="nav-button selected">
                     <SportsSoccerIcon fontSize="large" color="primary"></SportsSoccerIcon>
-                    <div className="nav-item-text">Fantasy PL</div>
+                    <div className="nav-item-text">Fantasy</div>
                 </div>
             ) 
         }
