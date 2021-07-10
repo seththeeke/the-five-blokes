@@ -7,6 +7,7 @@ import Home from './Home';
 import EmailSubscriptionManagementPage from './EmailSubscriptionManagementPage';
 import Podcast from './Podcast';
 import Fantasy from './Fantasy';
+import FollowBlokes from './FollowBlokes';
 
 class AppRouter extends React.Component {
     render() {
@@ -31,6 +32,12 @@ class AppRouter extends React.Component {
                             fplService={this.props.fplService}
                         >
                         </Fantasy>
+                    </Route>
+                    <Route path="/follow">
+                        <FollowBlokes
+                            emailSubscriptionService={this.props.emailSubscriptionService}
+                        >
+                        </FollowBlokes>
                     </Route>
                     <Route path="/email-subscription-management">
                         <EmailSubscriptionManagementPage

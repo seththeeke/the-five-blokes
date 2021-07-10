@@ -64,15 +64,15 @@ class AppNavigation extends React.Component {
                 </div>
             ) 
         }
-        let email = (
-            <div id="email-subscription-management" className="nav-button">
+        let follow = (
+            <div id="follow" className="nav-button">
                 <EmailIcon fontSize="large" color="primary"></EmailIcon>
                 <div className="nav-item-text">Follow</div>
             </div>
         )
-        if (this.state.selected === "email-subscription-management") {
-            email = (
-                <div id="email-subscription-management" className="nav-button selected">
+        if (this.state.selected === "follow") {
+            follow = (
+                <div id="follow" className="nav-button selected">
                     <EmailIcon fontSize="large" color="primary"></EmailIcon>
                     <div className="nav-item-text">Follow</div>
                 </div>
@@ -89,8 +89,8 @@ class AppNavigation extends React.Component {
                 <Link to="/fantasy" onClick={this.onLinkClick.bind(this, "fantasy")}>
                     {fantasy}
                 </Link>
-                <Link to="/email-subscription-management" onClick={this.onLinkClick.bind(this, "email-subscription-management")}>
-                    {email}
+                <Link to="/follow" onClick={this.onLinkClick.bind(this, "follow")}>
+                    {follow}
                 </Link>
             </div>
         );
