@@ -18,7 +18,15 @@ exports.addNewLeague = async (event, context) => {
 exports.getAllParticipants = async (event, context) => {
     try {
         console.log(JSON.stringify(event));
-        let response = await lastOfTheMohigansService.getAllParticipants();
+        let response = {};
+        if (event.multiValueQueryStringParameters && event.multiValueQueryStringParameters.leagueId){
+            console.log("Fetching participants based on leagueId: " + event.multiValueQueryStringParameters.leagueId[0]);
+            response = await lastOfTheMohigansService.getGameweekBadgeHistoryForLeague({
+                "leagueId": event.multiValueQueryStringParameters.leagueId[0]
+            });
+        } else {
+            response = await lastOfTheMohigansService.getAllParticipants();
+        }
         return respond(response);
     } catch (err) {
         console.log(err);
@@ -29,7 +37,16 @@ exports.getAllParticipants = async (event, context) => {
 exports.getLatestGameweek = async (event, context) => {
     try {
         console.log(JSON.stringify(event));
-        let response = await lastOfTheMohigansService.getLatestGameweek();
+        let leagueId;
+        if (event.multiValueQueryStringParameters && event.multiValueQueryStringParameters.leagueId) {
+            leagueId = event.multiValueQueryStringParameters.leagueId[0];
+        }
+        let response;
+        if (leagueId) {
+            response = await lastOfTheMohigansService.getLatestGameweek(leagueId);
+        } else {
+            response = await lastOfTheMohigansService.getLatestGameweek();
+        }
         return respond(response);
     } catch (err) {
         console.log(err);
@@ -40,7 +57,26 @@ exports.getLatestGameweek = async (event, context) => {
 exports.getStandingsHistoryForActiveLeague = async (event, context) => {
     try {
         console.log(JSON.stringify(event));
-        let response = await lastOfTheMohigansService.getStandingsHistoryForActiveLeague();
+        let leagueId;
+        if (event.multiValueQueryStringParameters && event.multiValueQueryStringParameters.leagueId) {
+            leagueId = event.multiValueQueryStringParameters.leagueId[0];
+        }
+        if (leagueId) {
+            response = await lastOfTheMohigansService.getStandingsHistoryForActiveLeague(leagueId);
+        } else {
+            response = await lastOfTheMohigansService.getStandingsHistoryForActiveLeague();
+        }
+        return respond(response);
+    } catch (err) {
+        console.log(err);
+        return error(err);
+    }
+}
+
+exports.getAllLeagueDetails = async (event, context) => {
+    try {
+        console.log(JSON.stringify(event));
+        let response = await lastOfTheMohigansService.getAllLeagueDetails();
         return respond(response);
     } catch (err) {
         console.log(err);

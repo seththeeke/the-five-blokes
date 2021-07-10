@@ -1,0 +1,32 @@
+.page-spinner-container {
+    padding: 100px;
+}
+
+.home-container {
+    margin-bottom: 15%;
+}
+
+.grid-container {
+    justify-content: start;
+    text-align: center;
+}
+
+.grid-item {
+    margin: 5px;
+    width: 95%;
+    display: inline-block;
+}
+
+.five-blokes {
+    height: 200px;
+    width: 100%;
+}
+
+.info-icon-container {
+    color: white;
+    float: right;
+}
+
+.info-icon-container:hover {
+    cursor: pointer
+}

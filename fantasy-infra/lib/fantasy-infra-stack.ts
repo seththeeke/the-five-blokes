@@ -9,6 +9,7 @@ import { InitiateLeagueLambda } from './lambda/initiate-league-lambda';
 import { StartingPosition } from '@aws-cdk/aws-lambda';
 import { FantasyLeagueStateMachine } from './step-function/fantasy-league-state-machine';
 import { DataSources, DataSourceMapKeys } from './data/data-stores';
+import { TestEmailsLambda } from './lambda/test/test-emails-lambda';
 
 export class FantasyInfraStack extends cdk.Stack {
 
@@ -141,6 +142,13 @@ export class FantasyInfraStack extends cdk.Stack {
       errorTopic,
       dataSourcesMap: this.dataSources.dataSourcesMap,
       vpc: this.vpc
+    });
+
+    new TestEmailsLambda(this, "TestEmailsLambda", {
+      functionName: "TestEmailsLambda",
+      description: "Controller for sending test emails outside of the state machine",
+      handler: "controller/email-controller.sendTestEmails",
+      mediaAssetsBucket: this.dataSources.dataSourcesMap.s3Buckets[DataSourceMapKeys.MEDIA_ASSET_BUCKET]
     });
   }
 }

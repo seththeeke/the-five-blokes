@@ -1,0 +1,76 @@
+.App {
+  text-align: center;
+  background-color: #1E253F;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #1E253F;
+  /*padding accounts for bottom menu, preventing content being hidden*/
+  padding-bottom: 70px;
+}
+
+button {
+  font-size: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+button:focus {
+  outline: none;
+}
+
+input:focus {
+  outline: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.icon-button {
+  border: none;
+  cursor: pointer;
+}
+
+.icon{
+  padding: 15px;
+  height: 40px;
+  width: 40px;
+}
+
+table {
+  display: inline-table;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 15px;
+  width:100%;
+}
+
+th {
+  padding: 2px;
+  padding-left: 5px;
+}
+
+td {
+  padding: 2px;
+  padding-left: 5px;
+}
+
+.header-row {
+  background-color: #8CACFD;
+  color: white;
+}
+
+.body-row {
+  background-color: white;
+  color: #505050;
+}
+
+.window-size-warning {
+  background-color: #ffffcc;
+  border: 1px solid #ffff33;
+}

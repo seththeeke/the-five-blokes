@@ -1,0 +1,41 @@
+.gameweek-badges-container {
+    width: 100%;
+}
+
+.gameweek-badges-title-container {
+    /* background-color: #2fab95; */
+    background-color: #8CACFD;
+    color: white;
+    font-weight: bold;
+    text-align: left;
+    padding: 10px;
+}
+
+.gameweek-badge-container {
+    margin: 5px;
+    border-bottom: 1px solid darkgray;
+    width: 100%;
+}
+
+.gameweek-badge-list {
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+.gameweek-badges-wrapper {
+    background-color: white;
+}
+
+.awarded-to-container {
+    padding: 5px;
+    font-size: 14px;
+    color: gray;
+}
+
+ul {
+    padding: 0;
+}
+
+.list-subheader {
+    background-color: white;
+}

@@ -1,0 +1,10 @@
+.badge-center-container {
+    color: black;
+    display: inline-flex;
+    align-items: center;
+    padding: 5px
+}
+
+.badge-type-container {
+    padding-left: 5px;
+}

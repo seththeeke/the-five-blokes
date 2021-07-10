@@ -1,0 +1,20 @@
+.standings-title-container {
+    /* background-color: #2fab95; */
+    background-color: #8CACFD;
+    color: white;
+    font-weight: bold;
+    text-align: left;
+    padding: 10px;
+}
+
+.standings-chart {
+    width: 100%;
+    background-color: white;
+}
+
+@media only screen and (min-device-width : 320px) 
+and (max-device-width : 667px) {
+    .standings-chart {
+       width: 95vw;
+    }
+}

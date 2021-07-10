@@ -1,0 +1,27 @@
+.nav-wrapper {
+    position:fixed;
+    left:0px;
+    bottom:0px;
+    width:100%;
+    /* background: #00332a; */
+    background-color: #8CACFD;
+}
+
+.nav-button {
+    display: inline-block;
+    width: 20%;
+    padding: 0.4em;
+}
+
+.nav-button-icon {
+    height: 10px;
+}
+
+.nav-item-text {
+    text-decoration: none;
+    color: #4051B6;
+}
+
+.selected {
+    background-color: white;
+}

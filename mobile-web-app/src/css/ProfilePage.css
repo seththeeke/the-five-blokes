@@ -1,0 +1,61 @@
+.profile-wrapper {
+    border: 1px solid black;
+    display: inline-block;
+    /* background-color: #054a3e; */
+    background-color: #8CACFD;
+    color: white;
+    text-align: left;
+}
+
+.main-profile-container {
+    padding: 5px;
+}
+
+.short-info-container {
+    display: inline-block;
+    float: left;
+    text-align: center;
+}
+
+.short-name-container {
+    font-size: 30px;
+    background-color: darkgrey;
+    color: grey;
+    border-radius: 50px;
+    padding: 25px;
+}
+
+.player-info-container {
+    display: inline-block;
+    padding: 5px;
+}
+
+.player-name-container {
+    font-size: 25px;
+}
+
+.subtitle-container {
+    font-size: 12px;
+}
+
+.badges-container {
+    background-color: white;
+}
+
+.badge-container {
+    color: black;
+    display: inline-flex;
+    align-items: center;
+    padding: 5px
+}
+
+.badge {
+    height: 25px;
+    width: auto;
+}
+
+.badge-counter-container {
+    color: darkgray;
+    padding: 5px;
+    font-size: 10px;
+}

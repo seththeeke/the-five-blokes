@@ -1,10 +1,20 @@
-# FPL Badges and Stats
+![The Five Blokes](five-blokes-sample.png)
 
-This [project](https://lastofthemohigans.com/) was created to track the history of our fantasy premiere league players, stats, scores, losers, winner, etc. The premiere league fantasy system has an api exposed to fetch league data, player data, transactions, fixtures, and more and this project utilizes them to create a league history, aware preseason, gameweek, season, and other types of badges to track the highs and lows of your season and increase banter.
+# The Five Blokes
+
+The Five Blokes are a group of my closest friends who have been fans, players, officials, and coaches in soccer since high school.
+
+## The Website
+
+![The Website GIF](the-five-blokes-mobile-demo.gif)
+
+### Fantasy PL Data Collection
+
+Originally, this [project](https://thefiveblokes.com/) was created to track the history of our fantasy premiere league players, stats, scores, losers, winner, etc. The premiere league fantasy system has an api exposed to fetch league data, player data, transactions, fixtures, and more and this project utilizes them to create a league history, aware preseason, gameweek, season, and other types of badges to track the highs and lows of your season and increase banter. You can see the history of our fantasy league from the Fantasy tab on the website.
 
 ## Architecture
 
-This architecture, like many others I've made utilizes serverless tech as much as possible, primarily to save on cost to keep me in the free tier rather than optimize for performance. It follows a basic ETL process using AWS Step Functions, Lambda, Dynamo, and Aurora MySQL to collect data each week. The website is a basic 3-tier architecture made of a React website hosted in S3 behind a Cloudfront distribution.
+This architecture, like many others I've made utilizes serverless tech as much as possible, primarily to save on cost to keep me in the free tier rather than optimize for performance. It follows a basic ETL process using AWS Step Functions, Lambda, Dynamo, and Aurora MySQL to collect data each week. The website is a basic 3-tier architecture made of a React website hosted in S3 behind a Cloudfront distribution. Adding a new league is currently a manual process by scraping the leagueId from the console on draft.fantasy.com and then adding it through an addLeagueLambda.
 
 ![Architecture Image From DrawIO](fantasy-premier-league-v3.png)
 
@@ -87,7 +97,7 @@ cd $BASE_DIR/web-app
 sam build
 sam deploy
 npm run-script build
-aws s3 sync build/ s3://lastofthemohigans.com --acl public-read --profile lotm
+aws s3 sync build/ s3://thefiveblokes.com --acl public-read --profile lotm
 ```
 
 Note: You must have appropriate access and secret keys setup on your machine for the AWS account

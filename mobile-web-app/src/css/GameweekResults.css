@@ -1,0 +1,12 @@
+.results-container {
+    width: 100%;
+}
+
+.gameweek-results-wrapper {
+    font-size: 0.1em;
+}
+
+.gameweek-results-player-container {
+    font-weight: bold;
+    text-align: left;
+}
