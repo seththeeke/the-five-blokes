@@ -1,10 +1,11 @@
 import React from 'react';
-import './../css/Fantasy.css';
+import './../../css/Fantasy.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import GameweekResults from './GameweekResults';
-import TheBoys from './TheBoys';
-import Standings from "./Standings";
-import GameweekBadges from './GameweekBadges';
+import GameweekResults from './../widgets/GameweekResults';
+import TheBoys from './../widgets/TheBoys';
+import Standings from "./../widgets/Standings";
+import GameweekBadges from './../widgets/GameweekBadges';
+import LeagueChampions from './../widgets/LeagueChampions';
 
 class Fantasy extends React.Component {
    constructor(props){
@@ -67,15 +68,19 @@ class Fantasy extends React.Component {
             </div>
             <div hidden={this.state.isLoadingWebsite}>
                <div className="grid-container">
+                     <div className="grid-item">
+                        <LeagueChampions
+                           fplService={this.props.fplService}
+                           leagueId={this.state.leagueId}
+                        >
+                        </LeagueChampions>
+                    </div>
                     <div className="grid-item">
                         <TheBoys
                             fplService={this.props.fplService}
                         >
                         </TheBoys>
                     </div>
-                    {/* <div className="grid-item">
-                        <LeagueHistory></LeagueHistory>
-                    </div> */}
                     <div className="grid-item">
                         <GameweekBadges
                            fplService={this.props.fplService}

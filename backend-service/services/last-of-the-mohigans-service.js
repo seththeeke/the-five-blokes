@@ -1,6 +1,7 @@
 var badgesDao = require('./../dao/badges-dao');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');
+var BADGE_TYPE = require('./../util/badge-type');
 
 /**
  * Api for lastofthemohigans.com, should only consume data from normalized data stores rather than query the FPL Service. 
@@ -114,5 +115,14 @@ module.exports = {
     getAllLeagueDetails: async function() {
         let allLeagueDetails = await leagueDetailsDao.getAllLeagueDetails();
         return allLeagueDetails;
+    },
+
+    getLeagueChampions: async function() {
+        let allLeagueDetails = await this.getAllLeagueDetails();
+        let champions = await badgesDao.getAllBadgesByType(BADGE_TYPE.SEASON_CHAMPION);
+        return {
+            allLeagueDetails,
+            champions
+        }
     }
 }

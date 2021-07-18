@@ -1,5 +1,5 @@
 import React from 'react';
-import './../css/Standings.css';
+import './../../css/Standings.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Chart from 'react-apexcharts'
 

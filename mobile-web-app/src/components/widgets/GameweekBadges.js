@@ -1,8 +1,8 @@
 import React from 'react';
-import './../css/GameweekBadges.css';
+import './../../css/GameweekBadges.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Badge from './Badge';
-import IconService from '../services/IconService';
+import IconService from '../../services/IconService';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListSubheader from '@material-ui/core/ListSubheader';
@@ -138,22 +138,22 @@ class GameweekBadges extends React.Component {
                     </div>
                 </div>
                 <Modal
-                aria-labelledby="transition-modal-title"
-                aria-describedby="transition-modal-description"
-                open={this.state.legendOpen}
-                onClose={this.toggleLegend}
-                closeAfterTransition
-                BackdropComponent={Backdrop}
-                BackdropProps={{
-                    timeout: 500,
-                }}
-            >
-                <Fade in={this.state.legendOpen}>
-                    <div className="badge-legend-container" style={this.state.legendOpen ? {} : { display: 'none' }}>
-                        <BadgeLegend></BadgeLegend>
-                    </div>
-                </Fade>
-            </Modal>
+                    aria-labelledby="transition-modal-title"
+                    aria-describedby="transition-modal-description"
+                    open={this.state.legendOpen}
+                    onClose={this.toggleLegend}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                        timeout: 500,
+                    }}
+                >
+                    <Fade in={this.state.legendOpen}>
+                        <div className="badge-legend-container" style={this.state.legendOpen ? {} : { display: 'none' }}>
+                            <BadgeLegend></BadgeLegend>
+                        </div>
+                    </Fade>
+                </Modal>
             </div>
         );
     }

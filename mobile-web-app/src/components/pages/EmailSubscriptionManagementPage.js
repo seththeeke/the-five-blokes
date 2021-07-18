@@ -1,6 +1,6 @@
 import React from 'react';
-import './../css/EmailSubscriptionManagement.css';
-import EmailManagementWidget from './EmailManagementWidget';
+import './../../css/EmailSubscriptionManagement.css';
+import EmailManagementWidget from './../widgets/EmailManagementWidget';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 class EmailSubscriptionManagementPage extends React.Component {

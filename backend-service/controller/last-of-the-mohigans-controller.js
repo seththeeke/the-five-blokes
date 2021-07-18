@@ -84,6 +84,17 @@ exports.getAllLeagueDetails = async (event, context) => {
     }
 }
 
+exports.getAllChampions = async (event, context) => {
+    try {
+        console.log(JSON.stringify(event));
+        let response = await lastOfTheMohigansService.getLeagueChampions();
+        return respond(response);
+    } catch (err) {
+        console.log(err);
+        return error(err);
+    }
+}
+
 function respond(responseData){
     return {
         'statusCode': 200,

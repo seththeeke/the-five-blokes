@@ -1,10 +1,11 @@
 import React from 'react';
-import './../css/Podcast.css';
+import './../../css/Home.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { TwitterTimelineEmbed } from 'react-twitter-embed';
-import theFiveBlokes from './../img/faces-WIP-removebg-preview.png';
+import EmailManagementWidget from './../widgets/EmailManagementWidget';
+import fiveBlokes from "../../img/morgantown-view.jpg";
+import TheBoys from './../widgets/TheBoys';
 
-class Podcast extends React.Component {
+class Home extends React.Component {
    constructor(props){
       super(props);
       this.state = {
@@ -36,18 +37,24 @@ class Podcast extends React.Component {
             </div>
             <div hidden={this.state.isLoadingWebsite}>
                <div className="grid-container">
-                  <img className="the-five-blokes-heads" src={theFiveBlokes} alt="five-blokes-logo"></img>
+                  {/* <div className="grid-item">
+                     <img className="five-blokes" alt="logo" src={fiveBlokes}></img>
+                  </div> */}
                   <div className="grid-item">
                      <iframe title="spotify" src="https://open.spotify.com/embed-podcast/show/7Hw0EJXJE2Zmi4pZ13aehl" width="100%" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe>
                   </div>
-                  {/* <div className="grid-item">
-                     <div className="twitter-embed-wrapper">
-                        <TwitterTimelineEmbed
-                           sourceType="profile"
-                           screenName="blokesfive"
-                        />
-                     </div>
-                  </div> */}
+                  <div className="grid-item">
+                     <TheBoys
+                        fplService={this.props.fplService}
+                     >
+                     </TheBoys>
+                  </div>
+                  <div className="grid-item">
+                     <EmailManagementWidget
+                        emailSubscriptionService={this.props.emailSubscriptionService}
+                     >
+                     </EmailManagementWidget>
+                  </div>
                </div>
             </div>
          </div>
@@ -55,4 +62,4 @@ class Podcast extends React.Component {
    }
 }
 
-export default Podcast;
+export default Home;

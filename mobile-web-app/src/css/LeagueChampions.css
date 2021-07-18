@@ -1,0 +1,14 @@
+.trophy-room-container {
+  display: inline-block;
+  background-color: #1E253F;
+  border: 1px solid black;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  outline: none;
+  border: 1px solid black;
+  display: inline-block;
+  text-align: left;
+  width: 90%;
+}

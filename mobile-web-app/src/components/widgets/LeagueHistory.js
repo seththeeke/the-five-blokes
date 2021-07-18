@@ -1,7 +1,7 @@
 import React from 'react';
-import './../css/LeagueHistory.css';
-import nathanVid from '../vid/Nathan-2019.mov';
-import evan2019 from '../img/2019-evan.jpg';
+import './../../css/LeagueHistory.css';
+import nathanVid from '../../vid/Nathan-2019.mov';
+import evan2019 from '../../img/2019-evan.jpg';
 
 class LeagueHistory extends React.Component {
     render() {

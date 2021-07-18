@@ -1,5 +1,5 @@
 import React from 'react';
-import './../css/GameweekResults.css';
+import './../../css/GameweekResults.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 class GameweekResults extends React.Component {

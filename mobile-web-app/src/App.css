@@ -17,6 +17,9 @@ button {
   text-decoration: none;
   padding: 10px;
   border-radius: 20px;
+  background-color: #8CACFD;
+  border: none;
+  color: white;
 }
 
 button:focus {

@@ -10,6 +10,7 @@ class FPLService {
     this.gameweekHistoryCache = undefined;
     this.gameweekHistoryLeagueIdCache = {};
     this.leagueDetailsCache = undefined;
+    this.championsCache = undefined;
   }
 
   /**
@@ -88,10 +89,19 @@ class FPLService {
 
   getAllLeagueDetails() {
     if (this.leagueDetailsCache){
+      console.log(this.leagueDetailsCache);
       return this.leagueDetailsCache;
     }
     this.leagueDetailsCache = this.amplifyRequestService.request(this.apiName, '/league-details', "GET");
     return this.leagueDetailsCache;
+  }
+
+  getLeagueChampions() {
+    if (this.championsCache){
+      return this.championsCache;
+    }
+    this.championsCache = this.amplifyRequestService.request(this.apiName, '/champions', "GET");
+    return this.championsCache;
   }
 
 }
