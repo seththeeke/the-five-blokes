@@ -1,7 +1,7 @@
 import React from 'react';
-import './../css/ProfilePage.css';
+import './../../css/ProfilePage.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import IconService from '../services/IconService.js';
+import IconService from '../../services/IconService.js';
 import Badge from './Badge';
 import StarRateIcon from '@material-ui/icons/StarRate';
 

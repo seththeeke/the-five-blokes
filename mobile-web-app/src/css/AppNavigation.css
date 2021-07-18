@@ -3,7 +3,7 @@
     left:0px;
     bottom:0px;
     width:100%;
-    /* background: #00332a; */
+    z-index: 2;
     background-color: #8CACFD;
 }
 

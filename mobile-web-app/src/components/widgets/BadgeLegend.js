@@ -1,6 +1,6 @@
 import React from 'react';
-import './../css/BadgeLegend.css';
-import IconService from '../services/IconService.js';
+import './../../css/BadgeLegend.css';
+import IconService from '../../services/IconService.js';
 import Badge from './Badge';
 
 class BadgeLegend extends React.Component {

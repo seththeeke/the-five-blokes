@@ -1,5 +1,5 @@
 import React from 'react';
-import './../css/TheBoys.css';
+import './../../css/TheBoys.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ProfilePage from './ProfilePage';
 import Modal from '@material-ui/core/Modal';

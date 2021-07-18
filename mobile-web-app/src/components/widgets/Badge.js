@@ -1,5 +1,5 @@
 import React from 'react';
-import './../css/Badge.css';
+import './../../css/Badge.css';
 import Tooltip from '@material-ui/core/Tooltip';
 
 class Badge extends React.Component {

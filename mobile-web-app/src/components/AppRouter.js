@@ -3,11 +3,11 @@ import {
   Switch,
   Route
 } from "react-router-dom";
-import Home from './Home';
-import EmailSubscriptionManagementPage from './EmailSubscriptionManagementPage';
-import Podcast from './Podcast';
-import Fantasy from './Fantasy';
-import FollowBlokes from './FollowBlokes';
+import Home from './pages/Home';
+import EmailSubscriptionManagementPage from './pages/EmailSubscriptionManagementPage';
+import Podcast from './pages/Podcast';
+import Fantasy from './pages/Fantasy';
+import FollowBlokes from './pages/FollowBlokes';
 
 class AppRouter extends React.Component {
     render() {

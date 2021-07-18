@@ -1,15 +1,15 @@
 import React from 'react';
-import './../css/FollowBlokes.css';
-import EmailManagementWidget from './EmailManagementWidget';
+import './../../css/FollowBlokes.css';
+import EmailManagementWidget from './../widgets/EmailManagementWidget';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import nateHead from './../img/nate-head.png';
-import sethHead from './../img/seth-head.png';
-import evanHead from './../img/evan-head.png';
-import amineHead from './../img/amine-head.png';
-import nimaHead from './../img/nima-head.png';
-import instagram from './../img/instagram.png';
-import facebook from './../img/facebook.png';
-import linkedin from './../img/linkedin.png';
+import nateHead from './../../img/nate-head.png';
+import sethHead from './../../img/seth-head.png';
+import evanHead from './../../img/evan-head.png';
+import amineHead from './../../img/amine-head.png';
+import nimaHead from './../../img/nima-head.png';
+import instagram from './../../img/instagram.png';
+import facebook from './../../img/facebook.png';
+import linkedin from './../../img/linkedin.png';
 
 class FollowBlokes extends React.Component {
     constructor(props){
