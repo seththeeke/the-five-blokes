@@ -7,9 +7,7 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import { AddNewLeagueLambda } from './lambda/add-new-league-lambda';
 import { InitiateLeagueLambda } from './lambda/initiate-league-lambda';
 import { StartingPosition } from '@aws-cdk/aws-lambda';
-import { FantasyLeagueStateMachine } from './step-function/fantasy-league-state-machine';
 import { DataSources, DataSourceMapKeys } from './data/data-stores';
-import { TestEmailsLambda } from './lambda/test/test-emails-lambda';
 
 export class FantasyInfraStack extends cdk.Stack {
 
@@ -99,6 +97,16 @@ export class FantasyInfraStack extends cdk.Stack {
     const staticContentBucket = new s3.Bucket(this, "StaticContentBucket");
     const mediaAssetsBucket = new s3.Bucket(this, "MediaAssetsBucket");
 
+    const gameweekCompletedTopic = new sns.Topic(this, "GameweekCompletedTopic", {
+      topicName: "GameweekCompletedTopic"
+    });
+    const seasonCompletedTopic = new sns.Topic(this, "SeasonCompletedTopic", {
+      topicName: "SeasonCompletedTopic"
+    });
+    const errorTopic = new sns.Topic(this, "ErrorTopic", {
+      topicName: "ErrorTopic"
+    });
+
     // Global data sources so I don't have to pass individual databases and tables into sub-constructs
     this.dataSources = new DataSources(this, "FantasyInfraDataSources", {
       vpc: this.vpc,
@@ -108,17 +116,10 @@ export class FantasyInfraStack extends cdk.Stack {
       gameweekPlayerHistoryTable,
       staticContentBucket,
       mediaAssetsBucket,
-      emailSubscriptionTable
-    });
-
-    const gameweekCompletedTopic = new sns.Topic(this, "GameweekCompletedTopic", {
-      topicName: "GameweekCompletedTopic"
-    });
-    const seasonCompletedTopic = new sns.Topic(this, "SeasonCompletedTopic", {
-      topicName: "SeasonCompletedTopic"
-    });
-    const errorTopic = new sns.Topic(this, "ErrorTopic", {
-      topicName: "ErrorTopic"
+      emailSubscriptionTable,
+      gameweekCompletedTopic,
+      seasonCompletedTopic,
+      errorTopic
     });
 
     const addNewLeagueLambda = new AddNewLeagueLambda(this, "AddNewLeagueLambda", {
@@ -135,20 +136,5 @@ export class FantasyInfraStack extends cdk.Stack {
       retryAttempts: 5
     });
     leagueDetailsStreamEventSource.bind(initiateLeagueLambda);
-
-    const fantasyLeagueStateMachine = new FantasyLeagueStateMachine(this, "GameweekProcessing", {
-      gameweekCompletedTopic,
-      seasonCompletedTopic,
-      errorTopic,
-      dataSourcesMap: this.dataSources.dataSourcesMap,
-      vpc: this.vpc
-    });
-
-    new TestEmailsLambda(this, "TestEmailsLambda", {
-      functionName: "TestEmailsLambda",
-      description: "Controller for sending test emails outside of the state machine",
-      handler: "controller/email-controller.sendTestEmails",
-      mediaAssetsBucket: this.dataSources.dataSourcesMap.s3Buckets[DataSourceMapKeys.MEDIA_ASSET_BUCKET]
-    });
   }
 }

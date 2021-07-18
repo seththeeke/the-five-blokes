@@ -3,6 +3,7 @@ import * as ddb from '@aws-cdk/aws-dynamodb';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as rds from '@aws-cdk/aws-rds';
+import * as sns from '@aws-cdk/aws-sns';
 import { RemovalPolicy } from '@aws-cdk/core';
 
 export interface DataSourcesProps {
@@ -16,6 +17,9 @@ export interface DataSourcesProps {
     staticContentBucket: s3.Bucket;
     mediaAssetsBucket: s3.Bucket;
     emailSubscriptionTable: ddb.Table;
+    gameweekCompletedTopic: sns.Topic;
+    seasonCompletedTopic: sns.Topic;
+    errorTopic: sns.Topic;
 }
 export class DataSourcesMap {
     ddbTables: {
@@ -27,10 +31,14 @@ export class DataSourcesMap {
     rdsClusters: {
         [key: string]: rds.ServerlessCluster;
     }
+    topics: {
+        [key: string]: sns.Topic;
+    }
     constructor(){
         this.ddbTables = {};
         this.s3Buckets = {};
         this.rdsClusters = {};
+        this.topics = {};
     }
 }
 export const DataSourceMapKeys = {
@@ -43,6 +51,9 @@ export const DataSourceMapKeys = {
     MEDIA_ASSET_BUCKET: "MediaAssetsBucket",
     PREMIER_LEAGUE_RDS_CLUSTER: "PremierLeagueRDSCluster",
     FANTASY_TRANSACTIONS_TABLE: "FantasyTransactions",
+    GAMEWEEK_COMPLETED_TOPIC: "GameweekCompletedTopic",
+    SEASON_COMPLETED_TOPIC: "SeasonCompletedTopic",
+    ERROR_TOPIC: "ErrorTopic",
 }
 export class DataSources extends cdk.Construct {
 
@@ -58,6 +69,9 @@ export class DataSources extends cdk.Construct {
         this.dataSourcesMap.ddbTables[DataSourceMapKeys.EMAIL_SUBSCRIPTIONS_TABLE] = props.emailSubscriptionTable;
         this.dataSourcesMap.s3Buckets[DataSourceMapKeys.MEDIA_ASSET_BUCKET] = props.mediaAssetsBucket;
         this.dataSourcesMap.s3Buckets[DataSourceMapKeys.STATIC_CONTENT_BUCKET] = props.staticContentBucket;
+        this.dataSourcesMap.topics[DataSourceMapKeys.GAMEWEEK_COMPLETED_TOPIC] = props.gameweekCompletedTopic;
+        this.dataSourcesMap.topics[DataSourceMapKeys.SEASON_COMPLETED_TOPIC] = props.seasonCompletedTopic;
+        this.dataSourcesMap.topics[DataSourceMapKeys.ERROR_TOPIC] = props.errorTopic;
 
         this.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER] = new rds.ServerlessCluster(this, "PremierLeagueRDSCluster", {
             engine: rds.DatabaseClusterEngine.auroraMysql({ version: rds.AuroraMysqlEngineVersion.VER_5_7_12 }),

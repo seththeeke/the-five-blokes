@@ -1,9 +1,12 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as c9 from '@aws-cdk/aws-cloud9';
+import { TestEmailsLambda } from './lambda/test/test-emails-lambda';
+import { DataSources, DataSourceMapKeys } from './data/data-stores';
 
 export interface DevelopmentResourcesStackProps extends cdk.StackProps {
     vpc: ec2.Vpc;
+    dataSources: DataSources;
 }
 export class DevelopmentResourcesStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: DevelopmentResourcesStackProps) {
@@ -18,6 +21,13 @@ export class DevelopmentResourcesStack extends cdk.Stack {
     new c9.Ec2Environment(this, "FantasyInfraCloud9Environment", {
         vpc: props.vpc,
         description: "Cloud9 environment to use as Aurora Client"
+    });
+
+    new TestEmailsLambda(this, "TestEmailsLambda", {
+      functionName: "TestEmailsLambdaV2",
+      description: "Controller for sending test emails outside of the state machine",
+      handler: "controller/email-controller.sendTestEmails",
+      mediaAssetsBucket: props.dataSources.dataSourcesMap.s3Buckets[DataSourceMapKeys.MEDIA_ASSET_BUCKET]
     });
   }
 }
