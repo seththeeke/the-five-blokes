@@ -89,7 +89,6 @@ class FPLService {
 
   getAllLeagueDetails() {
     if (this.leagueDetailsCache){
-      console.log(this.leagueDetailsCache);
       return this.leagueDetailsCache;
     }
     this.leagueDetailsCache = this.amplifyRequestService.request(this.apiName, '/league-details', "GET");

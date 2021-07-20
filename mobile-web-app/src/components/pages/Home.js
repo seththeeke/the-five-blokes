@@ -2,7 +2,6 @@ import React from 'react';
 import './../../css/Home.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import EmailManagementWidget from './../widgets/EmailManagementWidget';
-import fiveBlokes from "../../img/morgantown-view.jpg";
 import TheBoys from './../widgets/TheBoys';
 
 class Home extends React.Component {

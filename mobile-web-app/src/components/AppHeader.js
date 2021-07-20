@@ -3,7 +3,7 @@ import {
   Link
 } from "react-router-dom";
 import './../css/AppHeader.css';
-import fiveBlokesLogo from './../img/five-blokes-sample.png';
+import fiveBlokesLogo from './../img/blokes/Blokes-words-transparent-small.png';
 
 class AppHeader extends React.Component {
     render() {

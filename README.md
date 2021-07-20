@@ -1,4 +1,4 @@
-![The Five Blokes](five-blokes-sample.png)
+![The Five Blokes](five-blokes.jpg)
 
 # The Five Blokes
 

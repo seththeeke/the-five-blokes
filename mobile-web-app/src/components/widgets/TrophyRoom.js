@@ -28,7 +28,6 @@ class TrophyRoom extends React.Component {
     }
 
     buildTrophy(champ, allLeagueDetails){
-        console.log(champ);
         // Hack for Evan's first title
         if (champ.id.S.includes("2019")) {
             return (

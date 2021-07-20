@@ -2,7 +2,7 @@ import React from 'react';
 import './../../css/Podcast.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { TwitterTimelineEmbed } from 'react-twitter-embed';
-import theFiveBlokes from './../../img/faces-WIP-removebg-preview.png';
+import theFiveBlokes from './../../img/blokes/Blokes-group-small.jpg';
 
 class Podcast extends React.Component {
    constructor(props){
@@ -36,7 +36,7 @@ class Podcast extends React.Component {
             </div>
             <div hidden={this.state.isLoadingWebsite}>
                <div className="grid-container">
-                  <img className="the-five-blokes-heads" src={theFiveBlokes} alt="five-blokes-logo"></img>
+                  {/* <img className="the-five-blokes-heads" src={theFiveBlokes} alt="five-blokes-logo"></img> */}
                   <div className="grid-item">
                      <iframe title="spotify" src="https://open.spotify.com/embed-podcast/show/7Hw0EJXJE2Zmi4pZ13aehl" width="100%" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe>
                   </div>

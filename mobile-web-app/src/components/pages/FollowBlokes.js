@@ -2,14 +2,14 @@ import React from 'react';
 import './../../css/FollowBlokes.css';
 import EmailManagementWidget from './../widgets/EmailManagementWidget';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import nateHead from './../../img/nate-head.png';
-import sethHead from './../../img/seth-head.png';
-import evanHead from './../../img/evan-head.png';
-import amineHead from './../../img/amine-head.png';
-import nimaHead from './../../img/nima-head.png';
-import instagram from './../../img/instagram.png';
-import facebook from './../../img/facebook.png';
-import linkedin from './../../img/linkedin.png';
+import amineHead from './../../img/blokes/Blokes-avatar-Amine-transparent.png';
+import evanHead from './../../img/blokes/Blokes-avatar-Evan-transparent.png';
+import nateHead from './../../img/blokes/Blokes-avatar-Nathan-transparent.png';
+import nimaHead from './../../img/blokes/Blokes-avatar-Nima-transparent.png';
+import sethHead from './../../img/blokes/Blokes-avatar-Seth-transparent.png';
+import instagram from './../../img/social-media/instagram.png';
+import facebook from './../../img/social-media/facebook.png';
+import linkedin from './../../img/social-media/linkedin.png';
 
 class FollowBlokes extends React.Component {
     constructor(props){
