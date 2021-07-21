@@ -5,3 +5,15 @@
 .the-five-blokes-heads {
     width: 20em;
 }
+
+.merch {
+    width: 300px;
+    height: auto;
+}
+
+.shop-blokes-title {
+    color: white;
+    font-weight: bolder;
+    font-size: 30px;
+    padding: 10px;
+}
