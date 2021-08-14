@@ -45,5 +45,7 @@ module.exports = {
     MOST_CLEAN_SHEETS: "Most Clean Sheets",
     MOST_YELLOW_CARDS: "Most Yellow Cards",
     MOST_RED_CARDS: "Most Red Cards",
-    MOST_BONUS_POINTS: "Most Bonus Points"
+    MOST_BONUS_POINTS: "Most Bonus Points",
+    FIRST_DRAFT_PICK: "First Draft Pick",
+    LAST_DRAFT_PICK: "Last Draft Pick"
 };

@@ -8,6 +8,7 @@ import * as cwActions from '@aws-cdk/aws-cloudwatch-actions';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 import { Duration } from '@aws-cdk/core';
 import { ExtractDraftPicksLambda } from '../lambda/extract-draft-picks-lambda';
+import { AssignDraftPicksBadgesLambda } from '../lambda/assign-draft-picks-badges-lambda';
 
 export interface SeasonStartProcessingStateMachineProps {
     dataSourcesMap: DataSourcesMap;
@@ -16,6 +17,7 @@ export interface SeasonStartProcessingStateMachineProps {
 export class SeasonStartProcessingStateMachine extends cdk.Construct{
 
     extractDraftPicksLambda: lambda.Function;
+    assignDraftPicksBadgesLambda: lambda.Function;
     seasonStartProcessingStateMachine: stepFunctions.StateMachine;
 
     constructor(scope: cdk.Construct, id: string, props: SeasonStartProcessingStateMachineProps) {
@@ -28,6 +30,15 @@ export class SeasonStartProcessingStateMachine extends cdk.Construct{
             comment: "Extracts and stores data the draft picks for the season",
             resultPath: stepFunctions.JsonPath.DISCARD
         });
+
+        const assignDraftPicksBadgesTask = new stepFunctions.Task(this, "AssignDraftPicksBadgesTask", {
+            task: new stepFunctionTasks.InvokeFunction(this.assignDraftPicksBadgesLambda),
+            timeout: cdk.Duration.minutes(20),
+            comment: "Assigns badges related to draft picks",
+            resultPath: stepFunctions.JsonPath.DISCARD
+        });
+
+        extractDraftPicksTask.next(assignDraftPicksBadgesTask);
 
         this.seasonStartProcessingStateMachine = new stepFunctions.StateMachine(this, "SeasonStartProcessingStateMachine", {
             stateMachineName: "SeasonStartProcessingStateMachine",
@@ -50,6 +61,13 @@ export class SeasonStartProcessingStateMachine extends cdk.Construct{
         this.extractDraftPicksLambda = new ExtractDraftPicksLambda(this, "ExtractDraftPicksLambda", {
             draftPicksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.DRAFT_PICKS_TABLE]
         });
+
+        this.assignDraftPicksBadgesLambda = new AssignDraftPicksBadgesLambda(this, "AssignDraftPicksBadgesLambda", {
+            badgeTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.BADGE_TABLE],
+            draftPicksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.DRAFT_PICKS_TABLE],
+            leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE]
+        });
+
     }
 
 }
