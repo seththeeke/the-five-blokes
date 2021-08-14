@@ -43,6 +43,7 @@ export const DataSourceMapKeys = {
     MEDIA_ASSET_BUCKET: "MediaAssetsBucket",
     PREMIER_LEAGUE_RDS_CLUSTER: "PremierLeagueRDSCluster",
     FANTASY_TRANSACTIONS_TABLE: "FantasyTransactions",
+    DRAFT_PICKS_TABLE: "DraftPicks"
 }
 export class DataSources extends cdk.Construct {
 
@@ -64,6 +65,21 @@ export class DataSources extends cdk.Construct {
             vpc: props.vpc,
             removalPolicy: RemovalPolicy.RETAIN,
             deletionProtection: true
+        });
+
+        this.dataSourcesMap.ddbTables[DataSourceMapKeys.DRAFT_PICKS_TABLE] = new ddb.Table(this, "DraftPicksTable", {
+            tableName: "DraftPicks",
+            partitionKey: {
+              name: "id",
+              type: ddb.AttributeType.STRING
+            },
+            stream: ddb.StreamViewType.NEW_AND_OLD_IMAGES,
+            sortKey: {
+              name: "league_id",
+              type: ddb.AttributeType.STRING
+            },
+            pointInTimeRecovery: true,
+            billingMode: ddb.BillingMode.PAY_PER_REQUEST
         });
 
         this.dataSourcesMap.ddbTables[DataSourceMapKeys.FANTASY_TRANSACTIONS_TABLE] = new ddb.Table(this, "FantasyTransactions", {

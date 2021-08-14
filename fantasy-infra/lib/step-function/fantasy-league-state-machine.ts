@@ -14,6 +14,7 @@ import { GameweekProcessingMachine } from './gameweek-processing-machine';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 import { PremiereLeagueRDSDataLambda } from '../lambda/premier-league-rds-data-lambda';
 import { Result, JsonPath, IntegrationPattern } from '@aws-cdk/aws-stepfunctions';
+import { SeasonStartProcessingStateMachine } from './season-start-processing-state-machine';
 
 export interface FantasyLeagueStateMachineProps {
     gameweekCompletedTopic: sns.Topic;
@@ -43,6 +44,10 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
         const hasGameweekCompletedChoice = new stepFunctions.Choice(this, "HasGameweekCompletedChoice", {
             comment: "Checks the hasCompleted flag and if true, sends the state machine towards ETL process"
         });
+
+        const hasSeasonStartedChoice = new stepFunctions.Choice(this, "HasSeasonStartedChoice", {
+            comment: "Checks gameweek and returns true if the gameweek is 1, false otherwise"
+        });
         
         const noGameweekDataPublishTask = new stepFunctionTasks.SnsPublish(this, "NoGameweekDataTask", {
             message: {
@@ -53,6 +58,11 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
             comment: "Publish notification that there is no gameweek data",
             subject: "No Gameweek Data",
             resultPath: stepFunctions.JsonPath.DISCARD
+        });
+
+        const seasonStartProcessingStateMachine = new SeasonStartProcessingStateMachine(this, "SeasonStartProcessingStateMachine", {
+            errorTopic: props.errorTopic,
+            dataSourcesMap: props.dataSourcesMap
         });
 
         const gameweekCompletedStateMachine = new GameweekProcessingMachine(this, "GameweekProcessingStateMachine", {
@@ -105,14 +115,25 @@ export class FantasyLeagueStateMachine extends cdk.Construct{
             resultPath: JsonPath.DISCARD
         });
 
+        const seasonStartProcessingStateMachineExecution = new stepFunctionTasks.StepFunctionsStartExecution(this, "SeasonStartProcessingStateMachineTask", {
+            stateMachine: seasonStartProcessingStateMachine.seasonStartProcessingStateMachine,
+            resultPath: stepFunctions.JsonPath.DISCARD,
+            integrationPattern: IntegrationPattern.RUN_JOB
+        });
+
         const gameweekProcessingStateMachineExecution = new stepFunctionTasks.StepFunctionsStartExecution(this, "GameweekProcessingStateMachineTask", {
             stateMachine: gameweekCompletedStateMachine.gameweekProcessingStateMachine,
             resultPath: stepFunctions.JsonPath.DISCARD,
             integrationPattern: IntegrationPattern.RUN_JOB
         });
         hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", true), rdsWarmingTask);
-        rdsWarmingTask.next(gameweekProcessingStateMachineExecution);
         hasGameweekCompletedChoice.when(stepFunctions.Condition.booleanEquals("$.hasCompleted", false), noGameweekDataPublishTask);
+
+        rdsWarmingTask.next(hasSeasonStartedChoice);
+        hasSeasonStartedChoice.when(stepFunctions.Condition.stringEquals("$.gameweek", "1"), seasonStartProcessingStateMachineExecution);
+        hasSeasonStartedChoice.when(stepFunctions.Condition.not(stepFunctions.Condition.stringEquals("$.gameweek", "1")), gameweekProcessingStateMachineExecution);
+        seasonStartProcessingStateMachineExecution.next(gameweekProcessingStateMachineExecution);
+        
         gameweekProcessingStateMachineExecution.next(hasSeasonCompletedChoice);
         const hasSeasonCompletedCondition = stepFunctions.Condition.or(
             stepFunctions.Condition.stringEquals("$.gameweek", "38"),

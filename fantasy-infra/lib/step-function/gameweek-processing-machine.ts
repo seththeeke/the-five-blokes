@@ -41,6 +41,7 @@ export class GameweekProcessingMachine extends cdk.Construct{
     gameweekBadgeLambdas: lambda.Function[];
     gameweekProcessingCompletedEmailLambda: lambda.Function;
     gameweekProcessingStateMachine: stepFunctions.StateMachine;
+    draftPicksLambda: lambda.Function;
 
     constructor(scope: cdk.Construct, id: string, props: GameweekProcessingMachineProps) {
         super(scope, id);
