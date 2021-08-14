@@ -45,6 +45,8 @@ import mostGoals from "../img/badges/most-goals.png";
 import mostAssists from "../img/badges/most-assists.png";
 import mostCleanSheets from "../img/badges/most-clean-sheets.png";
 import mostBonusPoints from "../img/badges/most-bonus.png";
+import firstPickIcon from "../img/badges/first-pick-icon.png";
+import lastPickIcon from "../img/badges/last-pick-icon.png";
 
 class IconService {
     constructor() {
@@ -275,6 +277,16 @@ class IconService {
           icon: dreamteamPlayer,
           badgeType: "Dreamteam Player",
           description: "Given to the player who picks a player who earns at spot on the dreamteam of the year"
+        },
+        {
+          icon: firstPickIcon,
+          badgeType: "First Draft Pick",
+          description: "Given to the player who is given the first pick in a draft"
+        },
+        {
+          icon: lastPickIcon,
+          badgeType: "Last Draft Pick",
+          description: "Given to the player who is given the last pick in a draft"
         }
       ]
       this.allIcons = [];
