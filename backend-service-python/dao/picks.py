@@ -1,4 +1,5 @@
 import boto3
+import os
 
 class DraftPicksDao:
     def __init__(self):

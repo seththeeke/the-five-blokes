@@ -24,8 +24,9 @@ class DraftPicksService:
                     choice["element_type"] = element["element_type"]
                     choice["team_id"] = element["team"]
                     choice["team_name"] = self._get_team_name(element["team"], teams)
-                    choice["league_id"] = league_id
-                    choices_with_metadata.append(choice)
+                    choice["league_id"] = str(league_id)
+                    choice["id"] = str(choice["id"])
+                    draftPicksDao.upsert_draft_pick(choice)
         return choices_with_metadata
         
     def _get_team_name(self, team_id, teams):
