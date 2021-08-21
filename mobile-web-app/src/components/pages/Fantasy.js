@@ -6,6 +6,7 @@ import TheBoys from './../widgets/TheBoys';
 import Standings from "./../widgets/Standings";
 import GameweekBadges from './../widgets/GameweekBadges';
 import LeagueChampions from './../widgets/LeagueChampions';
+import DraftRoom from './../widgets/DraftRoom';
 
 class Fantasy extends React.Component {
    constructor(props){
@@ -25,11 +26,15 @@ class Fantasy extends React.Component {
    componentDidMount(){
       this.props.fplService.getAllLeagueDetails().then(function(response){
          let leagueDetails = response.data.Items;
+         let sortedDetails = leagueDetails.sort(function(a,b){
+            return parseInt(b.year.S) - parseInt(a.year.S);
+         });
          let options = [];
+         console.log(leagueDetails);
          // Need to change this to be the latest by default
-         let selection = leagueDetails[0]
-         for (let i in leagueDetails) {
-            let league = leagueDetails[i];
+         let selection = sortedDetails[0]
+         for (let i in sortedDetails) {
+            let league = sortedDetails[i];
             options.push(
                <option key={league.year.S} id={league.year.S} value={league.leagueId.S}>{league.year.S}</option>
             )
@@ -101,6 +106,13 @@ class Fantasy extends React.Component {
                            leagueId={this.state.leagueId}
                         >
                         </Standings>
+                    </div>
+                    <div className="grid-item">
+                        <DraftRoom
+                           fplService={this.props.fplService}
+                           leagueId={this.state.leagueId}
+                        >
+                        </DraftRoom>
                     </div>
                </div>
             </div>

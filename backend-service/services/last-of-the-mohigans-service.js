@@ -1,6 +1,7 @@
 var badgesDao = require('./../dao/badges-dao');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');
+var draftPicksDao = require('./../dao/draft-picks-dao');
 var BADGE_TYPE = require('./../util/badge-type');
 
 /**
@@ -124,5 +125,10 @@ module.exports = {
             allLeagueDetails,
             champions
         }
+    },
+
+    getDraftPicksForLeagueId: async function(leagueId){
+        let draftPicks = await draftPicksDao.getDraftPicksForLeagueId(leagueId);
+        return draftPicks;
     }
 }

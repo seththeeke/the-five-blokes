@@ -11,6 +11,7 @@ import { UnSubscribeEmailLambda } from '../lambda/unsubscribe-email-lambda';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 import { GetAllLeagueDetailsLambda } from '../lambda/get-all-league-details-lambda';
 import { GetAllChampionsLambda } from '../lambda/get-all-champions-lambda';
+import { GetDraftPicksLambda } from '../lambda/get-draft-picks-lambda';
 
 export interface LastOfTheMohigansRestServiceProps {
     shouldUseDomainName?: boolean;
@@ -49,6 +50,7 @@ export class LastOfTheMohigansRestService extends cdk.Construct {
     const emailsResource = fantasyApiGateway.root.addResource('emails');
     const leagueDetailsResource = fantasyApiGateway.root.addResource('league-details');
     const championsResource = fantasyApiGateway.root.addResource('champions');
+    const draftPicksResource = fantasyApiGateway.root.addResource('draft-picks');
 
     const getAllParticipantsLambda = new GetAllParticipantsLambda(this, "GetAllParticipantsLambda", {
         leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
@@ -95,5 +97,11 @@ export class LastOfTheMohigansRestService extends cdk.Construct {
     });
     const getAllChampionsIntegration = new apigateway.LambdaIntegration(getAllChampionsLambda);
     championsResource.addMethod('GET', getAllChampionsIntegration);
+
+    const getDraftPicksLambda = new GetDraftPicksLambda(this, "GetDraftPicksLambda", {
+      draftPicksTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.DRAFT_PICKS_TABLE]
+    });
+    const getDraftPicksIntegration = new apigateway.LambdaIntegration(getDraftPicksLambda);
+    draftPicksResource.addMethod('GET', getDraftPicksIntegration);
   }
 }
