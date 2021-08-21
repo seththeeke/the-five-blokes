@@ -6,7 +6,7 @@ The Five Blokes are a group of my closest friends who have been fans, players, o
 
 ## The Website
 
-![The Website GIF](the-five-blokes-mobile-demo.gif)
+![The Website GIF](mobile-demo.gif)
 
 ### Fantasy PL Data Collection
 
