@@ -95,6 +95,22 @@ exports.getAllChampions = async (event, context) => {
     }
 }
 
+exports.getDraftPicksForLeagueId = async (event, context) => {
+    try {
+        console.log(JSON.stringify(event));
+        let leagueId;
+        if (event.multiValueQueryStringParameters && event.multiValueQueryStringParameters.leagueId) {
+            leagueId = event.multiValueQueryStringParameters.leagueId[0];
+            response = await lastOfTheMohigansService.getDraftPicksForLeagueId(leagueId);
+            return respond(response);
+        }
+        throw new Error("leagueId is a required parameter");
+    } catch (err) {
+        console.log(err);
+        return error(err);
+    }
+}
+
 function respond(responseData){
     return {
         'statusCode': 200,
