@@ -12,6 +12,7 @@ import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
 import { GetAllLeagueDetailsLambda } from '../lambda/get-all-league-details-lambda';
 import { GetAllChampionsLambda } from '../lambda/get-all-champions-lambda';
 import { GetDraftPicksLambda } from '../lambda/get-draft-picks-lambda';
+import { PostPageViewLambda } from '../lambda/post-page-view-lambda';
 
 export interface LastOfTheMohigansRestServiceProps {
     shouldUseDomainName?: boolean;
@@ -51,6 +52,7 @@ export class LastOfTheMohigansRestService extends cdk.Construct {
     const leagueDetailsResource = fantasyApiGateway.root.addResource('league-details');
     const championsResource = fantasyApiGateway.root.addResource('champions');
     const draftPicksResource = fantasyApiGateway.root.addResource('draft-picks');
+    const pageViewResource = fantasyApiGateway.root.addResource('blogs');
 
     const getAllParticipantsLambda = new GetAllParticipantsLambda(this, "GetAllParticipantsLambda", {
         leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
@@ -103,5 +105,11 @@ export class LastOfTheMohigansRestService extends cdk.Construct {
     });
     const getDraftPicksIntegration = new apigateway.LambdaIntegration(getDraftPicksLambda);
     draftPicksResource.addMethod('GET', getDraftPicksIntegration);
+
+    const postPageViewLambda = new PostPageViewLambda(this, "PostPageViewLambda", {
+      blogTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.BLOG_POSTS_TABLE]
+    });
+    const postPageViewIntegration = new apigateway.LambdaIntegration(postPageViewLambda);
+    pageViewResource.addMethod('POST', postPageViewIntegration);
   }
 }

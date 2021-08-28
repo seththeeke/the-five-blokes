@@ -98,7 +98,9 @@ class AppNavigation extends React.Component {
 
     onLinkClick(navChoice, other){
         let previousSelection = document.getElementById(this.state.selected);
-        previousSelection.classList.remove('selected');
+        if (previousSelection){
+            previousSelection.classList.remove('selected');
+        }
         let newSelection = document.getElementById(navChoice);
         newSelection.classList.add('selected');
         this.setState({"selected": navChoice});

@@ -4,6 +4,7 @@ import AppRouter from './components/AppRouter.js';
 import { BrowserRouter as Router } from "react-router-dom";
 import FPLService from './services/FPLService.js';
 import EmailSubscriptionService from './services/EmailSubscriptionService.js';
+import PageViewService from './services/PageViewService.js';
 import AmplifyRequestService from './services/AmplifyRequestService.js';
 // AWS Amplify Imports
 import Amplify from "aws-amplify";
@@ -22,6 +23,7 @@ class App extends React.Component {
     this.amplifyRequestService = new AmplifyRequestService();
     this.fplService = new FPLService(this.amplifyRequestService, this.fplServiceApiName);
     this.emailSubscriptionService = new EmailSubscriptionService(this.amplifyRequestService, this.fplServiceApiName);
+    this.pageViewService = new PageViewService(this.amplifyRequestService, this.fplServiceApiName);
   }
 
   componentDidMount(){
@@ -39,6 +41,7 @@ class App extends React.Component {
           <AppRouter
             fplService={this.fplService}
             emailSubscriptionService={this.emailSubscriptionService}
+            pageViewService={this.pageViewService}
           ></AppRouter>
           <AppNavigation>
           </AppNavigation>

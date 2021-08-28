@@ -43,7 +43,8 @@ export const DataSourceMapKeys = {
     MEDIA_ASSET_BUCKET: "MediaAssetsBucket",
     PREMIER_LEAGUE_RDS_CLUSTER: "PremierLeagueRDSCluster",
     FANTASY_TRANSACTIONS_TABLE: "FantasyTransactions",
-    DRAFT_PICKS_TABLE: "DraftPicks"
+    DRAFT_PICKS_TABLE: "DraftPicks",
+    BLOG_POSTS_TABLE: "BlogPosts"
 }
 export class DataSources extends cdk.Construct {
 
@@ -93,6 +94,20 @@ export class DataSources extends cdk.Construct {
             stream: ddb.StreamViewType.NEW_AND_OLD_IMAGES,
             sortKey: {
               name: "leagueId",
+              type: ddb.AttributeType.STRING
+            }
+        });
+
+        this.dataSourcesMap.ddbTables[DataSourceMapKeys.BLOG_POSTS_TABLE] = new ddb.Table(this, "BlogPosts", {
+            tableName: "BlogPosts",
+            partitionKey: {
+              name: "id",
+              type: ddb.AttributeType.STRING
+            },
+            pointInTimeRecovery: true,
+            billingMode: ddb.BillingMode.PAY_PER_REQUEST,
+            sortKey: {
+              name: "owner",
               type: ddb.AttributeType.STRING
             }
         });
