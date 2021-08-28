@@ -111,6 +111,19 @@ exports.getDraftPicksForLeagueId = async (event, context) => {
     }
 }
 
+exports.postPageView = async (event, context) => {
+    try {
+        console.log(JSON.stringify(event));
+        let title = JSON.parse(event.body).title;
+        let owner = JSON.parse(event.body).owner;
+        response = await lastOfTheMohigansService.addPageView(title, owner);
+        return respond(response);
+    } catch (err) {
+        console.log(err);
+        return error(err);
+    }
+}
+
 function respond(responseData){
     return {
         'statusCode': 200,

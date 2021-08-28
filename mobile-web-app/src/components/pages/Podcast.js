@@ -1,10 +1,14 @@
 import React from 'react';
 import './../../css/Podcast.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import hoodie from './../../img/merch/hoodie.jpeg';
 import hat from './../../img/merch/hat.jpg';
 import sticker from './../../img/merch/sticker.jpg';
+import arsenalBloke from "../../img/blokes/Blokes-avatar-Seth-transparent.png";
+import chelseaBloke from "../../img/blokes/Blokes-avatar-Nathan-transparent.png";
+import liverpoolBloke from "../../img/blokes/Blokes-avatar-Nima-transparent.png";
+import manUnitedBloke from "../../img/blokes/Blokes-avatar-Evan-transparent.png";
+import barcelonaBloke from "../../img/blokes/Blokes-avatar-Amine-transparent.png";
 
 class Podcast extends React.Component {
    constructor(props){
@@ -31,6 +35,14 @@ class Podcast extends React.Component {
    }
 
    render() {
+      let path = window.location.pathname;
+      let href = window.location.href;
+      let base = href.substring(0, href.indexOf(path));
+      let arsenalBlokeHref = base + "/arsenal-bloke";
+      let chelseaBlokeHref = base + "/chelsea-bloke";
+      let liverpoolBlokeHref = base + "/liverpool-bloke";
+      let manUnitedBlokeHref = base + "/man-united-bloke";
+      let barcelonaBlokeHref = base + "/barcelona-bloke";
       return (
          <div className='home-container'>
             <div className="page-spinner-container" hidden={!this.state.isLoadingWebsite}>
@@ -38,9 +50,41 @@ class Podcast extends React.Component {
             </div>
             <div hidden={this.state.isLoadingWebsite}>
                <div className="grid-container">
-                  {/* <img className="the-five-blokes-heads" src={theFiveBlokes} alt="five-blokes-logo"></img> */}
                   <div className="grid-item">
                      <iframe title="spotify" src="https://open.spotify.com/embed-podcast/show/7Hw0EJXJE2Zmi4pZ13aehl" width="100%" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                  </div>
+                  <div className="grid-item">
+                     <div className="blokes-blog-title">View the Five Blokes Blogs</div>
+                     <div className="bloke-blog-link-container">
+                        <a className="blog-main-link" href={arsenalBlokeHref}>
+                           <img className="blog-link-bloke" alt="the-bloke" src={arsenalBloke}></img>
+                           <div>The Arsenal Bloke</div>
+                        </a>
+                     </div>
+                     <div className="bloke-blog-link-container">
+                        <a className="blog-main-link" href={chelseaBlokeHref}>
+                           <img className="blog-link-bloke" alt="the-bloke" src={chelseaBloke}></img>
+                           <div>The Chelsea Bloke</div>
+                        </a>
+                     </div>
+                     <div className="bloke-blog-link-container">
+                        <a className="blog-main-link" href={liverpoolBlokeHref}>
+                           <img className="blog-link-bloke" alt="the-bloke" src={liverpoolBloke}></img>
+                           <div>The Liverpool Bloke</div>
+                        </a>
+                     </div>
+                     <div className="bloke-blog-link-container">
+                        <a className="blog-main-link" href={manUnitedBlokeHref}>
+                           <img className="blog-link-bloke" alt="the-bloke" src={manUnitedBloke}></img>
+                           <div>The Man United Bloke</div>
+                        </a>
+                     </div>
+                     <div className="bloke-blog-link-container">
+                        <a className="blog-main-link" href={barcelonaBlokeHref}>
+                           <img className="blog-link-bloke" alt="the-bloke" src={barcelonaBloke}></img>
+                           <div>The Barcelona Bloke</div>
+                        </a>
+                     </div>
                   </div>
                   <div>
                      <div className="shop-blokes-title">Shop Merch!</div>
@@ -54,14 +98,6 @@ class Podcast extends React.Component {
                         <img className="merch" src={hat} alt="hoodie"></img>
                      </a>
                   </div>
-                  {/* <div className="grid-item">
-                     <div className="twitter-embed-wrapper">
-                        <TwitterTimelineEmbed
-                           sourceType="profile"
-                           screenName="blokesfive"
-                        />
-                     </div>
-                  </div> */}
                </div>
             </div>
          </div>

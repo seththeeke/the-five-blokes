@@ -1,0 +1,13 @@
+.blog-list-item {
+    text-align: left;
+    padding: 5px;
+}
+
+.blog-link {
+    color: white;
+}
+
+.list-item-publish-date {
+    font-size: 10px;
+}
+
