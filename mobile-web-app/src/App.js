@@ -19,7 +19,7 @@ class App extends React.Component {
     this.state = {
       isMobileView: true
     }
-    this.fplServiceApiName = "FPLServiceRaw";
+    this.fplServiceApiName = "FPLServiceProdRaw";
     this.amplifyRequestService = new AmplifyRequestService();
     this.fplService = new FPLService(this.amplifyRequestService, this.fplServiceApiName);
     this.emailSubscriptionService = new EmailSubscriptionService(this.amplifyRequestService, this.fplServiceApiName);
