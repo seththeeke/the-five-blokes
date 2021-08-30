@@ -116,6 +116,14 @@ class FPLService {
     return this.draftPicksCache[leagueId];
   }
 
+  getLiveGameweekView(leagueId) {
+    return this.amplifyRequestService.request(this.apiName, '/live-views', "GET", {
+      queryStringParameters: {
+        leagueId: leagueId
+      }
+    });
+  }
+
 }
 
 export default FPLService;
