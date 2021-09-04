@@ -38,11 +38,7 @@ class Podcast extends React.Component {
       let path = window.location.pathname;
       let href = window.location.href;
       let base = href.substring(0, href.indexOf(path));
-      let arsenalBlokeHref = base + "/arsenal-bloke";
-      let chelseaBlokeHref = base + "/chelsea-bloke";
-      let liverpoolBlokeHref = base + "/liverpool-bloke";
-      let manUnitedBlokeHref = base + "/man-united-bloke";
-      let barcelonaBlokeHref = base + "/barcelona-bloke";
+      let blokeBlogsHref = base + "/bloke-blogs"
       return (
          <div className='home-container'>
             <div className="page-spinner-container" hidden={!this.state.isLoadingWebsite}>
@@ -56,31 +52,31 @@ class Podcast extends React.Component {
                   <div className="grid-item">
                      <div className="blokes-blog-title">View the Five Blokes Blogs</div>
                      <div className="bloke-blog-link-container">
-                        <a className="blog-main-link" href={arsenalBlokeHref}>
+                        <a className="blog-main-link" href={blokeBlogsHref}>
                            <img className="blog-link-bloke" alt="the-bloke" src={arsenalBloke}></img>
                            <div>The Arsenal Bloke</div>
                         </a>
                      </div>
                      <div className="bloke-blog-link-container">
-                        <a className="blog-main-link" href={chelseaBlokeHref}>
+                        <a className="blog-main-link" href={blokeBlogsHref}>
                            <img className="blog-link-bloke" alt="the-bloke" src={chelseaBloke}></img>
                            <div>The Chelsea Bloke</div>
                         </a>
                      </div>
                      <div className="bloke-blog-link-container">
-                        <a className="blog-main-link" href={liverpoolBlokeHref}>
+                        <a className="blog-main-link" href={blokeBlogsHref}>
                            <img className="blog-link-bloke" alt="the-bloke" src={liverpoolBloke}></img>
                            <div>The Liverpool Bloke</div>
                         </a>
                      </div>
                      <div className="bloke-blog-link-container">
-                        <a className="blog-main-link" href={manUnitedBlokeHref}>
+                        <a className="blog-main-link" href={blokeBlogsHref}>
                            <img className="blog-link-bloke" alt="the-bloke" src={manUnitedBloke}></img>
                            <div>The Man United Bloke</div>
                         </a>
                      </div>
                      <div className="bloke-blog-link-container">
-                        <a className="blog-main-link" href={barcelonaBlokeHref}>
+                        <a className="blog-main-link" href={blokeBlogsHref}>
                            <img className="blog-link-bloke" alt="the-bloke" src={barcelonaBloke}></img>
                            <div>The Barcelona Bloke</div>
                         </a>
