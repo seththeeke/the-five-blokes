@@ -64,3 +64,16 @@ ul {
     text-align: left;
     padding-left: 12px;
 }
+
+.league-table th {
+    background-color: #8CACFD;
+}
+
+.league-table td {
+    background-color: white;
+    color: #505050;
+}
+
+.team-name {
+    text-align: left;
+}

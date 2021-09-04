@@ -1,8 +1,8 @@
 import React from 'react';
-import './../../css/BlokeBlogPage.css';
+import './../../css/BlokesBlogsPage.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-class BlokeBlogPage extends React.Component {
+class BlokesBlogsPage extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -23,8 +23,13 @@ class BlokeBlogPage extends React.Component {
             let key = "blogPost" + i;
             blogContentList.push(
                 <div key={key} className="blog-list-item">
-                    <div className="list-item-publish-date">{this.props.blogContent[i].publishDate}</div>
-                    <a className="blog-link" href={link}>{this.props.blogContent[i].title}</a>
+                    <div className="bloke-list-img-container">
+                        <img className="list-bloke" alt="the-bloke" src={this.props.blogContent[i].icon}></img>
+                    </div>
+                    <div className="blok-list-blog-container">
+                        <div className="list-item-publish-date">{this.props.blogContent[i].publishDate}</div>
+                        <a className="blog-link" href={link}>{this.props.blogContent[i].title}</a>
+                    </div>
                 </div>
             )
         }
@@ -35,9 +40,6 @@ class BlokeBlogPage extends React.Component {
                 </div>
                 <div hidden={this.state.isLoadingWebsite}>
                     <div className="blog-page-header">
-                        <div className="bloke-container">
-                            <img className="bloke" alt="the-bloke" src={this.props.blokeIcon}></img>
-                        </div>
                         <div className="bloke-header">
                             {this.props.blokeHeader}
                         </div>
@@ -51,4 +53,4 @@ class BlokeBlogPage extends React.Component {
     }
 }
 
-export default BlokeBlogPage;
+export default BlokesBlogsPage;

@@ -1,0 +1,34 @@
+.blog-list-item {
+    text-align: left;
+    padding: 5px;
+}
+
+.blog-link {
+    color: white;
+}
+
+.list-item-publish-date {
+    font-size: 10px;
+}
+
+.blog-list-item {
+    display: flex;
+    align-items: center;
+}
+
+.bloke-list-img-container {
+    display: inline-block;
+}
+
+.blok-list-blog-container {
+    display: inline-block;
+}
+
+.list-bloke {
+    width: 40px;
+    height: 40px;
+}
+
+.bloke-list-img-container {
+    padding: 4px;
+}
