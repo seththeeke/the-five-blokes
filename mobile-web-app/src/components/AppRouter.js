@@ -12,6 +12,8 @@ import WhyArsenalSucks from './blogs/WhyArsenalSucks';
 import HowGoodWereTheInvincibles from './blogs/HowGoodWereTheInvincibles';
 import BlokesBlogsPage from './pages/BlokesBlogsPage';
 import arsenalBloke from "../img/blokes/Blokes-avatar-Seth-transparent.png";
+import chelseaBloke from "../img/blokes/Blokes-avatar-Nathan-transparent.png";
+import WhyYouShouldWatchSeriaA from './blogs/WhyYouShouldWatchSerieA';
 
 class AppRouter extends React.Component {
     render() {
@@ -22,6 +24,13 @@ class AppRouter extends React.Component {
                 "publishDate": "8/28/2021",
                 "author": "the-arsenal-bloke",
                 "icon": arsenalBloke
+            },
+            {
+                "url": "/why-you-should-watch-serie-a",
+                "title": "Why You Should Watch The Serie A",
+                "publishDate": "9/1/2021",
+                "author": "the-chelsea-bloke",
+                "icon": chelseaBloke
             },
             {
                 "url": "/how-good-were-the-invincibles",
@@ -80,6 +89,14 @@ class AppRouter extends React.Component {
                             pageViewService={this.props.pageViewService}
                         >
                         </HowGoodWereTheInvincibles>
+                    </Route>
+                    <Route path="/bloke-blogs/why-you-should-watch-serie-a">
+                        <WhyYouShouldWatchSeriaA
+                            blokeIcon={chelseaBloke}
+                            blokeHeader="The Chelsea Bloke"
+                            pageViewService={this.props.pageViewService}
+                        >
+                        </WhyYouShouldWatchSeriaA>
                     </Route>
                     <Route path="/bloke-blogs">
                         <BlokesBlogsPage
