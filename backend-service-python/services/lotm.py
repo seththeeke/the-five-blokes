@@ -17,10 +17,12 @@ class LastOfTheMohigansService:
         }
         for team in league_entries:
             team_info = requests.get('https://draft.premierleague.com/api/entry/' + str(team["entry_id"])  + '/event/' + str(gameweek_metadata.json()["current_event"]))
-            team_points = 0;
-            bench_points = 0;
-            starters_yet_to_play = [];
-            bench_yet_to_play = [];
+            team_points = 0
+            bench_points = 0
+            starters_yet_to_play = []
+            bench_yet_to_play = []
+            starters_with_points = []
+            bench_with_points = []
             picks = team_info.json()["picks"]
             for pick in picks:
                 player_live_data = gameweek_live_data.json()["elements"][str(pick["element"])]
@@ -31,10 +33,20 @@ class LastOfTheMohigansService:
                     team_points += player_points
                     if player_minutes <= 0:
                         starters_yet_to_play.append(player_info)
+                    else:
+                        starters_with_points.append({
+                            "playerInfo": player_info,
+                            "points": player_points
+                        })
                 else:
                     bench_points += player_points
                     if player_minutes <= 0:
                         bench_yet_to_play.append(player_info)
+                    else:
+                        bench_with_points.append({
+                            "playerInfo": player_info,
+                            "points": player_points
+                        })
                 pick["stats"] = player_live_data["stats"]
                 pick["player_info"] = player_info
             live_view["teams"].append({
@@ -44,6 +56,8 @@ class LastOfTheMohigansService:
                     "bench_points": bench_points,
                     "starters_yet_to_play": starters_yet_to_play,
                     "bench_yet_to_play": bench_yet_to_play,
+                    "starters_with_points": starters_with_points,
+                    "bench_with_points": bench_with_points,
                     "picks": picks
                 }
             })

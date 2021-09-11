@@ -40,3 +40,7 @@
 .live-view-container th {
     font-size: 12px;
 }
+
+.name-row {
+  text-align: left;
+}

@@ -42,16 +42,36 @@ class LiveGameweekView extends React.Component {
                         let prevTotal = this.getPreviousTotal(teamData.team_info.id, prevStandings);
                         let starterYetToPlay = [];
                         let benchYetToPlay = [];
+                        let starterWithPoints = [];
+                        let benchWithPoints = [];
                         for (let j in teamData.gameweek_info.starters_yet_to_play){
-                            let playerName = teamData.gameweek_info.starters_yet_to_play[j].second_name;
+                            let playerNameArray = teamData.gameweek_info.starters_yet_to_play[j].second_name.split(" ");
+                            let playerName = playerNameArray[playerNameArray.length - 1];
                             starterYetToPlay.push(
                                 <div key={"starter" + playerName}>{playerName}</div>
                             );
                         }
                         for (let k in teamData.gameweek_info.bench_yet_to_play){
-                            let playerName = teamData.gameweek_info.bench_yet_to_play[k].second_name;
+                            let playerNameArray = teamData.gameweek_info.bench_yet_to_play[k].second_name.split(" ");
+                            let playerName = playerNameArray[playerNameArray.length - 1];
                             benchYetToPlay.push(
                                 <div key={"bench" + playerName}>{playerName}</div>
+                            );
+                        }
+                        for (let k in teamData.gameweek_info.starters_with_points){
+                            let playerNameArray = teamData.gameweek_info.starters_with_points[k].playerInfo.second_name.split(" ");
+                            let playerName = playerNameArray[playerNameArray.length - 1];
+                            let points = teamData.gameweek_info.starters_with_points[k].points;
+                            starterWithPoints.push(
+                                <div key={"starter-points" + playerName}>({points}){playerName}</div>
+                            );
+                        }
+                        for (let k in teamData.gameweek_info.bench_with_points){
+                            let playerNameArray = teamData.gameweek_info.bench_with_points[k].playerInfo.second_name.split(" ");
+                            let playerName = playerNameArray[playerNameArray.length - 1];
+                            let points = teamData.gameweek_info.bench_with_points[k].points;
+                            benchWithPoints.push(
+                                <div key={"bench-points" + playerName}>({points}){playerName}</div>
                             );
                         }
                         let key = "live result" + i;
@@ -69,11 +89,11 @@ class LiveGameweekView extends React.Component {
                         );
                         let otherKey = "not yet played" + i;
                         tableData.push(
-                            <tr key={otherKey} id={collapsableId} className="body-row" hidden>
+                            <tr key={otherKey} id={collapsableId} className="body-row name-row" hidden>
                                 <td></td>
                                 <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{starterWithPoints}</td>
+                                <td>{benchWithPoints}</td>
                                 <td></td>
                                 <td>{starterYetToPlay}</td>
                                 <td>{benchYetToPlay}</td>
