@@ -30,7 +30,6 @@ class Fantasy extends React.Component {
             return parseInt(b.year.S) - parseInt(a.year.S);
          });
          let options = [];
-         console.log(leagueDetails);
          // Need to change this to be the latest by default
          let selection = sortedDetails[0]
          for (let i in sortedDetails) {

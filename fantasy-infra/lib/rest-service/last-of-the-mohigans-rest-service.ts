@@ -13,6 +13,7 @@ import { GetAllLeagueDetailsLambda } from '../lambda/get-all-league-details-lamb
 import { GetAllChampionsLambda } from '../lambda/get-all-champions-lambda';
 import { GetDraftPicksLambda } from '../lambda/get-draft-picks-lambda';
 import { PostPageViewLambda } from '../lambda/post-page-view-lambda';
+import { GetLiveViewLambda } from '../lambda/get-live-view-lambda';
 
 export interface LastOfTheMohigansRestServiceProps {
     shouldUseDomainName?: boolean;
@@ -53,6 +54,7 @@ export class LastOfTheMohigansRestService extends cdk.Construct {
     const championsResource = fantasyApiGateway.root.addResource('champions');
     const draftPicksResource = fantasyApiGateway.root.addResource('draft-picks');
     const pageViewResource = fantasyApiGateway.root.addResource('blogs');
+    const liveViewResource = fantasyApiGateway.root.addResource('live-views');
 
     const getAllParticipantsLambda = new GetAllParticipantsLambda(this, "GetAllParticipantsLambda", {
         leagueDetailsTable: props.dataSourcesMap.ddbTables[DataSourceMapKeys.LEAGUE_DETAILS_TABLE],
@@ -111,5 +113,9 @@ export class LastOfTheMohigansRestService extends cdk.Construct {
     });
     const postPageViewIntegration = new apigateway.LambdaIntegration(postPageViewLambda);
     pageViewResource.addMethod('POST', postPageViewIntegration);
+
+    const getLiveViewLambda = new GetLiveViewLambda(this, "GetLiveViewLambda");
+    const getLiveViewLambdaIntegration = new apigateway.LambdaIntegration(getLiveViewLambda);
+    liveViewResource.addMethod('GET', getLiveViewLambdaIntegration);
   }
 }

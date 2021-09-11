@@ -3,6 +3,7 @@ import './../../css/Home.css';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import EmailManagementWidget from './../widgets/EmailManagementWidget';
 import TheBoys from './../widgets/TheBoys';
+import LiveGameweekView from './../widgets/LiveGameweekView';
 
 class Home extends React.Component {
    constructor(props){
@@ -47,6 +48,12 @@ class Home extends React.Component {
                         fplService={this.props.fplService}
                      >
                      </TheBoys>
+                  </div>
+                  <div className="grid-item">
+                     <LiveGameweekView
+                        fplService={this.props.fplService}
+                     >
+                     </LiveGameweekView>
                   </div>
                   <div className="grid-item">
                      <EmailManagementWidget
