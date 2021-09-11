@@ -1,0 +1,1290 @@
+swagger: "2.0"
+info:
+  description: "This is a model of the fantasy premiere league draft API"
+  version: "2021"
+  title: "Fantasy PL Draft API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "seththeeke@gmail.com"
+host: "draft.premierleague.com"
+basePath: "/api"
+tags:
+- name: "Season Metadata"
+  description: "Endpoints related to fetches league information such as player information, scores, etc."
+- name: "Gameweek Information"
+  description: "Endpoints related to gameweek data"
+- name: "League Information"
+  description: "Endpoints specific to an instance of a fantasy league"
+schemes:
+- "https"
+paths:
+  /bootstrap-static:
+    get:
+      tags:
+      - "Season Metadata"
+      summary: "Returns a blob of league data"
+      operationId: "getBootstrapStatic"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            $ref: "#/definitions/Bootstrap"
+        "405":
+          description: "Invalid input"
+  /top-elements:
+    get:
+      tags:
+      - "Gameweek Information"
+      summary: "Returns the top point getters for the fantasy gameweek"
+      operationId: "getTopElements"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation, response will have up to 30 map entries"
+          schema: 
+            $ref: "#/definitions/TopElements"
+        "405":
+          description: "Invalid input"
+  /league/{leagueId}/details:
+    get:
+      tags:
+      - "League Information"
+      summary: "Returns the league information of a specific fantasy league"
+      operationId: "getLeagueDetails"
+      parameters:
+      - name: "leagueId"
+        in: "path"
+        description: "ID of the league"
+        required: true
+        type: "integer"
+        format: "int64"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            $ref: "#/definitions/LeagueDetails"
+        "405":
+          description: "Invalid input"
+  /league/{leagueId}/transactions:
+    get:
+      tags:
+      - "League Information"
+      summary: "Returns the transactions, both successful and failures for the league"
+      operationId: "getLeagueTransactions"
+      parameters:
+      - name: "leagueId"
+        in: "path"
+        description: "ID of the league"
+        required: true
+        type: "integer"
+        format: "int64"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            $ref: "#/definitions/Transactions"
+        "405":
+          description: "Invalid input"
+  /element-summary/{elementId}:
+    get:
+      tags:
+      - "Season Metadata"
+      summary: "Returns all gameweeks information for a player with the specified id"
+      operationId: "getElementSummary"
+      parameters:
+      - name: "elementId"
+        in: "path"
+        description: "ID of the league player"
+        required: true
+        type: "integer"
+        format: "int64"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            $ref: "#/definitions/ElementSummary"
+        "405":
+          description: "Invalid input"
+  /event/{gameweek}/fixtures:
+    get:
+      tags:
+      - "Gameweek Information"
+      summary: "Returns all the information including goalscorers, match scores, assists, cards, etc for a gameweek"
+      operationId: "getGameweekFixtures"
+      parameters:
+      - name: "gameweek"
+        in: "path"
+        description: "The gameweek of interest, 1-38"
+        required: true
+        type: "integer"
+        format: "int64"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            $ref: "#/definitions/Fixtures"
+        "405":
+          description: "Invalid input"
+  /game:
+    get:
+      tags:
+      - "Gameweek Information"
+      summary: "Returns basic metadata about the current gameweek"
+      operationId: "getGameweekMetadata"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            $ref: "#/definitions/GameweekMetadata"
+        "405":
+          description: "Invalid input"
+  /entry/{entryId}/event/{gameweek}:
+    get:
+      tags:
+      - "League Information"
+      summary: "Returns the picks and subs for the entry id for the gameweek number"
+      operationId: "getGameweekPicksForEntry"
+      parameters:
+      - name: "entryId"
+        in: "path"
+        description: "The id of the participants entry, can be found in the league details"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "gameweek"
+        in: "path"
+        description: "The gameweek of interest, 1-38"
+        required: true
+        type: "integer"
+        format: "int64"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            $ref: "#/definitions/GameweekPicks"
+        "405":
+          description: "Invalid input"
+  /draft/{leagueId}/choices:
+    get:
+      tags:
+      - "League Information"
+      summary: "Returns all the draft picks for a league id"
+      operationId: "getDraftPicksForLeagueId"
+      parameters:
+      - name: "leagueId"
+        in: "path"
+        description: "ID of the league"
+        required: true
+        type: "integer"
+        format: "int64"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema: 
+            $ref: "#/definitions/DraftPicksSummary"
+        "405":
+          description: "Invalid input"
+definitions:
+  DraftPicksSummary:
+    type: "object"
+    properties:
+      choices: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            choice_time: 
+              type: string
+            element: 
+              type: integer
+              format: int32
+            entry: 
+              type: integer
+              format: int32
+            entry_name: 
+              type: string
+            id: 
+              type: integer
+              format: int32
+            index: 
+              type: integer
+              format: int32
+            league: 
+              type: integer
+              format: int32
+            pick: 
+              type: integer
+              format: int32
+            player_first_name: 
+              type: string
+            player_last_name: 
+              type: string
+            round: 
+              type: integer
+              format: int32
+            seconds_to_pick: 
+              type: string
+              format: nullable
+            was_auto: 
+              type: boolean
+      element_status: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            element: 
+              type: integer
+              format: int32
+            in_accepted_trade: 
+              type: boolean
+            owner: 
+              type: string
+              format: nullable
+            status: 
+              type: string
+  GameweekPicks:
+    type: "object"
+    properties:
+      picks: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            element: 
+              type: integer
+              format: int32
+            position: 
+              type: integer
+              format: int32
+            is_captain: 
+              type: boolean
+            is_vice_captain: 
+              type: boolean
+            multiplier: 
+              type: integer
+              format: int32
+      subs: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            element_in: 
+              type: integer
+              format: int32
+            element_out: 
+              type: integer
+              format: int32
+            event: 
+              type: integer
+              format: int32
+  GameweekMetadata:
+    type: "object"
+    properties:
+      current_event: 
+        type: integer
+        format: int32
+      current_event_finished: 
+        type: boolean
+      next_event: 
+        type: integer
+        format: int32
+      processing_status: 
+        type: string
+      trades_time_for_approval: 
+        type: boolean
+      waivers_processed: 
+        type: boolean
+  Fixtures:
+    type: "array"
+    items: 
+      type: object
+      properties: 
+        id: 
+          type: integer
+          format: int32
+        started:
+          type: boolean
+        stats: 
+          type: array
+          items:
+            type: object
+            properties:
+              s:
+                type: string
+              h:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    element:
+                      type: integer
+                      format: int32
+                    value:
+                      type: integer
+                      format: int32
+              a:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    element:
+                      type: integer
+                      format: int32
+                    value:
+                      type: integer
+                      format: int32
+        code:
+          type: integer
+          format: int32
+        finished: 
+          type: boolean
+        finished_provisional:
+          type: boolean
+        kickoff_time:
+          type: string
+          format: date-time
+        minutes:
+          type: integer
+          format: int32
+        provisional_start_time: 
+          type: boolean
+        team_a_score:
+          type: integer
+          format: int32
+        team_h_score:
+          type: integer
+          format: int32
+        pulse_id:
+          type: integer
+          format: int32
+        event:
+          type: integer
+          format: int32
+        team_a:
+          type: integer
+          format: int32
+        team_h:
+          type: integer
+          format: int32
+  ElementSummary:
+    type: "object"
+    properties:
+      fixtures: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            id: 
+              type: integer
+              format: int32
+            started: 
+              type: boolean
+            difficulty: 
+              type: integer
+              format: int32
+            opponent: 
+              type: integer
+              format: int32
+            is_home: 
+              type: boolean
+            code: 
+              type: integer
+              format: int32
+            finished: 
+              type: boolean
+            finished_provisional: 
+              type: boolean
+            kickoff_time: 
+              type: string
+              format: date-time
+            minutes: 
+              type: integer
+              format: int32
+            provisional_start_time: 
+              type: boolean
+            team_a_score: 
+              type: string
+              format: nullable
+            team_h_score: 
+              type: string
+              format: nullable
+            pulse_id: 
+              type: integer
+              format: int32
+            event: 
+              type: integer
+              format: int32
+            team_a: 
+              type: integer
+              format: int32
+            team_h: 
+              type: integer
+              format: int32
+      history: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            id: 
+              type: integer
+              format: int32
+            detail: 
+              type: string
+            event: 
+              type: integer
+              format: int32
+            assists: 
+              type: integer
+              format: int32
+            bonus: 
+              type: integer
+              format: int32
+            bps: 
+              type: integer
+              format: int32
+            clean_sheets: 
+              type: integer
+              format: int32
+            creativity: 
+              type: string
+            goals_conceded: 
+              type: integer
+              format: int32
+            goals_scored: 
+              type: integer
+              format: int32
+            ict_index: 
+              type: string
+            influence: 
+              type: string
+            minutes: 
+              type: integer
+              format: int32
+            own_goals: 
+              type: integer
+              format: int32
+            penalties_missed: 
+              type: integer
+              format: int32
+            penalties_saved: 
+              type: integer
+              format: int32
+            red_cards: 
+              type: integer
+              format: int32
+            saves: 
+              type: integer
+              format: int32
+            threat: 
+              type: string
+            yellow_cards: 
+              type: integer
+              format: int32
+            total_points: 
+              type: integer
+              format: int32
+            element: 
+              type: integer
+              format: int32
+            fixture: 
+              type: integer
+              format: int32
+            opponent_team: 
+              type: integer
+              format: int32
+  TopElements:
+    type: "object"
+    properties:
+      1:
+        type: object
+        properties: 
+          element: 
+            type: integer
+            format: int32
+          total_points: 
+            type: integer
+            format: int32
+      2: 
+        type: object
+        properties: 
+          element: 
+            type: integer
+            format: int32
+          total_points: 
+            type: integer
+            format: int32
+      3:
+        type: object
+        properties: 
+          element: 
+            type: integer
+            format: int32
+          total_points: 
+            type: integer
+            format: int32
+      4: 
+        type: object
+        properties: 
+          element: 
+            type: integer
+            format: int32
+          total_points: 
+            type: integer
+            format: int32
+      5:
+        type: object
+        properties: 
+          element: 
+            type: integer
+            format: int32
+          total_points: 
+            type: integer
+            format: int32
+  Bootstrap:
+    type: "object"
+    properties:
+      elements: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            id: 
+              type: integer
+              format: int32
+            assists: 
+              type: integer
+              format: int32
+            bonus: 
+              type: integer
+              format: int32
+            bps: 
+              type: integer
+              format: int32
+            clean_sheets: 
+              type: integer
+              format: int32
+            creativity: 
+              type: string
+            goals_conceded: 
+              type: integer
+              format: int32
+            goals_scored: 
+              type: integer
+              format: int32
+            ict_index: 
+              type: string
+            influence: 
+              type: string
+            minutes: 
+              type: integer
+              format: int32
+            own_goals: 
+              type: integer
+              format: int32
+            penalties_missed: 
+              type: integer
+              format: int32
+            penalties_saved: 
+              type: integer
+              format: int32
+            red_cards: 
+              type: integer
+              format: int32
+            saves: 
+              type: integer
+              format: int32
+            threat: 
+              type: string
+            yellow_cards: 
+              type: integer
+              format: int32
+            added: 
+              type: string
+            chance_of_playing_next_round: 
+              type: string
+              format: nullable
+            chance_of_playing_this_round: 
+              type: string
+              format: nullable
+            code: 
+              type: integer
+              format: int32
+            draft_rank: 
+              type: integer
+              format: int32
+            dreamteam_count: 
+              type: integer
+              format: int32
+            ep_next: 
+              type: string
+              format: nullable
+            ep_this: 
+              type: string
+              format: nullable
+            event_points: 
+              type: integer
+              format: int32
+            first_name: 
+              type: string
+            form: 
+              type: string
+            in_dreamteam: 
+              type: boolean
+            news: 
+              type: string
+            news_added: 
+              type: string
+              format: nullable
+            news_return: 
+              type: string
+              format: nullable
+            news_updated: 
+              type: string
+              format: nullable
+            points_per_game: 
+              type: string
+            second_name: 
+              type: string
+            squad_number: 
+              type: string
+              format: nullable
+            status: 
+              type: string
+            total_points: 
+              type: integer
+              format: int32
+            web_name: 
+              type: string
+            influence_rank: 
+              type: integer
+              format: int32
+            influence_rank_type: 
+              type: integer
+              format: int32
+            creativity_rank: 
+              type: integer
+              format: int32
+            creativity_rank_type: 
+              type: integer
+              format: int32
+            threat_rank: 
+              type: integer
+              format: int32
+            threat_rank_type: 
+              type: integer
+              format: int32
+            ict_index_rank: 
+              type: integer
+              format: int32
+            ict_index_rank_type: 
+              type: integer
+              format: int32
+            corners_and_indirect_freekicks_order: 
+              type: string
+              format: nullable
+            corners_and_indirect_freekicks_text: 
+              type: string
+            direct_freekicks_order: 
+              type: string
+              format: nullable
+            direct_freekicks_text: 
+              type: string
+            penalties_order: 
+              type: string
+              format: nullable
+            penalties_text: 
+              type: string
+            element_type: 
+              type: integer
+              format: int32
+            team: 
+              type: integer
+              format: int32
+      element_types: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            id: 
+              type: integer
+              format: int32
+            element_count: 
+              type: integer
+              format: int32
+            singular_name: 
+              type: string
+            singular_name_short: 
+              type: string
+            plural_name: 
+              type: string
+            plural_name_short: 
+              type: string
+      element_stats: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            name: 
+              type: string
+            label: 
+              type: string
+            abbreviation: 
+              type: string
+            is_match_stat: 
+              type: boolean
+            match_stat_order: 
+              type: string
+              format: nullable
+            sort: 
+              type: string
+      events: 
+        type: object
+        properties: 
+          current: 
+            type: integer
+            format: int32
+          data: 
+            type: array
+            items: 
+              type: object
+              properties: 
+                average_entry_score: 
+                  type: string
+                  format: nullable
+                deadline_time: 
+                  type: string
+                  format: date-time
+                id: 
+                  type: integer
+                  format: int32
+                name: 
+                  type: string
+                finished: 
+                  type: boolean
+                highest_scoring_entry: 
+                  type: string
+                  format: nullable
+                waivers_time: 
+                  type: string
+                  format: date-time
+          next: 
+            type: integer
+            format: int32
+      fixtures: 
+        type: object
+        properties: 
+          5: 
+            type: array
+            items: 
+              type: object
+              properties: 
+                id: 
+                  type: integer
+                  format: int32
+                started: 
+                  type: boolean
+                code: 
+                  type: integer
+                  format: int32
+                finished: 
+                  type: boolean
+                finished_provisional: 
+                  type: boolean
+                kickoff_time: 
+                  type: string
+                  format: date-time
+                minutes: 
+                  type: integer
+                  format: int32
+                provisional_start_time: 
+                  type: boolean
+                team_a_score: 
+                  type: string
+                  format: nullable
+                team_h_score: 
+                  type: string
+                  format: nullable
+                pulse_id: 
+                  type: integer
+                  format: int32
+                event: 
+                  type: integer
+                  format: int32
+                team_a: 
+                  type: integer
+                  format: int32
+                team_h: 
+                  type: integer
+                  format: int32
+          6: 
+            type: array
+            items: 
+              type: object
+              properties: 
+                id: 
+                  type: integer
+                  format: int32
+                started: 
+                  type: boolean
+                code: 
+                  type: integer
+                  format: int32
+                finished: 
+                  type: boolean
+                finished_provisional: 
+                  type: boolean
+                kickoff_time: 
+                  type: string
+                  format: date-time
+                minutes: 
+                  type: integer
+                  format: int32
+                provisional_start_time: 
+                  type: boolean
+                team_a_score: 
+                  type: string
+                  format: nullable
+                team_h_score: 
+                  type: string
+                  format: nullable
+                pulse_id: 
+                  type: integer
+                  format: int32
+                event: 
+                  type: integer
+                  format: int32
+                team_a: 
+                  type: integer
+                  format: int32
+                team_h: 
+                  type: integer
+                  format: int32
+          7: 
+            type: array
+            items: 
+              type: object
+              properties: 
+                id: 
+                  type: integer
+                  format: int32
+                started: 
+                  type: boolean
+                code: 
+                  type: integer
+                  format: int32
+                finished: 
+                  type: boolean
+                finished_provisional: 
+                  type: boolean
+                kickoff_time: 
+                  type: string
+                  format: date-time
+                minutes: 
+                  type: integer
+                  format: int32
+                provisional_start_time: 
+                  type: boolean
+                team_a_score: 
+                  type: string
+                  format: nullable
+                team_h_score: 
+                  type: string
+                  format: nullable
+                pulse_id: 
+                  type: integer
+                  format: int32
+                event: 
+                  type: integer
+                  format: int32
+                team_a: 
+                  type: integer
+                  format: int32
+                team_h: 
+                  type: integer
+                  format: int32
+      settings: 
+        type: object
+        properties: 
+          league: 
+            type: object
+            properties: 
+              default_entries: 
+                type: integer
+                format: int32
+              draft_reminder_hours: 
+                type: array
+                items: 
+                  type: integer
+                  format: int32
+              draft_postpone_hours: 
+                type: integer
+                format: int32
+              draft_pushback_times: 
+                type: integer
+                format: int32
+              h2h_draw: 
+                type: integer
+                format: int32
+              h2h_lose: 
+                type: integer
+                format: int32
+              h2h_win: 
+                type: integer
+                format: int32
+              max_entries: 
+                type: integer
+                format: int32
+              min_entries: 
+                type: integer
+                format: int32
+              private_max: 
+                type: integer
+                format: int32
+              public_draft_delay_minutes: 
+                type: integer
+                format: int32
+              public_draft_tz_default: 
+                type: string
+              public_entry_sizes: 
+                type: array
+                items: 
+                  type: integer
+                  format: int32
+              public_max: 
+                type: integer
+                format: int32
+          scoring: 
+            type: object
+            properties: 
+              long_play_limit: 
+                type: integer
+                format: int32
+              short_play: 
+                type: integer
+                format: int32
+              long_play: 
+                type: integer
+                format: int32
+              concede_limit: 
+                type: integer
+                format: int32
+              goals_conceded_GKP: 
+                type: integer
+                format: int32
+              goals_conceded_DEF: 
+                type: integer
+                format: int32
+              goals_conceded_MID: 
+                type: integer
+                format: int32
+              goals_conceded_FWD: 
+                type: integer
+                format: int32
+              saves_limit: 
+                type: integer
+                format: int32
+              saves: 
+                type: integer
+                format: int32
+              goals_scored_GKP: 
+                type: integer
+                format: int32
+              goals_scored_DEF: 
+                type: integer
+                format: int32
+              goals_scored_MID: 
+                type: integer
+                format: int32
+              goals_scored_FWD: 
+                type: integer
+                format: int32
+              assists: 
+                type: integer
+                format: int32
+              clean_sheets_GKP: 
+                type: integer
+                format: int32
+              clean_sheets_DEF: 
+                type: integer
+                format: int32
+              clean_sheets_MID: 
+                type: integer
+                format: int32
+              clean_sheets_FWD: 
+                type: integer
+                format: int32
+              penalties_saved: 
+                type: integer
+                format: int32
+              penalties_missed: 
+                type: integer
+                format: int32
+              yellow_cards: 
+                type: integer
+                format: int32
+              red_cards: 
+                type: integer
+                format: int32
+              own_goals: 
+                type: integer
+                format: int32
+              bonus: 
+                type: integer
+                format: int32
+          squad: 
+            type: object
+            properties: 
+              size: 
+                type: integer
+                format: int32
+              select_GKP: 
+                type: integer
+                format: int32
+              select_DEF: 
+                type: integer
+                format: int32
+              select_MID: 
+                type: integer
+                format: int32
+              select_FWD: 
+                type: integer
+                format: int32
+              play: 
+                type: integer
+                format: int32
+              min_play_GKP: 
+                type: integer
+                format: int32
+              max_play_GKP: 
+                type: integer
+                format: int32
+              min_play_DEF: 
+                type: integer
+                format: int32
+              max_play_DEF: 
+                type: integer
+                format: int32
+              min_play_MID: 
+                type: integer
+                format: int32
+              max_play_MID: 
+                type: integer
+                format: int32
+              min_play_FWD: 
+                type: integer
+                format: int32
+              max_play_FWD: 
+                type: integer
+                format: int32
+              position_type_locks: 
+                type: object
+                properties: 
+                  12: 
+                    type: string
+              captains_disabled: 
+                type: boolean
+          transactions: 
+            type: object
+            properties: 
+              new_element_locked_hours: 
+                type: integer
+                format: int32
+              trade_veto_minimum: 
+                type: integer
+                format: int32
+              trade_veto_hours: 
+                type: integer
+                format: int32
+              waivers_before_start_min_hours: 
+                type: integer
+                format: int32
+              waivers_before_deadline_hours: 
+                type: integer
+                format: int32
+              waivers_before_deadline_hours_event: 
+                type: object
+                properties: 
+                  16: 
+                    type: integer
+                    format: int32
+                  31: 
+                    type: integer
+                    format: int32
+                  33: 
+                    type: integer
+                    format: int32
+                  36: 
+                    type: integer
+                    format: int32
+      teams: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            code: 
+              type: integer
+              format: int32
+            id: 
+              type: integer
+              format: int32
+            name: 
+              type: string
+            pulse_id: 
+              type: integer
+              format: int32
+            short_name: 
+              type: string
+  LeagueDetails:
+    type: "object"
+    properties:
+      league: 
+        type: object
+        properties: 
+          admin_entry: 
+            type: integer
+            format: int32
+          closed: 
+            type: boolean
+          draft_dt: 
+            type: string
+            format: date-time
+          draft_pick_time_limit: 
+            type: integer
+            format: int32
+          draft_status: 
+            type: string
+          draft_tz_show: 
+            type: string
+          id: 
+            type: integer
+            format: int32
+          ko_rounds: 
+            type: integer
+            format: int32
+          make_code_public: 
+            type: boolean
+          max_entries: 
+            type: integer
+            format: int32
+          min_entries: 
+            type: integer
+            format: int32
+          name: 
+            type: string
+          scoring: 
+            type: string
+          start_event: 
+            type: integer
+            format: int32
+          stop_event: 
+            type: integer
+            format: int32
+          trades: 
+            type: string
+          transaction_mode: 
+            type: string
+          variety: 
+            type: string
+      league_entries: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            entry_id: 
+              type: integer
+              format: int32
+            entry_name: 
+              type: string
+            id: 
+              type: integer
+              format: int32
+            joined_time: 
+              type: string
+            player_first_name: 
+              type: string
+            player_last_name: 
+              type: string
+            short_name: 
+              type: string
+            waiver_pick: 
+              type: integer
+              format: int32
+      standings: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            event_total: 
+              type: integer
+              format: int32
+            last_rank: 
+              type: integer
+              format: int32
+            league_entry: 
+              type: integer
+              format: int32
+            rank: 
+              type: integer
+              format: int32
+            rank_sort: 
+              type: integer
+              format: int32
+            total: 
+              type: integer
+              format: int32
+  Transactions:
+    type: "object"
+    properties:
+      transactions: 
+        type: array
+        items: 
+          type: object
+          properties: 
+            added: 
+              type: string
+            element_in: 
+              type: integer
+              format: int32
+            element_out: 
+              type: integer
+              format: int32
+            entry: 
+              type: integer
+              format: int32
+            event: 
+              type: integer
+              format: int32
+            id: 
+              type: integer
+              format: int32
+            index: 
+              type: integer
+              format: int32
+            kind: 
+              type: string
+            priority: 
+              type: integer
+              format: int32
+            result: 
+              type: string
+
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

@@ -10,7 +10,7 @@ The Five Blokes are a group of my closest friends who have been fans, players, o
 
 ### Fantasy PL Data Collection
 
-Originally, this [project](https://thefiveblokes.com/) was created to track the history of our fantasy premiere league players, stats, scores, losers, winner, etc. The premiere league fantasy system has an api exposed to fetch league data, player data, transactions, fixtures, and more and this project utilizes them to create a league history, aware preseason, gameweek, season, and other types of badges to track the highs and lows of your season and increase banter. You can see the history of our fantasy league from the Fantasy tab on the website.
+Originally, this [project](https://thefiveblokes.com/) was created to track the history of our fantasy premiere league players, stats, scores, losers, winner, etc. The premiere league fantasy system has an api exposed to fetch league data, player data, transactions, fixtures, and more and this project utilizes them to create a league history, aware preseason, gameweek, season, and other types of badges to track the highs and lows of your season and increase banter. You can see the history of our fantasy league from the Fantasy tab on the website. Fantasy Draft API Swagger definition can be found [here](https://github.com/seththeeke/the-five-blokes/blob/master/fantasy-api-swagger-models).
 
 ## Architecture
 
@@ -48,7 +48,7 @@ Once the season completes, a final round of data extraction occurs and then seas
 
 ### Aurora Schema
 
-The premiere league data is stored in an Aurora serverless cluster because it is highly relational. A rough outline of the schema can be seen below and full schema is defined in the mysql init files in [fantasy-infra/data/database-operations](https://github.com/seththeeke/last-of-the-mohigans/blob/extract-season-data/fantasy-infra/lib/data/database-operations/1-init-pl-data.sql).
+The premiere league data is stored in an Aurora serverless cluster because it is highly relational. A rough outline of the schema can be seen below and full schema is defined in the mysql init files in [fantasy-infra/data/database-operations](https://github.com/seththeeke/the-five-blokes/blob/master/fantasy-infra/lib/data/database-operations/1-init-pl-data.sql).
 
 ![Aurora Schema](aurora-schema.png)
 
