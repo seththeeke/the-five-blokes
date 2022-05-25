@@ -212,7 +212,7 @@ module.exports = {
         let leagueTopAssisterBadge = leagueTopAssisterBadgeScan.Items[0];
         if (leagueTopAssisterBadge) {
             leagueTopAssisterBadgeParticipantName = leagueTopAssisterBadge.participantName.S;
-            leagueTopAssisterBadgeMetadata = JSON.parse(leagueTopGoalScorerBadge.badgeMetadata.S);
+            leagueTopAssisterBadgeMetadata = JSON.parse(leagueTopAssisterBadge.badgeMetadata.S);
             leagueTopAssisterPlayerName = leagueTopAssisterBadgeMetadata.player.first_name + " " + leagueTopAssisterBadgeMetadata.player.last_name;
             leagueTopAssisterScorerValue = leagueTopAssisterBadgeMetadata.value ? leagueTopAssisterBadgeMetadata.value : "default";;
         }
