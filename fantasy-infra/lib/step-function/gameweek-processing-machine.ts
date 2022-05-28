@@ -55,7 +55,8 @@ export class GameweekProcessingMachine extends cdk.Construct{
         const extractTransactionsTask = new stepFunctions.Task(this, "ExtractTransactionsTask", {
             task: new stepFunctionTasks.InvokeFunction(this.extractTransactionsLambda),
             timeout: cdk.Duration.minutes(5),
-            comment: "Extracts and stores transactions for the league"
+            comment: "Extracts and stores transactions for the league",
+            resultPath: stepFunctions.JsonPath.DISCARD
         });
 
         const extractGameweekDataTask = new stepFunctions.Task(this, "ExtractGameweekData", {

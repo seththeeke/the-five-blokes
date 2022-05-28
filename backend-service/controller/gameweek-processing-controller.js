@@ -15,8 +15,8 @@ exports.hasGameweekCompleted = async (event) => {
 exports.extractGameweekDataHandler = async (event) => {
     console.log(JSON.stringify(event));
     let extractGameweeDataRequest = {
-        "leagueId": event[0].league,
-        "gameweekNum": event[0].gameweek,
+        "leagueId": event.league,
+        "gameweekNum": event.gameweek,
         "shouldOverrideSeasonCompletedChoice": event.shouldOverrideSeasonCompletedChoice
     }
     let response = await gameweekProcessService.extractGameweekData(extractGameweeDataRequest);
