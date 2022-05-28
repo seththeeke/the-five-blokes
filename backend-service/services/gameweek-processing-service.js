@@ -3,7 +3,6 @@ var gameweeksDao = require('./../dao/gameweeks-dao');
 var staticContentDao = require('./../dao/static-content-dao');
 var gameweekPlayerDataDao = require('./../dao/gameweek-player-history-dao');
 var fplDraftService = require('./fpl-draft-service');
-var premiereLeagueDataDao = require('./../dao/premiere-league-data-dao');
 var transactionsDao = require('./../dao/transactions-dao');
 
 module.exports = {
@@ -56,84 +55,6 @@ module.exports = {
             "gameweek": extractGameweekDataRequest.gameweekNum,
             "shouldOverrideSeasonCompletedChoice": extractGameweekDataRequest.shouldOverrideSeasonCompletedChoice || false
         };
-    },
-
-    extractGameweekFixtures: async function(extractGameweekDataRequest) {
-        let activeLeague = await leagueDetailsDao.getActiveLeague();
-        let gameweekFixturesResponse = await fplDraftService.getGameweekFixtures(extractGameweekDataRequest.gameweekNum);
-        let gameweekFixtures = gameweekFixturesResponse.data;
-        let foreignPlayerIds = [];
-        let foreignFixtureIds = [];
-        for (let i in gameweekFixtures) {
-            let fixture = gameweekFixtures[i];
-            let homeTeamIdResults = await premiereLeagueDataDao.getTeamIdByForeignId(fixture.team_h);
-            let awayTeamIdResults = await premiereLeagueDataDao.getTeamIdByForeignId(fixture.team_a);
-            let fixturesInsertResults = await premiereLeagueDataDao.upsertFixture(fixture.id, 
-                awayTeamIdResults[0][0].team_id, homeTeamIdResults[0][0].team_id, 
-                new Date(fixture.kickoff_time), this._getLeagueYear(activeLeague), 
-                fixture.team_h_score, fixture.team_a_score, 
-                parseInt(extractGameweekDataRequest.gameweekNum));
-            foreignFixtureIds.push(fixture.id);
-            let stats = fixture.stats;
-            for (let j in stats) {
-                let stat = stats[j];
-                let allPlayerStats = stat.h.concat(stat.a);
-                for (let k in allPlayerStats){
-                    if (!foreignPlayerIds.includes(allPlayerStats[k].element)){
-                        foreignPlayerIds.push(allPlayerStats[k].element);
-                    }
-                }
-            }
-        }
-        return {
-            foreignFixtureIds,
-            foreignPlayerIds,
-            gameweek: extractGameweekDataRequest.gameweekNum,
-            leagueId: extractGameweekDataRequest.leagueId,
-            activeLeague
-        }
-    },
-
-    extractGameweekPlayerFixtures: async function(extractGameweekPlayerFixturesRequest) {
-        for (let i in extractGameweekPlayerFixturesRequest.foreignPlayerIds){
-            let playerForeignId = extractGameweekPlayerFixturesRequest.foreignPlayerIds[i];
-            let playerSummaryResponse = await fplDraftService.getElementSummary(playerForeignId);
-            let fixtureHistory = playerSummaryResponse.data.history;
-            let filteredFixtureHistory = fixtureHistory.filter(function(fixture){
-                return extractGameweekPlayerFixturesRequest.foreignFixtureIds.includes(fixture.fixture);
-            });
-            let playerIdResponse = await premiereLeagueDataDao.getPlayerIdByForeignId(playerForeignId);
-            if (playerIdResponse[0].length > 0){
-                let playerId = playerIdResponse[0][0].player_id;
-                for (let i in filteredFixtureHistory){
-                    let fixture = filteredFixtureHistory[i];
-                    // fixture ids are different than player history fixture ids, fixture.fixture appears to be the link
-                    let fixtureResults = await premiereLeagueDataDao.getFixtureByForeignId(fixture.fixture);
-                    let fixtureId = (fixtureResults[0].length > 0) ? fixtureResults[0][0].fixture_id : undefined;
-                    let gameweek = (fixtureResults[0].length > 0) ? fixtureResults[0][0].gameweek: undefined;
-                    if (fixtureId) {
-                        console.log("Adding fixture for playerId: " + playerId + " and fixtureId: " + fixtureId);
-                        let playerFixtureResult = await premiereLeagueDataDao.upsertPlayerFixture(playerId,
-                            fixtureId, fixture.goals_scored, fixture.assists,
-                            this._getLeagueYear(extractGameweekPlayerFixturesRequest.activeLeague), gameweek, 
-                            fixture.clean_sheets, fixture.total_points, 
-                            fixture.minutes, fixture.yellow_cards, fixture.red_cards, fixture.bonus,
-                            fixture.goals_conceded, fixture.own_goals, fixture.penalties_missed,
-                            fixture.penalties_saved, fixture.saves);
-                    } else {
-                        console.log("FixtureId does not exist in database for foreign_id: " + fixture.fixture + ". This is likely because of test data and shouldn't happen in production");
-                    }
-                }
-            } else {
-                // Need to be able to handle the case when a player does not exist in my database
-                console.log("Did not find player for foreignId: " + playerForeignId);
-            }
-        }
-
-        return {
-            gameweek: extractGameweekPlayerFixturesRequest.gameweek,
-            league: extractGameweekPlayerFixturesRequest.leagueId
-        }
     },
 
     extractTransactions: async function(extractGameweekDataRequest) {

@@ -24,13 +24,9 @@ export class DataSourcesMap {
     s3Buckets: {
         [key: string]: s3.Bucket;
     }
-    rdsClusters: {
-        [key: string]: rds.ServerlessCluster;
-    }
     constructor(){
         this.ddbTables = {};
         this.s3Buckets = {};
-        this.rdsClusters = {};
     }
 }
 export const DataSourceMapKeys = {
@@ -41,7 +37,6 @@ export const DataSourceMapKeys = {
     EMAIL_SUBSCRIPTIONS_TABLE: "EmailSubscriptions",
     STATIC_CONTENT_BUCKET: "StaticContentBucket",
     MEDIA_ASSET_BUCKET: "MediaAssetsBucket",
-    PREMIER_LEAGUE_RDS_CLUSTER: "PremierLeagueRDSCluster",
     FANTASY_TRANSACTIONS_TABLE: "FantasyTransactions",
     DRAFT_PICKS_TABLE: "DraftPicks",
     BLOG_POSTS_TABLE: "BlogPosts"
@@ -60,13 +55,6 @@ export class DataSources extends cdk.Construct {
         this.dataSourcesMap.ddbTables[DataSourceMapKeys.EMAIL_SUBSCRIPTIONS_TABLE] = props.emailSubscriptionTable;
         this.dataSourcesMap.s3Buckets[DataSourceMapKeys.MEDIA_ASSET_BUCKET] = props.mediaAssetsBucket;
         this.dataSourcesMap.s3Buckets[DataSourceMapKeys.STATIC_CONTENT_BUCKET] = props.staticContentBucket;
-
-        this.dataSourcesMap.rdsClusters[DataSourceMapKeys.PREMIER_LEAGUE_RDS_CLUSTER] = new rds.ServerlessCluster(this, "PremierLeagueRDSCluster", {
-            engine: rds.DatabaseClusterEngine.auroraMysql({ version: rds.AuroraMysqlEngineVersion.VER_5_7_12 }),
-            vpc: props.vpc,
-            removalPolicy: RemovalPolicy.RETAIN,
-            deletionProtection: true
-        });
 
         this.dataSourcesMap.ddbTables[DataSourceMapKeys.DRAFT_PICKS_TABLE] = new ddb.Table(this, "DraftPicksTable", {
             tableName: "DraftPicks",
