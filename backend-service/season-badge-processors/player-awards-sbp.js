@@ -2,7 +2,6 @@ var badgesDao = require('./../dao/badges-dao');
 var BADGE_TYPE = require('./../util/badge-type');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweekPlayerHistoryDao = require('./../dao/gameweek-player-history-dao');
-var premiereLeagueDataDao = require('./../dao/premiere-league-data-dao');
 
 module.exports = {
 
@@ -11,9 +10,12 @@ module.exports = {
         let gameweekWhenCompleted = assignSeasonBadgesRequest.gameweek;
         let gameweekPlayerHistory = await gameweekPlayerHistoryDao.getGameweekPlayerDataForGameweek(assignSeasonBadgesRequest.leagueId, gameweekWhenCompleted);
 
-        let topTenScorers = await premiereLeagueDataDao.getTopPlayersByStatistic("goals", "2020/2021");
-        let topTenAssisters = await premiereLeagueDataDao.getTopPlayersByStatistic("assists", "2020/2021");
-        let topTenCleanSheets = await premiereLeagueDataDao.getTopPlayersByStatistic("clean_sheets", "2020/2021", 1);
+        /* Need new way to get top players after removing RDS
+        // let topTenScorers = await premiereLeagueDataDao.getTopPlayersByStatistic("goals", "2020/2021");
+        // let topTenAssisters = await premiereLeagueDataDao.getTopPlayersByStatistic("assists", "2020/2021");
+        // let topTenCleanSheets = await premiereLeagueDataDao.getTopPlayersByStatistic("clean_sheets", "2020/2021", 1);
+        */
+
         let goldenBootWinner = topTenScorers[0];
         let playmakerOfTheSeasonWinner = topTenAssisters[0];
         let goldenGloveWinner = topTenCleanSheets[0];

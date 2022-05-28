@@ -1,12 +1,14 @@
 var badgesDao = require('./../dao/badges-dao');
 var BADGE_TYPE = require('./../util/badge-type');
-var premiereLeagueDataDao = require('./../dao/premiere-league-data-dao');
 var gameweeksDao = require('./../dao/gameweeks-dao');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweeksPlayerHistoryDao = require('./../dao/gameweek-player-history-dao');
 
 module.exports = {
 
+    /**
+     * Need to re-implement this entirely
+     */
     assignBadges: async function(assignSeasonBadgesRequest) {
         let leagueDetails = await leagueDetailsDao.getLeagueDetailsById(assignSeasonBadgesRequest.leagueId);
         let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(leagueDetails);
@@ -55,7 +57,7 @@ module.exports = {
             };
             for (let j in playerPicks){
                 let player = playerPicks[j];
-                let playerSummary = await premiereLeagueDataDao.getPlayerSeasonSummary(leagueDetails.year.S + "/" + ((parseInt(leagueDetails.year.S) + 1).toString()), player.element.toString());
+                // let playerSummary = await premiereLeagueDataDao.getPlayerSeasonSummary(leagueDetails.year.S + "/" + ((parseInt(leagueDetails.year.S) + 1).toString()), player.element.toString());
                 console.log(playerSummary);
                 if (playerSummary.player_id) {
                     playerStatisticsMap[teamId].points = playerStatisticsMap[teamId].points + parseInt(playerSummary.total_points);

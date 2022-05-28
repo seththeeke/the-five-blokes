@@ -2,7 +2,6 @@ var badgesDao = require('./../dao/badges-dao');
 var BADGE_TYPE = require('./../util/badge-type');
 var leagueDetailsDao = require('./../dao/league-details-dao');
 var gameweekPlayerHistoryDao = require('./../dao/gameweek-player-history-dao');
-var premiereLeagueDataDao = require('./../dao/premiere-league-data-dao');
 
 module.exports = {
 
@@ -13,7 +12,10 @@ module.exports = {
 
         let formattedYear = leagueDetails.year.S + "/" + (parseInt(leagueDetails.year.S) + 1);
         // limiting the point getters to top 100, don't think there will be more than 100 players with 200+ points, only 10 players at midpoint that have 100+ points
-        let topPointGetters = await premiereLeagueDataDao.getTopPlayersByStatistic("points", formattedYear.toString(), -1, 100);
+        
+        /* Need a new way to get the top 100 point getters
+        // let topPointGetters = await premiereLeagueDataDao.getTopPlayersByStatistic("points", formattedYear.toString(), -1, 100);
+        */
         let playerMap = {};
         for (let i in topPointGetters){
             let player = topPointGetters[i];
