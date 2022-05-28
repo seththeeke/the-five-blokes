@@ -12,8 +12,7 @@ import { HasGameweekCompletedLambda } from '../lambda/has-gameweek-completed-lam
 import { SeasonProcessingMachine } from './season-processing-machine';
 import { GameweekProcessingMachine } from './gameweek-processing-machine';
 import { DataSourcesMap, DataSourceMapKeys } from '../data/data-stores';
-import { PremiereLeagueRDSDataLambda } from '../lambda/premier-league-rds-data-lambda';
-import { Result, JsonPath, IntegrationPattern } from '@aws-cdk/aws-stepfunctions';
+import { IntegrationPattern } from '@aws-cdk/aws-stepfunctions';
 import { SeasonStartProcessingStateMachine } from './season-start-processing-state-machine';
 
 export interface FantasyLeagueStateMachineProps {

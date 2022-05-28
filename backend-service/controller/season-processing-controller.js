@@ -7,12 +7,6 @@ var transactionsSBP = require('./../season-badge-processors/transactions-sbp');
 var draftPicksPBP = require('./../preseason-badge-processors/draft-picks-pbp');
 var seasonProcessingService = require('./../services/season-processing-service');
 
-exports.extractSeasonDataHandler = async (event) => {
-    console.log(JSON.stringify(event));
-    let response = await seasonProcessingService.extractSeasonData(createBadgeProcessingRequest(event));
-    return response;
-}
-
 exports.assignLeagueAwardsHandler = async (event) => {
     console.log(JSON.stringify(event));
     let response = await leagueAwardsSBP.assignBadges(createBadgeProcessingRequest(event));
