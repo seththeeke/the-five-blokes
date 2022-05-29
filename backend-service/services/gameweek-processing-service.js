@@ -9,6 +9,12 @@ module.exports = {
     hasGameweekCompleted: async function(forceGameweekReprocessing, shouldOverrideSeasonCompletedChoice){
         console.log("Beginning to check if a gameweek has completed");
         let activeLeague = await leagueDetailsDao.getActiveLeague();
+        if (!activeLeague){
+            return {
+                "hasCompleted": forceGameweekReprocessing || false,
+                "shouldOverrideSeasonCompletedChoice": shouldOverrideSeasonCompletedChoice || false
+            }
+        }
         let lastCompletedGameweek = await gameweeksDao.getLatestGameweek(activeLeague);
 
         let gameweekMetadataResponse = await fplDraftService.getGameweekMetadata();
